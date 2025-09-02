@@ -1,0 +1,37 @@
+{
+  "generated_by": "ChatGPT",
+  "files": {
+    "single": "assets/characters/A1.png",
+    "sheet": "assets/characters/A1_sheet_256x128.png"
+  },
+  "tile_order": [
+    "idle_1",
+    "idle_2",
+    "run_1",
+    "run_2",
+    "swing_1",
+    "swing_2",
+    "shoot_1",
+    "shoot_2"
+  ],
+  "filled_frames": [
+    "idle_1",
+    "idle_2",
+    "swing_1",
+    "swing_2"
+  ],
+  "empty_frames": [
+    "run_1",
+    "run_2",
+    "shoot_1",
+    "shoot_2"
+  ],
+  "tile_size": [
+    64,
+    64
+  ],
+  "sheet_size": [
+    256,
+    128
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "url": "file:///C:/Users/a1kay/Desktop/a1%20a1/a1%2012.html",
+  "issues": [],
+  "console": [
+    {
+      "t": 1756725753942,
+      "kind": "console",
+      "type": "log",
+      "text": "[A1K PATCH] merged v13 config Object"
+    },
+    {
+      "t": 1756725753943,
+      "kind": "console",
+      "type": "log",
+      "text": "[A1K PATCH] hooks ready: A1K.applyInvuln, A1K.onMeleeHit, A1K.computeRageTier, A1K.spawnXPOrbs, A1K.floater, A1K.maintainBossRange, A1K.clampTurn"
+    }
+  ]
+}

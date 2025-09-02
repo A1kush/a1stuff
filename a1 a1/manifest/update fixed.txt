@@ -1,0 +1,348 @@
+A1K RUNNER — SINGLE‑FILE HTML5 GAME (16:9) —
+BUILD SPEC
+Vision: A responsive, offline‑ready single file index.html (HTML + CSS + JS inline) that delivers a
+side‑scrolling, wave‑based bullet‑heaven runner with light RPG and loot—styled like Solo Leveling ×
+Roblox × DBZ—starring the trio A1, Unique, and Missy.
+Layout references (for composition only): /mnt/data/
+controls.PNG , /mnt/data/top bars.PNG , /mnt/data/abilty points.PNG , /mnt/
+data/invertory2.PNG , /mnt/data/equipment.PNG .
+OUTPUT RULES
+Ship one file only: index.html with all CSS/JS inline. No CDNs or external libs. Must run fully
+offline.
+If PNGs are missing, draw programmatic placeholders so the game is immediately playable.
+Use a 16:9 canvas at a design resolution of 1280×720. Scale responsively with letterboxing and
+safe‑area padding.
+Minimum touch target size: 56 px. Provide keyboard access for all actions.
+Organize code into clearly marked sections: // ===== Engine ===== , // ===== Entities
+===== , // ===== UI ===== , etc.
+Include a /* HOW TO ADD PNGs */ comment: place A1.png , Unique.png , Missy.png (or
+*_sheet_256x128.png variants), BG_mid.(png|gif) , BG_ground.(png|gif) , and optional
+bgm.mp3 next to the HTML file.
+FILE STRUCTURE (INSIDE THE SINGLE FILE)
+`` — Reset, readable system pixel font fallback, canvas wrapper, HUD, rounded button skins with soft
+shadows, conic cooldown rings, drawers (Inventory/Shop/Settings), tooltip/compare panes.
+`` —
+Responsive wrapper that centers a fixed‑logic canvas (1280×720).
+Top HUD: Stage/Wave/Kills bar; Shop / Settings / Inventory buttons beneath; Speed toggle (1×/2×/
+3×/4×/6×) with a Currency Pill under it (Gold, Silver, Tickets, Gems).
+Bottom‑left: Virtual joystick; A / U / M leader switch above it.
+Right action cluster: Big Shoot, Shield, Jump, vertical S1 / S2 / S3 with live conic cooldown rings
+(glow green when ready); Rage sits next to Shield.
+Center‑top: Boss HP bar (visible only during boss fights).
+Over leader: compact XP bar and Rage meter.
+Drawers: Inventory (32 slots + equipment panel), Shop, Settings (Sprite Loader Status, Auto
+toggles, performance).
+`` — Engine, systems, data tables, UI wiring, and the main loop.
+•
+•
+•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+1
+INPUT & CONTROLS
+Touch: left‑thumb joystick for movement; right‑side buttons for Shoot, Shield, Jump, S1, S2, S3, and
+Rage.
+Keyboard: WASD/Arrows move; J Shoot, K Shield, Space Jump, 1/2/3 Skills, R Rage, Q , above joystick ,a, u, m button that let you change leaders , a for a1, u for unique, m for missy, you can you player skills you switch to
+cycle leader, P Pause, I Inventory, O Shop, Esc close drawers.
+Gamepad (nice‑to‑have): left stick move; A Shoot, B Shield, X Jump, Y Rage; LB/RB Skill1/
+Skill2; LT Skill3.
+ASSET LOADER & PROXIES
+Loader attempts, in order, and lists results under Settings → Sprite Loader Status:
+Characters: A1.png or A1_sheet_256x128.png (same for Unique , Missy ).
+Backgrounds: BG_mid.(png|gif) , BG_ground.(png|gif) .
+Optional audio: bgm.mp3 .
+Any missing art is replaced by vector proxies: labeled rectangles and simple sheet stand‑ins for run/
+attack.
+CORE LOOP & ENGINE
+Fixed timestep ( dt = 1/60 ) with accumulator; render every frame.
+World: side‑scrolling lane with parallax mid/ground.
+Entities: players[3] , enemies[] , projectiles[] , pickups[] , effects[] . Entity core:
+{pos, vel, hp, maxHp, team, radius, ai, state, anim} .
+Projectile flags: pierce, bounce, aoe, fuse, beam, homing, lifetime, owner .
+Cast bus: followers stagger skill usage to avoid synchronized bursts.
+Auto Mode: auto‑fire + smart auto‑skills; toggles in HUD and Settings.
+Fail/Restart: when all three reach 0 HP, auto‑restart at Stage 1, Wave 1 (fresh timers, cleared
+entities; meta progress only if specified).
+PARTY, FORMATION & AI
+Always‑on trio: A1 (default leader), Unique, Missy.
+Formation offsets with gentle rubber‑banding—it keeps spacing readable and prevents overlap;
+followers can body‑block.
+Leader switch via A/U/M or Q ; UI highlights the current leader and swaps the active skill set.
+Follower AI:
+Unique fires intermittently and uses Heal/Beam when allies <60% HP or when clustered enemies
+are present.
+Missy cycles sword → sword → pistol, drops Bubbles opportunistically, and triggers small economy
+perks (+coin find, +magnet radius for 5s).
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+2
+COMBAT RULES
+Parry Reflect (buffed): Well‑timed sword parries by A1 or Missy convert enemy bullets into friendly
+shots. Reflected shots can pierce and retain speed.
+Example: A boss spreads bullets. You parry on time → the volley flips and mows down a line of mobs.
+Bounce: Certain fan‑style shots ricochet once off floor, walls, or enemies.
+Example: A shot hits the ground, bounces up, and clips a flying target you couldn’t reach.
+Homing: Player waves/rounds prefer targets in front; if their target dies they retarget the nearest
+valid enemy ahead using a clamped turn rate.
+Example: A bullet locks on, the target dies, and the shot curves smoothly to the next enemy.
+Contact & Shields: Shields absorb before HP; touching enemies deals contact damage. Enemies—
+including aerial types—can shoot (aerials may fire downward).
+Damage Floaters: Show -dmg and resource gains ( +gold , +ticket , etc.).
+CHARACTER KITS (SPEC‑ACCURATE)
+Each hero has a basic attack loop plus three skills. Cooldowns are S1/S2/S3 = 6s / 10s / 16s unless
+otherwise stated.
+A1 — Melee Slayer
+Basic: 3‑hit sword combo; the final hit emits a short‑range homing wave. Parry window during
+swings.
+S1 — Shadow Waves on Swing: Each sword swing also launches after‑image waves forward.
+Example: One slash sends two faint arcs that reach distant mobs.
+S2 — Fuse Bomb: Toss a bomb that detonates after 0.8s in a 2.5m radius; small HP cost to cast. hit
+all enemies
+Example: Pop it into a pack; it explodes as they step over it.
+S3 — Combo Burst: Rapid 3‑hit melee plus a bomb and two wide slash waves. waves hit all
+enemies
+Example: Dash in, slash‑slash‑slash, the bomb detonates, arcs finish the survivors.
+Unique — Ranged Caster/Marksman
+Basic: Semi‑auto homing shots.
+S1 — Burst Shot: Fires 2–3 shots, sometimes including a thick piercer that drills through enemies.
+S2 — Healing Rain: Brief AoE that heals HP, adds Shield, and boosts drop rate while active.
+S3 — Overcharge Stream: A beam‑like rapid burst for \~7s that pierces; ideal for lane control. hit
+all enemies
+Missy — Support/Trickster
+Basic: Sword → sword → pistol sequence; the pistol shot homes.
+S1 — Claw + Wave (Parry‑capable): A claw strike that also emits a wave; perfectly timed casts parry
+bullets.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+3
+S2 — Safe Zone (Forcefield): 7s protective bubble; also grants +20% Rage, 10% HP heal, and +30%
+drops while active.
+S3 — Black Cat Luck: Summons two mini chest monsters (100 HP each) that fire 10–20 dmg shots
+and leave a gift when they depart.
+RAGE SYSTEM
+Global Rage Buff (all heroes): When the meter hits 100, activate Rage for 10s: +25% ATK, +20%
+move/attack speed, +20% ShieldMax. Internal cooldown: 20s after use.
+Kill Refund: Each enemy killed during Rage refunds 20% Rage meter (cannot bypass the internal
+cooldown).
+Hero Ultimates (on Rage):
+A1 — One‑Sword Cataclysm: Emit three giant slash waves that hit all enemies; each deals 150
+damage and applies –10% current HP to enemies. Casting costs –10% current HP to A1. Also grants
++Loot Drop% for \~15s. hit all enemies
+Unique — Dual Convergence Beams: For 12s, fire two sweeping beams that hit everything and
+apply 3–5% HP/second chip damage.
+Missy — Black Cat Luck 3: For 20s, summon treasure‑chest allies (100 HP) that pelt foes for 10–50
+damage and drop gifts when they leave.
+PROGRESSION, LEVELING & ABILITY POINTS
+Level cap: 101. Kills grant XP; level‑ups fully restore HP/MP.
+XP curve:
+function xpToNext(L){ return Math.round(50 + 25*L + 5*L*L); }
+Ability Points (AP): Gain +1 AP every level starting at level 2 (cap 30 spent). Spend AP in a talent
+tree:
+Rows unlock left → right with prerequisites.
+Nodes include ATK%, ShieldMax, Crit, MoveSpeed, Skill Haste, plus hero keystones (A1: longer
+parry window; Unique: extra beam ticks; Missy: stronger bubble reflect).
+Save AP choices and meta progress to localStorage .
+EQUIPMENT & INVENTORY UI
+Inventory drawer: 32‑slot grid.
+Equipment panel: Weapon, Armor, Accessory 1, Accessory 2, Pet (pets are accessories in this
+template).
+Selecting an item opens a stat preview and Compare pane (green/red deltas); include concise
+tooltips.
+Auto‑equip (optional): if a slot is empty, auto‑equip the higher‑score item; toggle in Settings.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+4
+Stats: ATK, HP, Shield, Crit, Haste, MoveSpeed, CoinFind, Magnet. Rarities: Common / Rare /
+Epic / Legendary.
+ECONOMY, DROPS & SHOP
+Drops: coins, silver, gold, gems, gift tickets, gift boxes, and gear. Auto‑magnetized collection with
+upgradable radius.
+Mystery Chests: Boss or streak rewards; roll gear/currency/pets when opened.
+Super Gift Box: Consumes tickets to access a high‑tier loot table.
+Combo Streaks: Multi‑kills and no‑hit waves trigger popups—“Double Kill!”, “Triple Kill!”, “Loot
+Rush!”—granting temporary +ATK% and +Loot Drop% and a 20% chance to spawn an extra gift box.
+Shop (Gold): Revive, +Damage, +Fire Rate, Potion, Rage Pill, Skill Meter Refill, EXP Pill, Mystery
+Box, Gift Box, Pets Box.
+WAVES, STAGES & BOSSES
+Each Stage has 10 waves. Clearing all spawns and an empty field advances the wave; after wave 10
+the Stage Boss appears. waves get bigger and stronger everytime you beat enemies and bosses 
+add gear box, pet box, mystery box, rage pill or potion,exp pill or potion to shop
+
+Chest Boss Rule: On a boss wave, 50% chance to replace the normal boss with a Chest Boss (walks,
+dodges, sprays coin/gem bursts when hit; guaranteed chest on kill).
+Boss Design: Telegraph attacks; add a second phase at 50% HP (speed up, new patterns, summons).
+Patterns must be dodge‑able and reflect‑able.
+Stage Themes & Boss Logic
+Neon Backstreets — Circuit Ogre: ground shockwaves, arcing bolts; enrages at 50%.
+Cargo Skyway — Drone Swarm Queen: minion spawns, downward volleys, rotating beam sweep.
+Crystal Caverns — Prism Golem: reflective crystals (player can re‑reflect), shard rain.
+Metro Ruins — Rail Titan: lane charges, mine drops; phase‑2 rapid charges.
+Jade Gardens — Serpent Warden: poison spits, constrict beams, snake adds.
+Voltaic Docks — Kraken Mech: tentacle slams, ink bombs, electrified water zones.
+Sky Monastery — Wind Lancer: dash slashes, crosswinds that push bullets.
+Obsidian Works — Forge Behemoth: hammer shock cones, lava orbs.
+Aurora Tundra — Frost Phoenix: dive bombs, ice shards, rebirth at 1 HP.
+Star Bazaar — Cosmic Dealer: card spreads, coin novas, steal‑buff the player can interrupt.
+stop running on boss fights and mini boss fights and gift boss
+
+UI WIRING & PLACEMENT (1280×720 REFERENCE)
+Joystick: bottom‑left, center (140, 600) ; outer radius 120 px; inner knob 50 px.
+A/U/M switch: just above joystick; three pill buttons.
+Right stack:
+Shoot: center (1170, 580) , radius 88 px.
+•
+•
+•
+•
+•
+•
+•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+•
+•
+•
+•
+5
+Shield: (1170, 470) , 48 px.
+Jump: (1080, 470) , 48 px.
+S1 / S2 / S3: (1170, 350 / 280 / 210) , 44–48 px, with conic cooldown rings (rings glow green
+when ready).
+Rage: next to Shield at (1080, 580) , 56 px.
+Top: Stage/Wave/Kills full‑width; Shop / Settings / Inventory under it, left‑aligned. Speed toggle in
+the top‑left; Currency Pill underneath (Gold, Silver, Tickets, Gems). Boss HP bar spans upper center
+only during boss fights.
+Accessibility: descriptive labels, tooltips on hover, ARIA roles.
+DATA TABLES (IN CODE)
+Define content as plain JS objects: items , lootTables , stages , bosses , skillsByHero ,
+talents , shopItems . Keep numbers readable and easy to tune.
+PERFORMANCE TARGETS
+Aim for 60 FPS on mid‑range phones. Pool bullets/floaters; soft‑cap active projectiles (e.g., ≤1200).
+Avoid per‑frame allocations.
+SAVE / LOAD
+Persist: settings (Auto, Speed), AP picks, best Stage, currencies, and unlocked items. Use
+localStorage under a versioned key.
+TESTING & ACCEPTANCE CHECKLIST
+-
+IMPLEMENTATION ORDER (SUGGESTED)
+Engine + canvas scaling + parallax background.
+Players (movement, formation, leader switch) + basic attacks.
+Projectiles/homing + enemies + waves.
+Skills + cast bus + cooldown rings + Rage system.
+Boss framework + Chest Boss + first three bosses.
+Drops + magnet + floaters + currency pill.
+Inventory + equipment + Compare + rarity colors.
+Shop + Super Gift Box + ticket flow.
+•
+•
+•
+•
+•
+•
+•
+•
+1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+6
+Leveling + AP tree + save.
+Polish (combo popups, telegraphs, Settings, performance).
+STRICT NOTES FOR THE CODER
+No external fonts/images/sounds; draw placeholders when assets are absent.
+Favor pure helpers; centralize RNG (seedable) for reproducible tests.
+Clearly mark art hook‑ups (e.g., // drawCharacter(A1Sprite || proxyShape) ).
+Provide a small debug overlay (FPS, entity counts, pools) toggled in Settings.
+Ensure both touch and keyboard feel great on first run.
+Deliverable: A single, copy‑pasteable index.html implementing this spec: trio party with leader
+swapping, homing/reflect combat, waves → stages → bosses (≥3 boss clears, passes Stage 3), chest‑boss
+rule, equipment + compare UI, AP talents, auto‑magnetized loot, combo popups, Super Gift Box ticket flow,
+and full UI wiring consistent with the reference layout.
+9.
+10.
+•
+•
+•
+•
+•
+7

@@ -1,0 +1,276 @@
+{
+  "name": "A1K Dark Aura \u2014 Next Assets",
+  "created": "2025-08-31T22:56:26.953087Z",
+  "style": "Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]",
+  "folders": [
+    "assets/vfx/dark_aura",
+    "assets/vfx/portals",
+    "assets/vfx/shockwaves",
+    "assets/vfx/trails",
+    "assets/vfx/hitsparks",
+    "assets/vfx/dissolves",
+    "assets/vfx/decals",
+    "assets/skills/a1",
+    "assets/skills/unique",
+    "assets/skills/missy",
+    "assets/projectiles",
+    "assets/ui/icons",
+    "assets/ui/overlays",
+    "assets/boss",
+    "assets/loot"
+  ],
+  "assets": [
+    {
+      "tier": 1,
+      "category": "vfx/dark_aura",
+      "filename": "aura_levelup_burst_strip_128x128.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Circular burst of dark aura with cyan/purple rim and red pop on first frames.",
+      "prompt": "Pixel-art dark aura level-up burst: void-black core punch outward, cyan/purple rim-light, tiny rune squares eject then fade; 12 frames, 1\u00d712, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "vfx/trails",
+      "filename": "shadow_dash_afterimage_strip_96x96.png",
+      "frames": 10,
+      "loop": false,
+      "desc": "Stacked silhouettes trailing behind a dash.",
+      "prompt": "Pixel-art dash after-images: 3 stacked silhouettes with neon rim and soft smear; entry\u2192long\u2192dissipate; 10 frames, 1\u00d710, 96\u00d796. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "vfx/shockwaves",
+      "filename": "dark_shockwave_heavy_strip_128x128.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Heavier shockwave for ultimates/boss entries.",
+      "prompt": "Pixel-art heavy shockwave ring: hot white flash \u2192 cyan edge \u2192 purple halo; faint red danger flicker mid; 12 frames, 1\u00d712, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "vfx/portals",
+      "filename": "shadow_portal_exit_strip_128x128.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Closing portal animation to pair with spawn.",
+      "prompt": "Pixel-art shadow portal closing: outer rings collapse, lightning retracts, void seals; 12 frames, 1\u00d712, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "vfx/hitsparks",
+      "filename": "parry_reflect_hex_strip_64x64.png",
+      "frames": 8,
+      "loop": false,
+      "desc": "Hex flare used for melee reflects.",
+      "prompt": "Pixel-art hexagonal reflect flare: bright white core, cyan shards, purple rim; 8 frames, 1\u00d78, 64\u00d764. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "vfx/dissolves",
+      "filename": "death_to_shadows_strip_96x96.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Enemy dissolves into shadow pixels sucked inward.",
+      "prompt": "Pixel-art death dissolve: sprite breaks into dark squares toward a black singularity with cyan/purple ember; 12 frames, 1\u00d712, 96\u00d796. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "vfx/decals",
+      "filename": "burn_scorch_ground_strip_96x32.png",
+      "frames": 8,
+      "loop": false,
+      "desc": "Ground scorch for beams/ultimates.",
+      "prompt": "Pixel-art ground scorch decal: hot white center \u2192 purple/cyan ember \u2192 cool; 8 frames, 1\u00d78, 96\u00d732. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "skills/a1",
+      "filename": "a1_shadow_claw_strip_128x128.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Wide clawed slash with shadow claws and aura burst.",
+      "prompt": "Pixel-art shadow claw cleave: triple claw arcs with black-to-cyan gradient, red spark pops; 12 frames, 1\u00d712, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "skills/a1",
+      "filename": "a1_dark_ascent_strip_128x128.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Upward cleave + vertical pillar (ultimate variant).",
+      "prompt": "Pixel-art vertical sword pillar: white hot core, cyan beam, purple bloom, shock ring finish; 12 frames, 1\u00d712, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "skills/unique",
+      "filename": "uniq_soulsiphon_beam_strip_128x128.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Thin beam that pulls; shadow motes flow toward source.",
+      "prompt": "Pixel-art soul-siphon beam segment: white core filament, cyan/purple outer, black motes drifting upstream; 12 frames, 1\u00d712, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "skills/unique",
+      "filename": "uniq_prism_rail_finish_strip_128x128.png",
+      "frames": 10,
+      "loop": false,
+      "desc": "End-burst + crackle tail for beam finishers.",
+      "prompt": "Pixel-art beam end-burst: bright star flash \u2192 crackle shards and shrinking ring; 10 frames, 1\u00d710, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "skills/missy",
+      "filename": "missy_winged_guard_strip_128x128.png",
+      "frames": 14,
+      "loop": false,
+      "desc": "Angel-wing shield dome with feathers (dark aura variant).",
+      "prompt": "Pixel-art winged shield dome: translucent bubble with wing sweep, descending feathers, cross flare; 14 frames, 1\u00d714, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "skills/missy",
+      "filename": "missy_shadow_bubble_pop_strip_96x96.png",
+      "frames": 10,
+      "loop": false,
+      "desc": "Stun bubble pops into shadow motes.",
+      "prompt": "Pixel-art shadow bubble: translucent dark sphere pops into 6 motes; 10 frames, 1\u00d710, 96\u00d796. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "projectiles",
+      "filename": "slashwave_dark_pierce_strip_96x96.png",
+      "frames": 8,
+      "loop": false,
+      "desc": "Piercing slash wave with void core.",
+      "prompt": "Pixel-art forward-flying slash-wave: cyan edge, purple rim, black inner void; 8 frames, 1\u00d78, 96\u00d796. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "projectiles",
+      "filename": "bullet_curse_strip_32x32.png",
+      "frames": 6,
+      "loop": true,
+      "desc": "Cursed bullet with rotating rune speck.",
+      "prompt": "Pixel-art bullet with tiny rotating rune speck, cyan tip flare, purple rim; 6 frames, 1\u00d76, 32\u00d732. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "ui/icons",
+      "filename": "ui_rage_ready_dark_strip_64x64.png",
+      "frames": 8,
+      "loop": true,
+      "desc": "Rage ready badge\u2014dark aura style.",
+      "prompt": "Pixel-art pulsing flame badge with dark aura halo; 8 frames, 1\u00d78, 64\u00d764. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "loot",
+      "filename": "magnet_aura_dark_strip_96x96.png",
+      "frames": 10,
+      "loop": true,
+      "desc": "Pickup magnet ring\u2014dark dotted ring orbit.",
+      "prompt": "Pixel-art magnet pickup ring: dotted cyan orbit with faint purple trail; 10 frames, 1\u00d710, 96\u00d796. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "loot",
+      "filename": "chest_sparkle_dark_strip_64x64.png",
+      "frames": 8,
+      "loop": true,
+      "desc": "Chest sparkle tuned to dark palette.",
+      "prompt": "Pixel-art twinkle cluster (cyan/purple) around chest corner; loop; 8 frames, 1\u00d78, 64\u00d764. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "boss",
+      "filename": "boss_entrance_glitch_strip_128x128.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Vertical glitch bars + shock ring entrance.",
+      "prompt": "Pixel-art boss entrance: vertical glitch bars, heavy shock ring, brief white flash on frame 1; 12 frames, 1\u00d712, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 1,
+      "category": "boss",
+      "filename": "boss_deflect_hex_strip_96x96.png",
+      "frames": 8,
+      "loop": false,
+      "desc": "Deflect window indicator.",
+      "prompt": "Pixel-art hex shield blink: front-facing, sharp edges, cyan core, purple edge; 8 frames, 1\u00d78, 96\u00d796. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 2,
+      "category": "vfx/trails",
+      "filename": "sword_trail_dark_strip_96x96.png",
+      "frames": 9,
+      "loop": false,
+      "desc": "General-purpose sword trail, dark variant.",
+      "prompt": "Pixel-art sword-trail arc: dim\u2192bright\u2192fade, cyan core, purple haze; 9 frames, 1\u00d79, 96\u00d796. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 2,
+      "category": "vfx/hitsparks",
+      "filename": "hitspark_light_dark_strip_64x64.png",
+      "frames": 7,
+      "loop": false,
+      "desc": "Small X-spark, dark toning.",
+      "prompt": "Pixel-art hitspark cross with white\u2192cyan fade; 7 frames, 1\u00d77, 64\u00d764. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 2,
+      "category": "vfx/hitsparks",
+      "filename": "hitspark_heavy_dark_strip_96x96.png",
+      "frames": 9,
+      "loop": false,
+      "desc": "Big starburst for crits.",
+      "prompt": "Pixel-art heavy starburst with shards; 9 frames, 1\u00d79, 96\u00d796. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 2,
+      "category": "vfx/dissolves",
+      "filename": "boss_phase_dissolve_strip_128x128.png",
+      "frames": 14,
+      "loop": false,
+      "desc": "Boss phase change dissolve/glitch.",
+      "prompt": "Pixel-art dissolve with vertical glitch + shadow pixels; 14 frames, 1\u00d714, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 2,
+      "category": "ui/overlays",
+      "filename": "screen_vignette_dark.png",
+      "frames": 1,
+      "loop": false,
+      "desc": "Static HUD vignette overlay for intensity moments.",
+      "prompt": "Pixel-art screen vignette: subtle dark corners with thin cyan/purple rim-light; single frame 1280\u00d7720 PNG, anchored to screen. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 2,
+      "category": "vfx/decals",
+      "filename": "rune_circle_cast_strip_128x128.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Summon/heal cast circle.",
+      "prompt": "Pixel-art rune circle summoning: symbols rotate, inner light threads rise; 12 frames, 1\u00d712, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 3,
+      "category": "vfx/dark_aura",
+      "filename": "shadow_wings_pop_strip_128x128.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Brief wing pop for power spikes.",
+      "prompt": "Pixel-art shadow wings flare out then fade as motes; 12 frames, 1\u00d712, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    },
+    {
+      "tier": 3,
+      "category": "vfx/portals",
+      "filename": "chain_bind_strip_128x128.png",
+      "frames": 12,
+      "loop": false,
+      "desc": "Shadow chains bind a target (crowd control).",
+      "prompt": "Pixel-art shadow chains lash out from edges, clamp center, then fade; 12 frames, 1\u00d712, 128\u00d7128. Side-view, right-facing; transparent PNG; crisp 1-px outlines; high contrast; no blur/AA; bottom-center pivot; consistent ground line (64\u00d764 baseline\u2248y=56; 96\u00d796\u2248y=84). Palette anchor: neon cyan #00E5FF, purple #A78BFA, red #FF3B3B. [A1K_STYLE]"
+    }
+  ]
+}

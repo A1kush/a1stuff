@@ -1,0 +1,3176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>A1K Runner — Fix v2 (wave/boss/inventory/beam)</title>
+<style>
+  :root{
+    --bg:#0d131c;--ink:#e9f4ff;--muted:#a8b7ce;--line:#293854;
+    --panel:#121b20;--panel2:#0f1826;--panel3:#0b1421;
+    --hp:#36c777;--hp2:#6de38e;--mp:#3ec5ff;--mp2:#6aa8ff;
+    --boss:#ff8c6a;--boss2:#ffbb9a;--rage:#f9cc2b;--rage2:#ff7a31;
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  *{box-sizing:border-box}
+  #wrap{position:relative;margin:0 auto;max-width:1280px;height:100vh;overflow:hidden;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;background:linear-gradient(#0c1420,#0a1018);}
+
+  /* HUD */
+  .hud{position:absolute;left:10px;right:10px;top:8px;display:flex;gap:10px;align-items:center;pointer-events:none;flex-wrap:wrap}
+  .pill{pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--muted)}
+  .bar{position:relative;height:12px;background:var(--panel);border:1px solid var(--line);border-radius:999px;overflow:hidden;min-width:200px}
+  .fill{position:absolute;inset:0;transform-origin:left center}
+  .hp{background:linear-gradient(90deg,var(--hp),var(--hp2))}
+  .mp{background:linear-gradient(90deg,var(--mp),var(--mp2))}
+  .boss{background:linear-gradient(90deg,var(--boss),var(--boss2))}
+  .xp{background:linear-gradient(90deg,#2EA8FF,#7B61FF)}
+  .xpText{position:absolute;left:0;right:0;top:-16px;text-align:center;font-weight:700;font-size:12px;color:#a8b7ce;text-shadow:0 1px 2px #000}
+  #xpDomFill.pulse{animation:xpGlow .6s ease-out}
+  @keyframes xpGlow{0%{box-shadow:0 0 0 rgba(123,97,255,0)}50%{box-shadow:0 0 10px rgba(123,97,255,.9)}100%{box-shadow:0 0 0 rgba(123,97,255,0)}}
+
+  /* Item quick menu */
+  #itemMenu{position:fixed;z-index:10000;background:#0f1826;border:1px solid var(--line);border-radius:8px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  #itemMenu button{display:block;width:100%;padding:6px 10px;background:transparent;border:0;color:#cfe3ff;text-align:left}
+  #itemMenu button:hover{background:#15243a}
+
+  /* Notifications */
+  #notifWrap{position:fixed;right:14px;top:14px;z-index:12000;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+  .toast{background:#0f1826;border:1px solid var(--line);border-radius:8px;color:#cfe3ff;padding:6px 10px;box-shadow:0 8px 18px rgba(0,0,0,.35);opacity:.95}
+
+  /* Dock */
+  /*
+   * Position the top dock lower so it doesn't overlap the stage/kills bar or currency.  This
+   * change moves the row of buttons (speed, inventory, auto, pause, shop, settings) down,
+   * leaving more vertical breathing room under the stage/wave/kills and currency bars.  See
+   * the updated top value below.  Note: currency positioning remains inline on the element.
+   */
+  .subdock{position:absolute;left:10px;top:70px;display:flex;gap:8px;pointer-events:auto;flex-wrap:wrap}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:6px 10px;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+
+  /* Drawers */
+  .drawer{position:absolute;top:70px;bottom:70px;width:420px;background:var(--panel);border:1px solid var(--line);box-shadow:0 12px 28px rgba(0,0,0,.35);display:none;border-radius:12px}
+  .drawer .in{padding:10px;overflow:auto;max-height:calc(100% - 42px)}
+  .drawer h3{margin:0;padding:10px 12px;border-bottom:1px solid var(--line)}
+  #inventory{right:10px} #shop{left:10px} #settings{left:50%;transform:translateX(-50%);max-width:92%;width:580px}
+  .card{background:#0f1826;border:1px solid var(--line);border-radius:10px;padding:10px;margin:10px 0}
+  .muted{color:var(--muted)}
+
+  /* Inventory grid & equipment slots */
+  .slots{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .slot{height:60px;border:1px dashed #41506a;border-radius:10px;background:#0c1826;display:flex;align-items:center;justify-content:center;color:#a8c0e0;cursor:pointer}
+  .slot.pet{outline:2px solid #5bd2b2}
+  .slot.equip{background:#0e1a2a;border-style:solid}
+  .slot:hover{filter:brightness(1.06)}
+
+  /* Controls */
+  .controls{position:absolute;left:10px;right:10px;bottom:10px;display:flex;align-items:flex-end;justify-content:space-between;pointer-events:none}
+  .stick{position:relative;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 50% 50%, #111b2a 0%, #0c1420 60%, #0c1420 100%);border:1px solid var(--line);box-shadow:inset 0 0 18px rgba(0,0,0,.55);pointer-events:auto}
+  .stick .nub{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:radial-gradient(circle at 35% 35%, #29384f, #1b2639);border:1px solid #3b4d71;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+  .joyWrap{position:relative;display:flex;flex-direction:column;align-items:flex-start;}
+  .char-switch{position:absolute;bottom:100%;left:0;margin-bottom:6px}
+  #btnSwitch{width:82px;height:32px;border-radius:16px;background:radial-gradient(circle at 40% 35%, #29384f, #1b2639);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.35);color:#cfe3ff;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;font-size:12px;font-weight:600;pointer-events:auto}
+  #btnSwitch:active{transform:translateY(1px)}
+
+  .actions{position:relative;display:flex;gap:22px;pointer-events:auto;align-items:flex-end}
+  .col{display:flex;flex-direction:column;gap:16px;align-items:flex-end}
+  .btn-round{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 40% 35%, #2a384f, #182235);border:1px solid var(--line);box-shadow:0 3px 12px rgba(0,0,0,.35);color:#dfe9ff;display:flex;align-items:center;justify-content:center;user-select:none;cursor:pointer}
+  .btn-round.small{width:56px;height:56px;font-size:11px}
+  .btn-round.big{width:86px;height:86px;font-weight:700}
+  .btn-round:active{transform:translateY(1px)}
+  .btn-round.ready{box-shadow:0 0 14px 2px rgba(255,213,106,.8);border-color:#ffd56a;}
+
+  /* Drawer close button */
+  .drawer-close{
+    position:absolute;
+    top:6px;
+    right:8px;
+    width:20px;
+    height:20px;
+    border:0;
+    background:transparent;
+    color:var(--muted);
+    font-size:16px;
+    line-height:20px;
+    cursor:pointer;
+    pointer-events:auto;
+  }
+  .drawer-close:hover{color:var(--ink);}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="cv" width="1280" height="720"></canvas>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="pill" id="stagePill">Stage 1 • Wave 1/10 • Kills 0</div>
+    <div class="bar"><div class="fill hp" id="hpFill" style="transform:scaleX(1)"></div></div>
+    <div class="bar"><div class="fill mp" id="mpFill" style="transform:scaleX(1)"></div></div>
+    <div class="bar" style="min-width:260px;position:relative"><div class="fill xp" id="xpDomFill" style="transform:scaleX(0)"></div><div class="xpText" id="xpDomLabel"></div></div>
+    <div class="bar" style="min-width:320px"><div class="fill boss" id="bossFill" style="transform: scaleX(0);"></div></div>
+  </div>
+  <div id="currency" class="hud" style="top:30px;gap:8px;justify-content:flex-start;pointer-events:none;">
+      <div class="pill" style="pointer-events:auto">Gold: <b id="goldVal">0</b></div>
+      <div class="pill" style="pointer-events:auto">Silver: <b id="silverVal">0</b></div>
+      <div class="pill" style="pointer-events:auto">Tickets: <b id="ticketVal">0</b></div>
+      <div class="pill" style="pointer-events:auto">Gems: <b id="gemVal">0</b></div>
+      <div class="pill" style="pointer-events:auto">Boss Kills: <b id="bossKillsVal">0</b></div>
+      <div class="pill" style="pointer-events:auto" id="giftKeysPill">Gift Keys: <b id="giftKeyVal">0</b></div>
+      <div class="pill" style="pointer-events:auto" id="bossKeysPill">Boss Keys: <b id="bossKeyVal">0</b></div>
+    </div>
+
+  <!-- Dock -->
+  <div class="subdock">
+    <button class="btn" id="btnSpeed">×1</button>
+    <button class="btn" id="btnInventory">Inventory</button>
+    <button class="btn" id="btnAuto">Auto: ON</button>
+    <button class="btn" id="btnStart">Pause</button>
+    <button class="btn" id="btnShop">Shop</button>
+    <button class="btn" id="btnSettings">Settings</button>
+    <button class="btn" id="btnTalents">Talents</button>
+    <button class="btn" id="btnDungeon">Dungeon</button>
+  </div>
+
+  <!-- Inventory Drawer -->
+  <aside id="inventory" class="drawer">
+    <h3>Inventory (32 slots) + Equipment<button class="drawer-close" aria-label="Close">×</button></h3>
+    <div class="in">
+      <div class="card">
+        <b>Equipment</b>
+        <div id="equip" class="slots" style="grid-template-columns:repeat(5,1fr)">
+          <div class="slot equip" data-slot="weapon">Weapon</div>
+          <div class="slot equip" data-slot="armor">Armor</div>
+          <div class="slot equip" data-slot="acc1">Accessory 1</div>
+          <div class="slot equip" data-slot="acc2">Accessory 2</div>
+          <div class="slot equip pet" data-slot="pet">Pet</div>
+        </div>
+      </div>
+      <div class="card">
+        <b>Bag</b>
+        <div id="invGrid" class="slots" style="grid-template-columns:repeat(8,1fr)"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Shop & Settings (same as before, brief for patch) -->
+  <aside id="shop" class="drawer">
+    <h3>Shop<button class="drawer-close" aria-label="Close">×</button></h3>
+    <div class="in">
+      <div class="card"><b>+Damage (All)</b> — 100 Gold <button class="btn" id="buyDmg">Buy</button></div>
+      <div class="card"><b>+Fire Rate (All)</b> — 100 Gold <button class="btn" id="buyRoF">Buy</button></div>
+      <div class="card"><b>Potion +50 HP</b> — 50 Gold <button class="btn" id="buyHP">Buy</button></div>
+      <div class="card"><b>Rage Pill</b> — 80 Gold <button class="btn" id="buyRage">Buy</button></div>
+
+      <!-- Boosters -->
+      <div class="card"><b>XP Booster (15m)</b> — +30% XP <span class="muted">1500G / 30T</span> <button class="btn" id="buyXP">Buy</button></div>
+      <div class="card"><b>Drop Booster (15m)</b> — +25% Drops <span class="muted">500G / 10T</span> <button class="btn" id="buyDrop">Buy</button></div>
+      <div class="card"><b>Rage Starter</b> — Start next stage with full Rage <span class="muted">2000G / 45T</span> <button class="btn" id="buyRageStart">Buy</button></div>
+      <div class="card"><b>Magnet Aura (30m)</b> - Big pickup radius <span class="muted">20G</span> <button class="btn" id="buyMagnet">Buy</button></div>
+      <div class="card"><b>Rage Chain</b> - Chain one extra Rage this stage <span class="muted">1800G / 40T</span> <button class="btn" id="buyRageChain">Buy</button></div>
+
+      <!-- Consumables & Tokens -->
+      <div class="card"><b>Revive Token</b> — Continue once at 40% HP <span class="muted">60G / 5T</span> <button class="btn" id="buyRevive">Buy</button></div>
+      <div class="card"><b>Random Gear Kit</b> — 4 random gear <span class="muted">200G</span> <button class="btn" id="buyGearKit">Buy</button></div>
+      <div class="card"><b>Respect Token</b> — Refund all AP <span class="muted">200G / 20T</span> <button class="btn" id="buyRespect">Buy</button></div>
+      <div class="card"><b>Boss Pass</b> — Skip to next boss (if cleared) <span class="muted">1000G / 20T</span> <button class="btn" id="buyBossPass">Buy</button></div>
+
+      <!-- Upgrades -->
+      <div class="card"><b>Inventory Row +1</b> — Adds 8 bag slots <span class="muted">2.5kG</span> <button class="btn" id="buyInvRow">Buy</button></div>
+      <div class="card"><b>Loadout Slot +1</b> — Extra loadout page <span class="muted">120T</span> <button class="btn" id="buyLoadout">Buy</button></div>
+      <div class="card"><b>Pet Slot +1</b> — Equip extra pet <span class="muted">500G / 180T</span> <button class="btn" id="buyPetSlot">Buy</button></div>
+      <div class="card"><b>Forge Permit I</b> — Unlock +5 upgrade <span class="muted">1000G</span> <button class="btn" id="buyForge1">Buy</button></div>
+      <div class="card"><b>Forge Permit II</b> — Unlock +10 upgrade <span class="muted">2000G</span> <button class="btn" id="buyForge2">Buy</button></div>
+      <div class="card"><b>Forge Permit III</b> — Unlock +15 upgrade <span class="muted">3000G</span> <button class="btn" id="buyForge3">Buy</button></div>
+
+      <!-- Gear & Craft -->
+      <div class="card"><b>Weapon Cache</b> — Choose 1 of 3 weapons <span class="muted">1000G</span> <button class="btn" id="buyWCache">Buy</button></div>
+      <div class="card"><b>Armor Cache</b> — Choose 1 of 3 armors <span class="muted">1000G</span> <button class="btn" id="buyACache">Buy</button></div>
+      <div class="card"><b>Accessory Cache</b> — Choose 1 of 3 accessories <span class="muted">1000G</span> <button class="btn" id="buyAccCache">Buy</button></div>
+
+      <!-- Keys & Chests -->
+      <div class="card"><b>Gift Key</b> — Opens Gift Chest <span class="muted">500G / 25T</span> <button class="btn" id="buyGiftKey">Buy</button></div>
+      <div class="card"><b>Boss Key</b> — Opens Boss Chest <span class="muted">3kG / 30T</span> <button class="btn" id="buyBossKey">Buy</button></div>
+
+      <!-- Bundles -->
+      <div class="card"><b>Starter Pack</b> — 2 Gift Keys + Magnet Aura (10m) <span class="muted">FREE</span> <button class="btn" id="buyBundleStarter">Claim</button></div>
+      <div class="card"><b>Booster Pack</b> — 5 Gift Keys + XP & Drop Boosters ×3 <span class="muted">500G / 50T</span> <button class="btn" id="buyBundleBooster">Buy</button></div>
+      <div class="card"><b>Founder Pack</b> — Loadout slot + cosmetic <span class="muted">100T</span> <button class="btn" id="buyBundleFounder">Buy</button></div>
+    </div>
+  </aside>
+  <aside id="settings" class="drawer">
+    <h3>Settings<button class="drawer-close" aria-label="Close">×</button></h3>
+    <div class="in">
+      <div class="card">
+        <label><input type="checkbox" id="optAuto" checked> Auto‑AI</label>
+        <div style="margin-top:8px">Canvas Size: <select id="optSize">
+          <option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option>
+        </select></div>
+        <label style="display:block;margin-top:6px"><input type="checkbox" id="optPar" checked> Parallax</label>
+      </div>
+
+      <!-- Sprite loader status card: lists which optional assets loaded or fell back to proxies.  Populated by loadAssets(). -->
+      <div class="card">
+        <b>Sprite Loader Status:</b>
+        <div id="loaderStatus" class="muted" style="font-size:12px;margin-top:4px;white-space:pre-wrap;"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Talents Drawer -->
+  <aside id="talents" class="drawer">
+    <h3>Talents<button class="drawer-close" aria-label="Close">×</button></h3>
+    <div class="in">
+      <canvas id="talentCanvas" width="800" height="440" style="image-rendering:pixelated;width:100%;background:var(--panel3);border:1px solid var(--line);border-radius:10px;"></canvas>
+      <div class="muted" style="margin-top:8px">Spend AP to unlock nodes. Keystone: <b>Rage II</b>. Press T to toggle.</div>
+    </div>
+  </aside>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="joyWrap">
+      <div class="char-switch"><div id="btnSwitch">Switch</div></div>
+      <div class="stick" id="stick"><div class="nub" id="nub"></div></div>
+    </div>
+    <div class="actions">
+      <div class="col">
+        <div class="btn-round small" id="btnRage">R</div>
+        <div class="btn-round small" id="btnShield">Shield</div>
+        <div class="btn-round small" id="btnJump">Jump</div>
+        <div class="btn-round big" id="btnShoot"><b>•</b></div>
+      </div>
+      <div class="col">
+        <div class="btn-round small" id="btnS1">S1</div>
+        <div class="btn-round small" id="btnS2">S2</div>
+        <div class="btn-round small" id="btnS3">S3</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DESIGN_W=1280, DESIGN_H=720;
+const wrap=document.getElementById('wrap'); const cv=document.getElementById('cv'); let ctx=cv.getContext('2d');
+
+// === PATCH v3 CONFIG ===
+// Configuration for stage/wave sizing, global slowdowns, combat tweaks, controls and UI.
+const PATCH = {
+  meta: { wavesPerStage: 10, totalStages: 10 },
+  systems: {
+    enemyMoveScale: 0.75,        // 25% slower movement
+    enemyFireRateScale: 0.75,    // 25% slower firing (longer cooldown)
+    jump: { v0: -0.22 },         // jump impulse source of truth (lowered)
+    rage: { max: 100, gainOnDealt: 1/15, gainOnTaken: 1/20, gainOnGift: 10 },
+    talents: {
+      perPoint: { atk: 100, def: 100, hp: 100 },
+      cap: 200
+    }
+  },
+  waves: {
+    sizes: [
+      { stage:1,  min:10, max:20 }, { stage:2,  min:20, max:25 },
+      { stage:3,  min:20, max:30 }, { stage:4,  min:25, max:35 },
+      { stage:5,  min:30, max:40 }, { stage:6,  min:30, max:45 },
+      { stage:7,  min:35, max:45 }, { stage:8,  min:35, max:50 },
+      { stage:9,  min:40, max:55 }, { stage:10, min:45, max:60 }
+    ],
+    miniboss:    { waveMin:5, waveMax:7, chance:0.40 },
+    giftBoxBoss: { waveMin:2, waveMax:9, chance:0.35 }
+  },
+  loot: {
+    perEnemy: { gold:[20,100], silver:[30,1000], giftChance:0.10, gearChance:0.15 },
+    giftBoxBoss: {
+      perHit: { gold:[5,15], silver:[20,60], gearChance:0.05 },
+      kill: { expMultiplier:3.0, gearRankWeights:{ S:0.20, A:0.35, B:0.30, C:0.15 } }
+    }
+  },
+  combat: {
+    reflect: {
+      playerMelee: { enabledFor:['A1','Missy'], activeMs:[0,350], dmgMul:1.2 },
+      boss: { windowSec:0.6, cooldownSec:4.0, maxBullets:12 }
+    },
+    boss: { preferredDistance:260, summon:{ count:2, cooldownSec:6.0, maxAlive:6 } }
+  },
+  controls: { leaderKeys: { A1:'KeyA', Unique:'KeyU', Missy:'KeyM' } },
+  ui: { showRageAboveNonLeaders:true, wave_debug_labels:false }
+};
+// Auto-enable wave debug labels in dev mode via URL query (?dev=1)
+try { if (location && /(^|[?&])dev=1(&|$)/.test(location.search)) { PATCH.ui.wave_debug_labels = true; } } catch {}
+// === END PATCH v3 CONFIG ===
+
+/* ===== Asset Loader ===== */
+// Basic asset loader that attempts to load optional sprites (PNG/GIF) for
+// players and backgrounds.  Results are stored in the `assets` map and
+// status strings are appended to `assetStatus`.  The loader tries each
+// path in order and falls back to null (proxy) on failure.  A summary
+// of loaded assets is displayed in the Settings drawer under
+// "Sprite Loader Status:" once all attempts complete.
+const assets = {};
+const assetStatus = [];
+function loadAssets(){
+  const items = [
+    {key:'A1', paths:['assets/img/A1.png','A1.png']},
+    {key:'Unique', paths:['assets/img/Unique.png','Unique.png']},
+    {key:'Missy', paths:['assets/img/Missy.png','Missy.png']},
+    {key:'BG_mid', paths:['assets/img/BG_mid.gif','assets/img/BG_mid.png','BG_mid.gif','BG_mid.png']},
+    {key:'BG_ground', paths:['assets/img/BG_ground.gif','assets/img/BG_ground.png','BG_ground.gif','BG_ground.png']},
+    // UI/loot sprites
+    {key:'Coin', paths:['assets/img/ico_coin_gold.png','assets/img/coin_gold.png']},
+    {key:'Silver', paths:['assets/img/ico_coin_silver.png']},
+    {key:'Gift', paths:['assets/img/gift_chest.png']},
+    // you can add more assets here as needed (e.g. bgm.mp3)
+  ];
+  // Custom sprite drop folder notice
+  try { assetStatus.push('Custom: put PNG/GIF under assets/custom/ (auto-proxy)'); } catch {}
+  let pending = items.length;
+  function done(){
+    if(--pending===0){ updateLoaderStatus(); }
+  }
+  items.forEach(item=>{
+    let loaded=false;
+    function tryPath(i){
+      if(i>=item.paths.length){
+        assetStatus.push(`${item.key}: proxy`);
+        assets[item.key] = null;
+        done();
+        return;
+      }
+      const img = new Image();
+      img.onload = function(){
+        loaded=true;
+        assetStatus.push(`${item.key}: ${item.paths[i]}`);
+        assets[item.key] = img;
+        done();
+      };
+      img.onerror = function(){
+        // try next path
+        tryPath(i+1);
+      };
+      img.src = item.paths[i];
+    }
+    tryPath(0);
+  });
+}
+function updateLoaderStatus(){
+  const el = document.getElementById('loaderStatus');
+  if(el){
+    el.textContent = assetStatus.join(', ');
+  }
+}
+
+// store clickable rectangles for non-leader skill icons
+let nonSkillRects = [];
+function resize(){
+  const scale=Math.min(innerWidth/DESIGN_W, innerHeight/DESIGN_H);
+  const cssW=DESIGN_W*scale, cssH=DESIGN_H*scale;
+  Object.assign(cv.style,{width:cssW+'px',height:cssH+'px',position:'absolute',left:((innerWidth-cssW)/2)+'px',top:((innerHeight-cssH)/2)+'px'});
+  const dpr=Math.min(devicePixelRatio||1,2); cv.width=Math.round(DESIGN_W*dpr); cv.height=Math.round(DESIGN_H*dpr);
+  ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+addEventListener('resize',resize); resize();
+
+/* ===== State ===== */
+// Global toggle for v13.7 number overrides (default false). When true, some
+// skills and basics use the buffed damage values from the spec. When false,
+// only visuals/logic change; damage stays near prior baselines.
+const enable_v13_7_damage_overrides = false;
+function applySkillDmg(n){ return enable_v13_7_damage_overrides ? Math.round(n * 1.30) : n; }
+function applyBasicDmg(base, actor){
+  // Use actor.dmg as baseline when overrides are off
+  return enable_v13_7_damage_overrides ? base : Math.max(1, Math.round((actor?.dmg||base)));
+}
+const st={
+  time:0, dt:0, running:true, speed:1, started:false,
+  stage:1, wave:1, wavesPerStage: PATCH.meta.wavesPerStage, kills:0,
+  gold:0, silver:0, tickets:0, gems:0,
+  hp:100, hpMax:100, mp:100, mpMax:100, mpRegen:8,
+  // rage and rageMax derive from PATCH.systems.rage.max
+  // Global rage fields (legacy). Per-hero rage fields below are used instead.
+  rage:0, rageMax: PATCH.systems.rage.max, rageOn:false, rageDur:0, rageICD:0,
+  auto:false, useParallax:true,
+  allowAutoRage:false,
+  waveClearDelay:800, waveClearT:0,
+  players:[
+    {id:'A1',x:220,y:DESIGN_H-160,vx:0,vy:0,grounded:true, dmg:20, alive:true, lane:0, overT:0, overCD:0, rage:0, rageMax:100, rageOn:false, rageDur:0, rageICD:0},
+    {id:'Unique',x:260,y:DESIGN_H-130,vx:0,vy:0,grounded:true,dmg:18, alive:true, lane:1, overT:0, overCD:0, rage:0, rageMax:100, rageOn:false, rageDur:0, rageICD:0},
+    {id:'Missy',x:240,y:DESIGN_H-100,vx:0,vy:0,grounded:true,dmg:18, alive:true, lane:2, overT:0, overCD:0, rage:0, rageMax:100, rageOn:false, rageDur:0, rageICD:0}
+  ],
+  leader:0, lastSwap:0,
+  shots:[], eShots:[], enemies:[], pickups:[], effects:[],
+  bossHP:0, bossMax:1, bossAlive:false, chestBoss:false,
+  cds:{'A1':{S1:0,S2:0,S3:0}, 'Unique':{S1:0,S2:0,S3:0}, 'Missy':{S1:0,S2:0,S3:0}},
+
+  // Progression & talents
+  level:1,
+  xp:0,
+  apTotal:0,
+  apSpent:0,
+  apPicks: new Set(),
+  rageTier:1,
+  // auto skill management
+  _autoNextSkill:0,
+  _autoSkillIdx:0,
+  // parry timer for reflect
+  parryT:0,
+
+  // Booster and power‑up timers and counts
+  xpBoost:0,           // XP gain multiplier (e.g. 0.3 for +30%)
+  xpBoostT:0,          // XP booster remaining time (ms)
+  dropBoost:0,         // Drop chance multiplier (e.g. 0.25 for +25%)
+  dropBoostT:0,
+  magnetAuraT:0,       // Magnet aura remaining time (ms)
+  reviveTokens:0,      // number of revive tokens
+  giftKeys:0,
+  bossKeys:0,
+  pityCount:0,
+  bossSkipPasses:0,
+  nextStageRageStart:false,
+  invRows:4,
+  invRowCost:2500,
+  loadoutSlots:1,
+  petSlots:1,
+  forgeLevel:0,
+  bundleStarter:false,
+  bundleBooster:false,
+  bundleFounder:false,
+};
+// number of unique bosses.  Stages beyond this reuse the last boss pattern.
+const BOSS_COUNT = 4;
+const SPEEDS=[1,2,3,4,6];
+function rng(){return Math.random();}
+const $=q=>document.querySelector(q);
+
+/* ===== UI wiring ===== */
+$('#btnInventory').onclick=()=>toggle('#inventory');
+$('#btnShop').onclick=()=>toggle('#shop');
+$('#btnSettings').onclick=()=>toggle('#settings');
+$('#btnAuto').onclick=()=>{ st.auto=!st.auto; $('#btnAuto').textContent='Auto: '+(st.auto?'ON':'OFF'); };
+$('#btnStart').onclick=()=>{ st.running=!st.running; $('#btnStart').textContent=st.running?'Pause':'Start'; };
+$('#btnSpeed').onclick=()=>{ const i=SPEEDS.indexOf(st.speed); st.speed=SPEEDS[(i+1)%SPEEDS.length]; $('#btnSpeed').textContent='×'+st.speed; };
+
+function toggle(sel){ const e=$(sel); e.style.display=e.style.display==='block'?'none':'block'; }
+function updateCharBtns(){ const names=['A1','Unique','Missy']; const sw=document.getElementById('btnSwitch'); if(sw){ sw.textContent = 'Switch ('+names[st.leader]+')'; } }
+const btnSwitch = document.getElementById('btnSwitch'); if(btnSwitch){ btnSwitch.onclick=()=>{ st.leader=(st.leader+1)%3; updateCharBtns(); }; }
+updateCharBtns();
+
+// Close button for drawers
+document.querySelectorAll('.drawer .drawer-close').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const d = btn.closest('.drawer');
+    if(d) d.style.display = 'none';
+  });
+});
+
+// Toggle talents drawer via button or T key
+$('#btnTalents').onclick = () => toggle('#talents');
+addEventListener('keydown', e => { if(e.code === 'KeyT') toggle('#talents'); });
+
+// Dungeon entry (Giant Mode). Requires >=1 Gift Key and >=1 Boss Key. Single-stage side instance.
+(function(){
+  const btnDungeon = document.getElementById('btnDungeon');
+  if(!btnDungeon) return;
+  btnDungeon.onclick = () => {
+    if(st._inDungeon){ addFloater(DESIGN_W/2, 80, 'Already in Dungeon', '#a8b7ce'); return; }
+    if(st.giftKeys < 1 || st.bossKeys < 1){ addFloater(DESIGN_W/2, 80, 'Need Gift + Boss Key', '#ff7a6a'); return; }
+    st.giftKeys--; st.bossKeys--; if(typeof updateCurrencies==='function') updateCurrencies();
+    startDungeon();
+  };
+})();
+
+/* ===== Talents UI & logic ===== */
+const talentCanvas = document.getElementById('talentCanvas');
+let talentCtx;
+if(talentCanvas){ talentCtx = talentCanvas.getContext('2d'); }
+
+// define a simple talents tree: attack%, shield, and Rage II keystone
+const talents = [
+  {id:'atk1', x:120, y:340, cost:1, req:[], text:'+5% ATK', fx:(s)=>{ s.atkMul+=0.05; }},
+  {id:'atk2', x:220, y:280, cost:1, req:['atk1'], text:'+5% ATK', fx:(s)=>{ s.atkMul+=0.05; }},
+  {id:'atk3', x:320, y:220, cost:1, req:['atk2'], text:'+5% ATK', fx:(s)=>{ s.atkMul+=0.05; }},
+  {id:'shield1', x:520, y:340, cost:1, req:[], text:'+10 Shield', fx:(s)=>{ s.shield+=10; }},
+  {id:'shield2', x:620, y:280, cost:1, req:['shield1'], text:'+10 Shield', fx:(s)=>{ s.shield+=10; }},
+  {id:'crit1', x:320, y:340, cost:1, req:[], text:'+2% Crit', fx:(s)=>{ s.crit=(s.crit||0)+2; }},
+  {id:'move1', x:420, y:280, cost:1, req:[], text:'+5% Move', fx:(s)=>{ s.move=(s.move||0)+5; }},
+  {id:'skillHaste1', x:720, y:340, cost:1, req:[], text:'+5% Haste', fx:(s)=>{ s.haste=(s.haste||0)+5; }},
+  {id:'rage2', x:420, y:160, cost:3, req:['atk3','shield2'], keystone:true, text:'Rage II', fx:(s)=>{ st.rageTier=2; }},
+  {id:'rage3', x:540, y:140, cost:5, req:['rage2'], keystone:true, text:'Rage III (200 AP)', fx:(s)=>{ if(st.apSpent>=200) st.rageTier=3; }}
+];
+
+function tallyTalentStats(){
+  const s = {atkMul:0, shield:0, crit:0, move:0, haste:0};
+  // reset rage tier
+  st.rageTier = 1;
+  for(const t of talents){
+    if(st.apPicks.has(t.id) && t.fx){ t.fx(s); }
+  }
+  st._talentStats = s;
+  recalcStats();
+}
+
+function drawTalents(){
+  if(!talentCtx) return;
+  const ctx2 = talentCtx;
+  ctx2.clearRect(0,0,talentCanvas.width, talentCanvas.height);
+  // connectors
+  ctx2.strokeStyle = '#2a3b58'; ctx2.lineWidth = 2; ctx2.beginPath();
+  const idMap = Object.fromEntries(talents.map(t => [t.id, t]));
+  talents.forEach(n => {
+    if(n.req){ n.req.forEach(rid => { const a=idMap[rid]; if(a){ ctx2.moveTo(a.x,a.y); ctx2.lineTo(n.x,n.y); } }); }
+  });
+  ctx2.stroke();
+  // nodes
+  talents.forEach(n => {
+    const owned = st.apPicks.has(n.id);
+    const canBuy = !owned && (st.apSpent < Math.min(PATCH.systems.talents.cap, st.apTotal)) && (!n.req || n.req.every(rid => st.apPicks.has(rid)));
+    // ring
+    ctx2.beginPath();
+    ctx2.fillStyle = owned ? '#20314d' : '#0f1e33';
+    ctx2.strokeStyle = canBuy ? '#63e6ff' : '#394d6f';
+    const rad = n.keystone ? 18 : 14;
+    ctx2.arc(n.x, n.y, rad, 0, Math.PI*2);
+    ctx2.fill(); ctx2.stroke();
+    // inner fill if owned
+    if(owned){ ctx2.beginPath(); ctx2.fillStyle = '#2d4a76'; ctx2.arc(n.x, n.y, rad-4, 0, Math.PI*2); ctx2.fill(); }
+    // text
+    ctx2.fillStyle = '#8fb6ff'; ctx2.font = '10px monospace';
+    ctx2.textAlign = 'left'; ctx2.textBaseline = 'middle';
+    ctx2.fillText(n.text, n.x + rad + 6, n.y);
+  });
+  // update header with AP spent/total
+  const hdr = document.querySelector('#talents h3');
+  if(hdr){ hdr.innerHTML = `Talents (${st.apSpent}/${st.apTotal})<button class="drawer-close" aria-label="Close">×</button>`; }
+  // rewire close button again (since we replaced innerHTML)
+  document.querySelectorAll('#talents .drawer-close').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); document.getElementById('talents').style.display='none'; };
+  });
+}
+
+if(talentCanvas){
+  // draw once at start
+  drawTalents();
+  // click to purchase
+  talentCanvas.addEventListener('click', e => {
+    const rect = talentCanvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width * talentCanvas.width;
+    const y = (e.clientY - rect.top) / rect.height * talentCanvas.height;
+    talents.forEach(n => {
+      const rad = n.keystone ? 18 : 14;
+      if(Math.hypot(n.x - x, n.y - y) <= rad + 4){
+        const owned = st.apPicks.has(n.id);
+        const canBuy = !owned && (st.apSpent < Math.min(PATCH.systems.talents.cap, st.apTotal)) && (!n.req || n.req.every(rid => st.apPicks.has(rid)));
+        if(canBuy){ st.apPicks.add(n.id); st.apSpent += n.cost || 1; tallyTalentStats(); drawTalents(); }
+      }
+    });
+  });
+}
+
+/* ===== Inventory scaffolding ===== */
+const inv=[]; const equip={weapon:null,armor:null,acc1:null,acc2:null,pet:null};
+const invGrid=document.getElementById('invGrid'); const equipBox=document.getElementById('equip');
+function makeItem(name,slot,atk=2){ return {id:Math.random(), name, slot, atk, rarity:['Common','Rare','Epic'][Math.floor(rng()*3)]}; }
+
+// Compute player stats from equipped items.  Each hero has a base damage which is
+// increased by the atk values of their currently equipped items.  Additional stats
+// (shield, move speed, etc.) could be added here using similar accumulation logic.
+function recalcStats(){
+  // base damage per hero
+  const baseDamage = {A1:20, Unique:18, Missy:18};
+  // accumulate atk bonuses by hero id
+  const bonus = {A1:0, Unique:0, Missy:0};
+  for(const slot in equip){
+    const it = equip[slot];
+    if(!it) continue;
+    if(it.atk){
+      // apply this bonus equally to all players for simplicity
+      bonus.A1 += it.atk;
+      bonus.Unique += it.atk;
+      bonus.Missy += it.atk;
+    }
+  }
+  for(const p of st.players){
+    const id = p.id;
+    let dmgBase = baseDamage[id] + bonus[id];
+    // apply legacy talent attack multiplier if present
+    if(st._talentStats && st._talentStats.atkMul){ dmgBase *= (1 + st._talentStats.atkMul); }
+    p.dmg = Math.round(dmgBase);
+  }
+  // Apply AP stat buffs: each spent ability point adds atk/def/hp from PATCH.systems.talents.perPoint
+  const ap = Math.min(PATCH.systems.talents.cap, st.apTotal || 0);
+  const extra = PATCH.systems.talents.perPoint;
+  // increase party HP Max and apply defense flat reduction
+  st.hpMax = 100 + ap * extra.hp;
+  st.hp = Math.min(st.hp, st.hpMax);
+  st._defFlat = ap * extra.def;
+  // increase damage for each hero
+  for(const p of st.players){ p.dmg += ap * extra.atk; }
+  // preserve original shield bonus from talents (unused yet)
+  st._shieldMaxBonus = (st._talentStats && st._talentStats.shield) ? st._talentStats.shield : 0;
+}
+
+// Add a random item to the inventory, used when collecting gift boxes.  If there is
+// no empty slot, the item is discarded.  Item slots are chosen randomly from the
+// available equipment types.
+function addRandomItem(){
+  // find an empty inventory slot
+  const totalSlots = st.invRows * 8;
+  for(let i=0; i<totalSlots; i++){
+    if(!inv[i]){
+      const slots = ['weapon','armor','acc1','acc2','pet'];
+      const sl = slots[Math.floor(Math.random() * slots.length)];
+      const newIt = makeItem('Gift Item', sl, 1 + Math.floor(Math.random()*4));
+      inv[i] = newIt;
+      refreshInv();
+      refreshEquip();
+      recalcStats();
+      return;
+    }
+  }
+}
+function addGiftBox(){
+  // find empty inventory slot for gift box entry
+  const totalSlots = st.invRows * 8;
+  for(let i=0;i<totalSlots;i++){
+    if(!inv[i]){ inv[i] = {id:Math.random(), name:'Gift Box', slot:'gift'}; refreshInv(); return; }
+  }
+}
+function refreshInv(){
+  // build grid cells
+  invGrid.innerHTML='';
+  const totalSlots = st.invRows * 8;
+  // create quick menu once
+  let menu = document.getElementById('itemMenu');
+  if(!menu){
+    menu = document.createElement('div');
+    menu.id = 'itemMenu';
+    menu.style.display = 'none';
+    menu.innerHTML = '<button data-act="equip">Equip</button><button data-act="upgrade">Upgrade</button><button data-act="sell">Sell</button><button data-act="fuse">Fuse</button>';
+    document.body.appendChild(menu);
+    menu.addEventListener('click', (e)=>{
+      const act = e.target?.getAttribute && e.target.getAttribute('data-act');
+      if(!act) return; e.stopPropagation();
+      const idx = st._menuIdx; if(idx==null) { menu.style.display='none'; return; }
+      const it = inv[idx]; if(!it){ menu.style.display='none'; return; }
+      if(act==='open' && it.slot==='gift'){
+        // open gift into a random item
+        const slots = ['weapon','armor','acc1','acc2','pet'];
+        const sl = slots[Math.floor(Math.random() * slots.length)];
+        const newIt = makeItem('Gift Item', sl, 1 + Math.floor(Math.random()*4));
+        inv[idx] = newIt; refreshInv(); refreshEquip(); recalcStats();
+        notify('Gift opened!');
+      }
+      else if(act==='equip'){
+        equip[it.slot] = it; inv[idx] = null; refreshInv(); refreshEquip(); recalcStats();
+      } else if(act==='upgrade'){
+        const cost = 100; if(st.gold>=cost){ st.gold-=cost; it.atk=(it.atk||0)+1; updateCurrencies(); refreshInv(); addFloater(DESIGN_W/2,60,'Upgraded','#6aa8ff'); } else addFloater(DESIGN_W/2,60,'Need 100G','#ff7a6a');
+      } else if(act==='sell'){
+        const price = 50 * (it.atk||1); st.gold += price; inv[idx] = null; updateCurrencies(); refreshInv(); addFloater(DESIGN_W/2,60,'+Gold','#ffd56a');
+      } else if(act==='fuse'){
+        const j = inv.findIndex((x,k)=>k!==idx && x && x.slot===it.slot); if(j>=0){ it.atk = (it.atk||0) + (inv[j].atk||0); inv[j]=null; refreshInv(); addFloater(DESIGN_W/2,60,'Fused','#a8b7ce'); } else addFloater(DESIGN_W/2,60,'No match','#a8b7ce');
+      }
+      menu.style.display='none';
+    });
+    addEventListener('pointerdown', ()=>{ menu.style.display='none'; });
+  }
+  for(let i=0;i<totalSlots;i++){
+    const d=document.createElement('div');
+    d.className='slot';
+    const it=inv[i];
+    d.textContent = it ? it.name : '•';
+    d.onclick = (ev)=>{
+      if(!it) return;
+      st._menuIdx = i;
+      // adjust menu entries for gift box
+      if(it.slot==='gift') menu.innerHTML = '<button data-act="open">Open</button><button data-act="sell">Sell</button>';
+      else menu.innerHTML = '<button data-act="equip">Equip</button><button data-act="upgrade">Upgrade</button><button data-act="sell">Sell</button><button data-act="fuse">Fuse</button>';
+      menu.style.left = ev.clientX + 'px';
+      menu.style.top = ev.clientY + 'px';
+      menu.style.display = 'block';
+    };
+    invGrid.appendChild(d);
+  }
+}
+function refreshEquip(){
+  [...equipBox.children].forEach(d=>{
+    const k=d.dataset.slot; const it=equip[k]; d.textContent = (k.toUpperCase()) + (it?': '+it.name:'');
+  });
+}
+for(let i=0;i<8;i++) inv.push(makeItem('Blade +'+(i+1),'weapon',3+i));
+inv.push(makeItem('Pet: Mini‑Cat','pet',0)); refreshInv(); refreshEquip();
+recalcStats();
+
+/* ===== Input ===== */
+const keys = {};
+// Handle key presses for leader cycling, jump and direct leader select.  Use PATCH.controls.leaderKeys for specific heroes.
+addEventListener('keydown', e => {
+  keys[e.code] = true;
+  // cycle leaders with Q
+  if(e.code === 'KeyQ'){ st.leader = (st.leader + 1) % 3; updateCharBtns(); }
+  // jump with space
+  if(e.code === 'Space'){ jumpAll(); }
+  // direct leader selection using configured keys
+  // keep legacy hotkeys but UI uses single Switch button
+  if(e.code === PATCH.controls.leaderKeys.A1){ st.leader = 0; updateCharBtns(); }
+  else if(e.code === PATCH.controls.leaderKeys.Unique){ st.leader = 1; updateCharBtns(); }
+  else if(e.code === PATCH.controls.leaderKeys.Missy){ st.leader = 2; updateCharBtns(); }
+});
+addEventListener('keyup', e => { keys[e.code] = false; });
+const stick=document.getElementById('stick'), nub=document.getElementById('nub'); let joyId=null, joyX=0, joyY=0, lastTap=0;
+stick.addEventListener('pointerdown',e=>{ stick.setPointerCapture(e.pointerId); joyId=e.pointerId; onJoy(e); });
+stick.addEventListener('pointermove',e=>{ if(e.pointerId===joyId) onJoy(e); });
+stick.addEventListener('pointerup',e=>{ if(e.pointerId===joyId){ joyId=null; joyX=0; joyY=0; nub.style.left='50%'; nub.style.top='50%'; const now=performance.now(); if(now-lastTap<260) jumpAll(); lastTap=now; }});
+function onJoy(e){ const r=stick.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2; let dx=e.clientX-cx, dy=e.clientY-cy; const m=Math.hypot(dx,dy); const lim=r.width*0.38; if(m>lim){ dx=dx/m*lim; dy=dy/m*lim; } nub.style.left=(50+dx/r.width*100)+'%'; nub.style.top=(50+dy/r.height*100)+'%'; joyX=dx/lim; joyY=dy/lim; }
+
+// click detection for non-leader skill icons
+cv.addEventListener('pointerdown', e => {
+  // ignore if clicking on UI (buttons are above canvas) by checking pointer-events: none on hud; pointer still captured though
+  const rect = cv.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width * DESIGN_W;
+  const y = (e.clientY - rect.top) / rect.height * DESIGN_H;
+  for(const r of nonSkillRects){
+    if(x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h){
+      // ensure skill is ready; make that hero leader when using
+      const hero = st.players[r.pIndex];
+      st.leader = r.pIndex; updateCharBtns();
+      if(r.key === 'R'){
+        if(!hero.rageOn && (hero.rage||0) >= (hero.rageMax||100) && (hero.rageICD||0) <= 0){
+          triggerRageFor(hero);
+        }
+      } else if(cdReady(hero.id, r.key)){
+        useSkill(hero, r.key);
+      }
+      break;
+    }
+  }
+});
+
+// Notifications
+let _notifEl = null; function notifWrap(){ if(!_notifEl){ _notifEl = document.createElement('div'); _notifEl.id='notifWrap'; document.body.appendChild(_notifEl); } return _notifEl; }
+function notify(msg, color){ const w=notifWrap(); const d=document.createElement('div'); d.className='toast'; if(color) d.style.color=color; d.textContent=msg; w.appendChild(d); setTimeout(()=>{ d.style.transition='opacity .4s'; d.style.opacity='0'; setTimeout(()=>d.remove(), 450); }, 1400); }
+
+// Keyboard: switch leader with A/U/M
+// legacy direct keys remain supported above; A/U/M mapping removed from UI
+
+/* ===== Helpers ===== */
+function leader(){ return st.players[st.leader]; }
+function laneY(l){ return (DESIGN_H-100) + (l===0?-30:l===2?30:0); }
+function jumpAll(){
+  // Jump all heroes if grounded using the configured impulse.  This keeps jumps consistent when the value changes.
+  for(const p of st.players){
+    if(p.grounded){
+      p.vy = PATCH.systems.jump.v0;
+      p.grounded = false;
+    }
+  }
+} // lowered jump (from PATCH)
+function grantGold(n){ st.gold+=n; updateCurrencies(); }
+function grantSilver(n){ st.silver+=n; updateCurrencies(); }
+
+// Current rage scale (>=1). Uses active rage attack multiplier if present.
+function rageScale(){ return (st.rageOn ? (st._rageAtk || 1.25) : 1); }
+
+// Update currency display values in the HUD.  This is used whenever
+// currencies change (e.g. pickups, purchases).  Without this helper,
+// the UI would not reflect current gold/ticket totals.
+function updateCurrencies(){
+  const g=document.getElementById('goldVal'); if(g) g.textContent=st.gold;
+  const s=document.getElementById('silverVal'); if(s) s.textContent=st.silver;
+  const t=document.getElementById('ticketVal'); if(t) t.textContent=st.tickets;
+  const z=document.getElementById('gemVal'); if(z) z.textContent=st.gems;
+  const bk=document.getElementById('bossKillsVal'); if(bk) bk.textContent=st.bossKills||0;
+  const gk=document.getElementById('giftKeyVal'); if(gk) gk.textContent=st.giftKeys||0;
+  const ck=document.getElementById('bossKeyVal'); if(ck) ck.textContent=st.bossKeys||0;
+}
+
+/* ===== Shop purchase helper ===== */
+// Attempt to deduct currency for a purchase.  Prefers to spend gold if
+// available; falls back to tickets if sufficient.  Accepts a gold cost
+// (gCost) and ticket cost (tCost).  On success, executes the provided
+// callback and returns true.  If funds are insufficient, displays a
+// floater and returns false.
+function tryBuy(item, gCost, tCost, cb){
+  const mult = (window.A1K && A1K.config && A1K.config.globals && A1K.config.globals.shop_price_multiplier) || 1;
+  if(gCost!=null) gCost = Math.round(gCost * mult);
+  // choose currency: use gold first if enough
+  if(gCost !== null && st.gold >= gCost){
+    st.gold -= gCost;
+    updateCurrencies();
+    cb('gold');
+    return true;
+  }
+  if(tCost !== null && st.tickets >= tCost){
+    st.tickets -= tCost;
+    updateCurrencies();
+    cb('tickets');
+    return true;
+  }
+  // not enough funds
+  addFloater(DESIGN_W/2, 60, 'Insufficient funds', '#ff7a6a');
+  return false;
+}
+
+/* ===== Chest opening functions ===== */
+function openGiftChest(){
+  // Determine rarity with pity system: guarantee Epic if pityCount >= 19
+  const rnd = Math.random();
+  let rarity;
+  if(st.pityCount >= 19){ rarity = 'Epic'; st.pityCount = 0; }
+  else {
+    if(rnd < 0.60) rarity = 'Common';
+    else if(rnd < 0.90) rarity = 'Rare';
+    else if(rnd < 0.99) rarity = 'Epic';
+    else rarity = 'Legendary';
+    // track pity for non‑Epic+ results
+    if(rarity === 'Common' || rarity === 'Rare'){ st.pityCount++; } else { st.pityCount = 0; }
+  }
+  // create random item with slot and atk based on rarity
+  const slots=['weapon','armor','acc1','acc2','pet'];
+  const slot=slots[Math.floor(Math.random()*slots.length)];
+  let atk=2;
+  if(rarity === 'Rare') atk=4;
+  if(rarity === 'Epic') atk=6;
+  if(rarity === 'Legendary') atk=8;
+  const it = makeItem(rarity+' Item', slot, atk);
+  // find empty slot
+  const totalSlots = st.invRows * 8;
+  let placed=false;
+  for(let i=0;i<totalSlots;i++){
+    if(!inv[i]){ inv[i] = it; placed=true; break; }
+  }
+  if(!placed){ addFloater(DESIGN_W/2, 80, 'Bag Full', '#ff7a6a'); }
+  refreshInv(); refreshEquip(); recalcStats();
+  // award tickets or gold? optionally
+}
+function openBossChest(){
+  // Boss chests drop higher rarities: 30% Rare, 50% Epic, 20% Legendary
+  const rnd = Math.random();
+  let rarity;
+  if(rnd < 0.30) rarity = 'Rare';
+  else if(rnd < 0.80) rarity = 'Epic';
+  else rarity = 'Legendary';
+  st.pityCount = 0; // reset pity on boss chest
+  const slots=['weapon','armor','acc1','acc2','pet'];
+  const slot=slots[Math.floor(Math.random()*slots.length)];
+  let atk=5;
+  if(rarity === 'Epic') atk=7;
+  if(rarity === 'Legendary') atk=10;
+  const it=makeItem(rarity+' Boss Item', slot, atk);
+  const totalSlots = st.invRows * 8;
+  let placed=false;
+  for(let i=0;i<totalSlots;i++){
+    if(!inv[i]){ inv[i]=it; placed=true; break; }
+  }
+  if(!placed){ addFloater(DESIGN_W/2, 80, 'Bag Full', '#ff7a6a'); }
+  refreshInv(); refreshEquip(); recalcStats();
+}
+function spawnCoin(x,y,amt){ st.pickups.push({kind:'coin',x,y,amt,vy:-0.2,life:7000}); }
+function spawnGift(x,y){ st.pickups.push({kind:'gift',x,y,vy:-0.1,life:7000}); }
+function spawnSilver(x,y,amt){ st.pickups.push({kind:'silver',x,y,amt,vy:-0.15,life:7000}); }
+
+// Add a floating text effect (damage/resource indicator)
+function addFloater(x,y,txt,color){ st.effects.push({x,y,txt,color,vy:-0.25,life:800}); }
+function addSlash(x,y,dir){ st.effects.push({kind:'slash',x,y,dir,life:240}); }
+function addCast(x,y,color){ st.effects.push({kind:'cast',x,y,color,life:320,max:320}); }
+function addSpeedlines(x,y,color){ st.effects.push({kind:'speed',x,y,color,life:1800,max:1800}); }
+function addImpact(x,y,color){ st.effects.push({kind:'impact',x,y,color:color||'#ffd56a',life:260,max:260}); }
+function addMuzzle(x,y,color){ st.effects.push({kind:'muzzle',x,y,color:color||'#ffffff',life:160,max:160}); }
+function addTrail(x,y,color,w=8,h=4){ st.effects.push({kind:'trail',x,y,color:color||'#ffffff',w,h,life:180,max:180}); }
+function addBeam(x1,y1,x2,y2,color){ st.effects.push({kind:'beam',x1,y1,x2,y2,color:color||'#6aa8ff',life:120,max:120}); }
+function addArcSlash(x,y,dir=1,color='#ff4d4f'){ st.effects.push({kind:'arcSlash',x,y,dir,color,life:260,max:260}); }
+function addAfterImage(x,y,color='#ff4d4f'){ st.effects.push({kind:'after',x,y,color,life:180,max:180}); }
+// New: crescent glow slash similar to provided attachment
+function addCrescent(x,y,dir=1,color='#ff7a31'){
+  st.effects.push({kind:'crescent', x, y, dir, color, life:260, max:260});
+}
+// New: lightning bolt mini effect for electric shots
+function addBolt(x1,y1,x2,y2,color='#63e6ff'){
+  st.effects.push({kind:'bolt', x1,y1,x2,y2, color, life:100, max:100});
+}
+
+// Procedural Flipbook generator (explosion, smoke, fire, sparkle, portal)
+const VFX = { books:{} };
+function buildFlipbooks(){
+  const mk = (key, frames, drawFn) => {
+    const list=[]; const sz=64; for(let i=0;i<frames;i++){ const c=document.createElement('canvas'); c.width=sz; c.height=sz; const g=c.getContext('2d'); g.clearRect(0,0,sz,sz); drawFn(g,i,frames,sz); list.push(c); } VFX.books[key]=list; };
+  // explosion: expanding ring + shards
+  mk('explosion', 10, (g,i,n,sz)=>{ const p=i/(n-1); g.globalAlpha = 1-p; g.strokeStyle='#ffd56a'; g.lineWidth=2; g.beginPath(); g.arc(sz/2,sz/2, 8+p*18, 0, Math.PI*2); g.stroke(); for(let k=0;k<8;k++){ g.fillStyle='#ff8c6a'; const a=k*(Math.PI/4); g.fillRect(sz/2+Math.cos(a)*p*22-1, sz/2+Math.sin(a)*p*22-1,2,2);} });
+  // smoke: puffs upward
+  mk('smoke', 12, (g,i,n,sz)=>{ const p=i/(n-1); g.globalAlpha = 0.6*(1-p); g.fillStyle='#a8b7ce'; g.beginPath(); g.arc(sz/2,sz/2-10*p*20, 6+10*p, 0, Math.PI*2); g.fill(); });
+  // fire: flicker blob
+  mk('fire', 12, (g,i,n,sz)=>{ const p=i/(n-1); g.globalAlpha = 0.8*(1-p); g.fillStyle='#ff7a31'; g.beginPath(); g.moveTo(sz/2, sz/2-16);
+    g.bezierCurveTo(sz/2+14,sz/2-6, sz/2+10,sz/2+6, sz/2,sz/2+12);
+    g.bezierCurveTo(sz/2-10,sz/2+6, sz/2-14,sz/2-6, sz/2,sz/2-16);
+    g.fill(); });
+  // sparkle: rotating cross
+  mk('sparkle', 10, (g,i,n,sz)=>{ const p=i/(n-1); g.globalAlpha=1-p; g.strokeStyle='#cfe3ff'; g.lineWidth=2; g.translate(sz/2,sz/2); g.rotate(p*Math.PI); g.beginPath(); g.moveTo(-10,0); g.lineTo(10,0); g.moveTo(0,-10); g.lineTo(0,10); g.stroke(); });
+  // portal: pulsing ring
+  mk('portal', 14, (g,i,n,sz)=>{ const p=i/(n-1); g.globalAlpha = 0.7; g.strokeStyle = '#7b61ff'; g.lineWidth=3; const r=16+6*Math.sin(p*Math.PI*2); g.beginPath(); g.arc(sz/2,sz/2, r, 0, Math.PI*2); g.stroke(); g.globalAlpha=0.35; g.beginPath(); g.arc(sz/2,sz/2, r+6, 0, Math.PI*2); g.stroke(); });
+}
+function spawnFlip(key,x,y){ const fb=VFX.books[key]; if(!fb) return; st.effects.push({kind:'flip',fb,key,frame:0,x,y,life:fb.length*40}); }
+
+/* ===== Skills & CDs ===== */
+const CD={ 'A1':{S1:6000,S2:10000,S3:16000}, 'Unique':{S1:4000,S2:20000,S3:40000}, 'Missy':{S1:3000,S2:25000,S3:30000} };
+function cdReady(id,k){ return st.cds[id][k]<=0; } function startCD(id,k){ st.cds[id][k]=CD[id][k]; }
+document.getElementById('btnS1').onclick=()=>useSkill(leader(),'S1');
+document.getElementById('btnS2').onclick=()=>useSkill(leader(),'S2');
+document.getElementById('btnS3').onclick=()=>useSkill(leader(),'S3');
+function triggerRageFor(h){
+  const max = h.rageMax || st.rageMax || 100;
+  if(h.rage>=max && !h.rageOn && (h.rageICD||0)<=0){
+    h.rageOn=true; h.rage=0; h.rageICD=20000;
+    // base duration and buffs
+    if(st.rageTier===3){ h.rageDur=14000; st._rageAtk=1.60; st._rageSpd=1.40; st._rageShield=1.35; }
+    else if(st.rageTier===2){ h.rageDur=12000; st._rageAtk=1.40; st._rageSpd=1.30; st._rageShield=1.30; }
+    else { h.rageDur=10000; st._rageAtk=1.25; st._rageSpd=1.20; st._rageShield=1.20; }
+    addCast(h.x+12, h.y-36, '#ff4d4f');
+    h._rageAuraT = Math.max(h._rageAuraT||0, 1000);
+    addSpeedlines(h.x, h.y-20, (h.id==='Unique') ? '#63e6ff' : (h.id==='Missy' ? '#ff8c6a' : '#ff4d4f'));
+    notify(h.id+': Rage!');
+    // If Rage Chain is active, allow skipping cooldown once
+    if((st._rageChains||0) > 0){
+      h.rageICD = 0; st._rageChains--; notify('Rage Chained!', '#f9cc2b');
+    }
+    st._aiAggroT = Math.max(st._aiAggroT||0, 8000);
+    // A1K: brief invulnerability on Rage activation
+    try { if(window.A1K && A1K.applyInvuln) A1K.applyInvuln(h); } catch {}
+    // Optional: scale rage potency using A1K's tier and stage bonus
+    try {
+      if(window.A1K && A1K.computeRageTier && A1K.applyStageRageBonus){
+        const t = A1K.computeRageTier(st.apSpent||0);
+        const sm = A1K.applyStageRageBonus(1, st.stage||1);
+        const scale = (t?.effect_mult||1) * (sm||1);
+        st._rageAtk = (st._rageAtk||1) * scale;
+      }
+    } catch {}
+    // hero ultimate when activating Rage
+    if(h.id==='A1') spawnA1Ultimate(h);
+    else if(h.id==='Unique') spawnUniqueUltimate(h);
+    else if(h.id==='Missy') spawnMissyUltimate(h);
+  }
+}
+document.getElementById('btnRage').onclick=()=>{ triggerRageFor(leader()); };
+document.getElementById('btnShield').onclick=()=>{ if(!st._shieldOn && st.mp>=30){ st._shieldOn=true; st._shieldT=2500; st.mp-=30; } };
+document.getElementById('btnJump').onclick=()=>jumpAll();
+const hold={shoot:false}; document.getElementById('btnShoot').onpointerdown=()=>hold.shoot=true; document.getElementById('btnShoot').onpointerup=()=>hold.shoot=false;
+
+// Minimal window.game dev API for quick testing
+try {
+  window.game = window.game || {};
+  window.game.setLeader = (who)=>{ const names=['A1','Unique','Missy']; const i = (typeof who==='number')?who:names.indexOf(String(who)); if(i>=0&&i<3){ st.leader=i; updateCharBtns(); } };
+  window.game.setSpeed = (n)=>{ st.speed = Math.max(0.1, Math.min(5, n||1)); };
+  window.game.setCurrencies = (o={})=>{ if(o.gold!=null) st.gold=o.gold; if(o.silver!=null) st.silver=o.silver; if(o.tickets!=null) st.tickets=o.tickets; if(o.gems!=null) st.gems=o.gems; try{ updateCurrencies(); }catch{} };
+  window.game.addAP = (n=1)=>{ st.apTotal = Math.min((st.apTotal||0) + n, (PATCH.systems?.talents?.cap)||200); };
+  window.game.resetAP = ()=>{ st.apPicks.clear(); st.apSpent=0; try{ tallyTalentStats(); drawTalents(); }catch{} };
+  window.game.open = (name)=>{ const map={inventory:'#inventory',shop:'#shop',settings:'#settings',talents:'#talents'}; const sel=map[name]||name; try { document.querySelector(sel).style.display='block'; } catch {} };
+  window.game.close = (name)=>{ const map={inventory:'#inventory',shop:'#shop',settings:'#settings',talents:'#talents'}; const sel=map[name]||name; try { document.querySelector(sel).style.display='none'; } catch {} };
+  window.game.cast = (hero='leader', key='S1')=>{ const p = (hero==='leader')?leader():st.players.find(x=>x.id===hero)||leader(); useSkill(p, key); };
+  window.game.rage = (hero='leader')=>{ const p = (hero==='leader')?leader():st.players.find(x=>x.id===hero)||leader(); triggerRageFor(p); };
+} catch {}
+
+/* ===== Shop button handlers ===== */
+// Utility to increase damage for all players by a percent
+function boostDamage(percent){
+  for(const p of st.players){ p.dmg = Math.round(p.dmg * (1 + percent)); }
+}
+// +Damage (All)
+const btnDmg = document.getElementById('buyDmg');
+if(btnDmg) btnDmg.onclick = () => {
+  tryBuy('Damage', 100, null, () => {
+    boostDamage(0.10);
+    addFloater(DESIGN_W/2, 60, '+Damage', '#36c777');
+  });
+};
+// +Fire Rate (All) – approximate by increasing damage slightly
+const btnRoF = document.getElementById('buyRoF');
+if(btnRoF) btnRoF.onclick = () => {
+  tryBuy('Fire Rate', 100, null, () => {
+    boostDamage(0.08);
+    addFloater(DESIGN_W/2, 60, '+Fire Rate', '#36c777');
+  });
+};
+// Potion +50 HP
+const btnHP = document.getElementById('buyHP');
+if(btnHP) btnHP.onclick = () => {
+  tryBuy('HP Potion', 50, null, () => {
+    st.hp = Math.min(st.hpMax, st.hp + 50);
+    addFloater(DESIGN_W/2, 60, '+HP', '#6aa8ff');
+  });
+};
+// Rage Pill – grant 30 Rage
+const btnRageP = document.getElementById('buyRage');
+if(btnRageP) btnRageP.onclick = () => {
+  tryBuy('Rage Pill', 80, null, () => {
+    st.rage = Math.min(st.rageMax, st.rage + 30);
+    addFloater(DESIGN_W/2, 60, '+Rage', '#f9cc2b');
+  });
+};
+// XP Booster (15m)
+const btnXP = document.getElementById('buyXP');
+if(btnXP) btnXP.onclick = () => {
+  tryBuy('XP Booster', 1500, 30, () => {
+    st.xpBoost = 0.30; st.xpBoostT = 15 * 60 * 1000;
+    addFloater(DESIGN_W/2, 60, 'XP Boost!', '#6aa8ff');
+  });
+};
+// Drop Booster (15m)
+const btnDrop = document.getElementById('buyDrop');
+if(btnDrop) btnDrop.onclick = () => {
+  tryBuy('Drop Booster', 500, 10, () => {
+    st.dropBoost = 0.25; st.dropBoostT = 15 * 60 * 1000;
+    addFloater(DESIGN_W/2, 60, 'Drop Boost!', '#ffb56a');
+  });
+};
+// Rage Starter – start next stage at full rage
+const btnRageStart = document.getElementById('buyRageStart');
+if(btnRageStart) btnRageStart.onclick = () => {
+  tryBuy('Rage Starter', 2000, 45, () => {
+    st.nextStageRageStart = true;
+    addFloater(DESIGN_W/2, 60, 'Next Rage ready', '#f9cc2b');
+  });
+};
+// Rage Chain — allow one chained Rage (skips cooldown once)
+const btnRageChain = document.getElementById('buyRageChain');
+if(btnRageChain) btnRageChain.onclick = () => {
+  tryBuy('Rage Chain', 1800, 40, () => {
+    st._rageChains = (st._rageChains||0) + 1;
+    notify('Rage Chain ready', '#f9cc2b');
+  });
+};
+// Magnet Aura (30m) – extend pickup magnet range
+const btnMagnet = document.getElementById('buyMagnet');
+if(btnMagnet) btnMagnet.onclick = () => {
+  tryBuy('Magnet Aura', 20, null, () => {
+    st.magnetAuraT = Math.max(st.magnetAuraT, 30 * 60 * 1000);
+    addFloater(DESIGN_W/2, 60, 'Magnet Aura', '#ffd56a');
+  });
+};
+// Revive Token
+const btnRevive = document.getElementById('buyRevive');
+if(btnRevive) btnRevive.onclick = () => {
+  tryBuy('Revive Token', 60, 5, () => {
+    st.reviveTokens++;
+    addFloater(DESIGN_W/2, 60, '+Revive', '#ff7a6a');
+  });
+};
+// Random Gear Kit
+const btnGearKit = document.getElementById('buyGearKit');
+if(btnGearKit) btnGearKit.onclick = () => {
+  tryBuy('Random Gear', 200, null, () => {
+    for(let i=0;i<4;i++) addRandomItem();
+    addFloater(DESIGN_W/2, 60, 'Gear Kit!', '#8fb6ff');
+  });
+};
+// Respect Token – reset AP
+const btnRespect = document.getElementById('buyRespect');
+if(btnRespect) btnRespect.onclick = () => {
+  tryBuy('Respect Token', 200, 20, () => {
+    st.apPicks.clear(); st.apSpent = 0;
+    tallyTalentStats(); drawTalents();
+    addFloater(DESIGN_W/2, 60, 'AP Reset', '#6aa8ff');
+  });
+};
+// Boss Pass
+const btnBossPass = document.getElementById('buyBossPass');
+if(btnBossPass) btnBossPass.onclick = () => {
+  tryBuy('Boss Pass', 1000, 20, () => {
+    st.bossSkipPasses++;
+    addFloater(DESIGN_W/2, 60, '+Boss Pass', '#ffd56a');
+  });
+};
+// Inventory Row +1
+const btnInvRow = document.getElementById('buyInvRow');
+if(btnInvRow) btnInvRow.onclick = () => {
+  tryBuy('Inventory Row', st.invRowCost, null, () => {
+    st.invRows++;
+    st.invRowCost += 500;
+    refreshInv();
+    addFloater(DESIGN_W/2, 60, '+Bag Slots', '#8fb6ff');
+  });
+};
+// Loadout Slot +1
+const btnLoad = document.getElementById('buyLoadout');
+if(btnLoad) btnLoad.onclick = () => {
+  tryBuy('Loadout Slot', null, 120, () => {
+    st.loadoutSlots++;
+    addFloater(DESIGN_W/2, 60, '+Loadout Slot', '#8fb6ff');
+  });
+};
+// Pet Slot +1
+const btnPetSlot = document.getElementById('buyPetSlot');
+if(btnPetSlot) btnPetSlot.onclick = () => {
+  tryBuy('Pet Slot', 500, 180, () => {
+    st.petSlots++;
+    addFloater(DESIGN_W/2, 60, '+Pet Slot', '#ffb4e6');
+  });
+};
+// Forge Permits
+const btnF1 = document.getElementById('buyForge1');
+if(btnF1) btnF1.onclick = () => {
+  tryBuy('Forge Permit I', 1000, null, () => {
+    st.forgeLevel = Math.max(st.forgeLevel, 1);
+    recalcStats();
+    addFloater(DESIGN_W/2, 60, 'Forge I', '#ffd56a');
+  });
+};
+const btnF2 = document.getElementById('buyForge2');
+if(btnF2) btnF2.onclick = () => {
+  tryBuy('Forge Permit II', 2000, null, () => {
+    st.forgeLevel = Math.max(st.forgeLevel, 2);
+    recalcStats();
+    addFloater(DESIGN_W/2, 60, 'Forge II', '#ffd56a');
+  });
+};
+const btnF3 = document.getElementById('buyForge3');
+if(btnF3) btnF3.onclick = () => {
+  tryBuy('Forge Permit III', 3000, null, () => {
+    st.forgeLevel = Math.max(st.forgeLevel, 3);
+    recalcStats();
+    addFloater(DESIGN_W/2, 60, 'Forge III', '#ffd56a');
+  });
+};
+// Gear & Craft caches
+const btnWC = document.getElementById('buyWCache');
+if(btnWC) btnWC.onclick = () => {
+  tryBuy('Weapon Cache', 1000, null, () => {
+    addRandomItem();
+    addFloater(DESIGN_W/2, 60, 'Weapon Cache', '#8fb6ff');
+  });
+};
+const btnAC = document.getElementById('buyACache');
+if(btnAC) btnAC.onclick = () => {
+  tryBuy('Armor Cache', 1000, null, () => {
+    addRandomItem();
+    addFloater(DESIGN_W/2, 60, 'Armor Cache', '#8fb6ff');
+  });
+};
+const btnAccC = document.getElementById('buyAccCache');
+if(btnAccC) btnAccC.onclick = () => {
+  tryBuy('Accessory Cache', 1000, null, () => {
+    addRandomItem();
+    addFloater(DESIGN_W/2, 60, 'Accessory Cache', '#8fb6ff');
+  });
+};
+// Keys & Chests
+const btnGiftKey = document.getElementById('buyGiftKey');
+if(btnGiftKey) btnGiftKey.onclick = () => {
+  tryBuy('Gift Key', 500, 25, () => {
+    st.giftKeys = (st.giftKeys||0) + 1;
+    openGiftChest();
+    addFloater(DESIGN_W/2, 60, 'Gift Chest', '#ffd56a');
+  });
+};
+const btnBossKey = document.getElementById('buyBossKey');
+if(btnBossKey) btnBossKey.onclick = () => {
+  tryBuy('Boss Key', 3000, 30, () => {
+    st.bossKeys = (st.bossKeys||0) + 1;
+    openBossChest();
+    addFloater(DESIGN_W/2, 60, 'Boss Chest', '#ff8c6a');
+  });
+};
+// Bundles
+const btnBStart = document.getElementById('buyBundleStarter');
+if(btnBStart) btnBStart.onclick = () => {
+  if(st.bundleStarter){ addFloater(DESIGN_W/2, 60, 'Claimed', '#a8b7ce'); return; }
+  // free starter pack: 2 gift chests and 10m magnet aura
+  st.bundleStarter = true;
+  openGiftChest(); openGiftChest();
+  st.magnetAuraT = Math.max(st.magnetAuraT, 10 * 60 * 1000);
+  addFloater(DESIGN_W/2, 60, 'Starter Pack', '#ffd56a');
+};
+const btnBBooster = document.getElementById('buyBundleBooster');
+if(btnBBooster) btnBBooster.onclick = () => {
+  if(st.bundleBooster){ addFloater(DESIGN_W/2, 60, 'Purchased', '#a8b7ce'); return; }
+  tryBuy('Booster Pack', 500, 50, () => {
+    st.bundleBooster = true;
+    // 5 gift chests
+    for(let i=0;i<5;i++) openGiftChest();
+    // XP & drop boosters ×3 => 45 minutes each
+    st.xpBoost = 0.30; st.xpBoostT = Math.max(st.xpBoostT, 45 * 60 * 1000);
+    st.dropBoost = 0.25; st.dropBoostT = Math.max(st.dropBoostT, 45 * 60 * 1000);
+    addFloater(DESIGN_W/2, 60, 'Booster Pack', '#ffd56a');
+  });
+};
+const btnBFounder = document.getElementById('buyBundleFounder');
+if(btnBFounder) btnBFounder.onclick = () => {
+  if(st.bundleFounder){ addFloater(DESIGN_W/2, 60, 'Purchased', '#a8b7ce'); return; }
+  tryBuy('Founder Pack', null, 100, () => {
+    st.bundleFounder = true;
+    st.loadoutSlots++;
+    addFloater(DESIGN_W/2, 60, 'Founder Pack', '#ffd56a');
+  });
+};
+
+function useSkill(a,key){
+  const id = a.id;
+  if(!cdReady(id,key)) return;
+  // A1K: grant brief invulnerability on skill start (safe if A1K absent)
+  try { if(window.A1K && A1K.applyInvuln) A1K.applyInvuln(a); } catch {}
+  // 2s force barrier on any skill cast
+  st._shieldOn = true; st._shieldT = Math.max(st._shieldT||0,2000);
+  if(id==='A1'){
+    if(key==='S1'){
+      addCast(a.x+16, a.y-36, '#ff7a6a');
+      // dash toward nearest enemy to get in range
+      const t = nearestEnemy(a); if(t){ a.x += Math.sign(t.x - a.x) * 80; }
+      // Rapid sword slashes + waves instead of bullets (4–8)
+      const swings = 4 + Math.floor(Math.random()*5);
+      for(let i=0;i<swings;i++){
+        setTimeout(()=>{ const base = 30 + Math.floor(Math.random()*40); const md = enable_v13_7_damage_overrides ? Math.round(base*1.3) : base; melee(a,36,42, md); addArcSlash(a.x+24, a.y-36, 1, '#ff4d4f'); addCrescent(a.x+26, a.y-38, 1, '#ff7a31'); addAfterImage(a.x, a.y, '#ff4d4f'); wave(a, enable_v13_7_damage_overrides? (0.7*1.3) : 0.7 ,'#ff7a6a'); }, i*80);
+      }
+      // extend parry window for A1
+      st.parryT = Math.max(st.parryT, 600);
+      // FX: quick front slash
+      addSlash(a.x+28, a.y-36, 1);
+    }
+    else if(key==='S2'){ const tx=a.x+120, ty=a.y-40; addCast(a.x+6, a.y-34, '#ff7a6a'); setTimeout(()=>{ st.shots.push({x:tx,y:ty,vx:0,vy:0,dmg:applySkillDmg(360),life:80,aoe:72}); addSlash(tx, ty, 1); addCrescent(tx, ty, 1, '#ff7a31'); },800); }
+  else { addCast(a.x+8, a.y-38, '#ff7a6a'); const t=nearestEnemy(a); if(t){ a.x += Math.sign(t.x - a.x) * 100; } a.x=Math.min(DESIGN_W-60, a.x); for(let i=0;i<5;i++){ setTimeout(()=>{ melee(a,36,42,40); wave(a,1.0,'#ff7a6a'); addArcSlash(a.x+24, a.y-36, 1, '#ff4d4f'); }, i*90); } addSlash(a.x+36, a.y-40, 1); a.overT = 4000 + Math.floor(Math.random()*3000); }
+  } else if(id==='Unique'){
+     if(key==='S1'){ console.log('DEBUG: Unique S1 cast start'); addCast(a.x+10, a.y-38, '#6aa8ff'); const n=1+Math.floor(Math.random()*3); for(let i=0;i<n;i++){ setTimeout(()=>{ try{ console.log('DEBUG enemies x:', st.enemies.map(e=>e.x)); }catch{} const t=nearestEnemy(a)||{x:a.x+300,y:a.y}; const ang=Math.atan2(t.y-(a.y-40), t.x-(a.x+10)); const vx=Math.cos(ang)*560, vy=Math.sin(ang)*560; st.shots.push({x:a.x+10,y:a.y-40,vx,vy,speed:560,dmg:applySkillDmg(20),life:2200,laneY:a.y,homing:true,pierce:2, spawnAir: !a.grounded}); console.log('DEBUG: Unique S1 shot', {vx, vy}); addBeam(a.x+10,a.y-40,t.x,t.y,'#63e6ff'); }, i*90); } }
+    else if(key==='S2'){ addCast(a.x+8, a.y-36, '#6aa8ff'); st.hp=Math.min(st.hpMax, st.hp+20); st._shieldOn=true; st._shieldT=Math.max(st._shieldT||0,2000); for(const e of st.enemies){ e.frozenT = Math.max(e.frozenT||0, 3000); } }
+    else { a.overT=7000; a.overCD=0; } // BEAM FIX: timer-based, no setInterval
+  } else { // Missy
+    if(key==='S1'){ addCast(a.x+10, a.y-36, '#ff8c6a'); const md = enable_v13_7_damage_overrides ? Math.round(24*1.3) : 24; melee(a,36,42, md); wave(a, enable_v13_7_damage_overrides? (0.9*1.3) : 0.9,'#6aa8ff'); addCrescent(a.x+22, a.y-36, 1, '#6aa8ff'); }
+    else if(key==='S2'){ addCast(a.x+8, a.y-36, '#63e6ff'); st._bubbleT=2000; st._shieldOn=true; st._shieldT=Math.max(st._shieldT||0,2000); const maxR=(a.rageMax||st.rageMax||100); a.rage=Math.min(maxR, (a.rage||0)+20); 
+      // Summon a big wall with 2k HP in front of team
+      st._wall = {x: Math.min(DESIGN_W-240, leader().x + 160), y: laneY(1), w: 18, h: 120, hp:2000, life:7000};
+      addFloater(a.x, a.y-60, 'Wall Deployed', '#63e6ff');
+    }
+    else { st.pickups.push({kind:'catAlly',x:a.x+40,y:a.y-30,vx:0.08,life:4000,fireT:0}); st.pickups.push({kind:'catAlly',x:a.x+58,y:a.y-30,vx:0.08,life:4000,fireT:0}); }
+  }
+  startCD(id,key);
+}
+function wave(a, mul, tint, fixedDmg){
+  const sc = rageScale();
+  const sizeMul = 1 + (sc - 1) * 0.7;
+  let w = Math.round(46 * sizeMul);
+  let h = Math.round(14 * Math.sqrt(sizeMul));
+  const isA1 = (a && a.id === 'A1');
+  // Determine spawn mode based on whether the spawner is grounded at cast time (A1 only)
+  const isAirborne = !a.grounded;
+  if(isA1 && isAirborne){
+    // Airborne waves: +40% visual+hitbox scale, light homing per global rule
+    w = Math.round(w * 1.4);
+    h = Math.round(Math.max(6, h * 1.4));
+  }
+  const proj = {kind:'wave', color: (tint||'#9ad1ff'), w, h,
+    x:a.x+24, y:a.y-40, vx:560, vy:0, speed:560,
+    dmg:(fixedDmg!=null?fixedDmg:Math.round(a.dmg*mul)), life:2200, laneY:a.y,
+    homing:false, pierce:2, ownerId: a.id};
+  if(isA1){
+    // Floor-rider: bind to lane with small bob; Airborne: enable directional homing
+    if(!isAirborne){
+      proj.floorRider = true;
+      proj.bobAmp = 3 + Math.random()*2; // 3–5px bob per wave
+      proj._t = 0;
+      // Bob frequency via config; default ~2.2 Hz
+      try {
+        const g = (window.game?.config || window.game?.CONFIG || window.CONFIG || window.A1K_CONFIG || {}).globals || {};
+        const aw = (g.a1_wave || {});
+        proj.bobHz = aw.floor_bob_hz || 2.2;
+      } catch { proj.bobHz = 2.2; }
+    } else {
+      proj.homing = true;
+      // Light homing; use global rule if available, else default ~200 deg/s
+      try {
+        const g = (window.game?.config || window.game?.CONFIG || window.CONFIG || window.A1K_CONFIG || {}).globals || {};
+        const pr = (g.projectiles || {});
+        let turn = (pr.skill_homing_turn_rate || pr.player_homing_turn_rate || 200);
+        const aw = (g.a1_wave || {});
+        const minT = (aw.homing_turn_deg_min ?? 180), maxT = (aw.homing_turn_deg_max ?? 220);
+        proj.homingTurn = Math.max(minT, Math.min(maxT, turn));
+      } catch { proj.homingTurn = 200; }
+      proj.reacqMs = 150; // reacquire every 0.15s
+      proj._retargetCD = 0;
+      proj._target = null;
+    }
+    // One-hit-per-enemy per wave (no multi-tick)
+    proj._hit = new Set();
+    // Pierce falloff table for waves: 40→30→20→10, then 10
+    proj._falloff = [40,30,20,10];
+    proj._fallIdx = 0;
+    // Tiny debug overlay: show mode on spawn if enabled
+    try {
+      const show = !!(PATCH && PATCH.ui && PATCH.ui.wave_debug_labels);
+      if(show){ st.effects.push({x: (proj.x||a.x+24), y: (proj.y||a.y-40) - 18, txt: (isAirborne?'airborne':'floor-rider'), color:'#a8b7ce', vy:-0.10, life:600}); }
+    } catch {}
+  }
+  st.shots.push(proj);
+}
+// Melee attack: damage enemies in front of the attacker and reflect overlapping bullets if applicable.
+function melee(a, reach, height, dmg){
+  // Attempt to reflect enemy bullets during melee.  Only A1 and Missy reflect.
+  tryReflectDuringMelee(a);
+  let hit = false;
+  for(const e of st.enemies){
+    if(e.hp>0 && e.x > a.x && (e.x - a.x) <= reach && Math.abs(e.y - a.y) <= height / 2){
+      let dealt = dmg;
+      if(e.defFlat) dealt = Math.max(1, dealt - e.defFlat);
+      if(e.defPct) dealt = Math.max(1, Math.round(dealt * (1 - e.defPct)));
+      e.hp -= dealt;
+      hit = true;
+    }
+  }
+  // FX: show a short slash when swinging
+  addSlash(a.x+24, a.y-36, 1);
+  // Parry/reflect window per swing (1s) for A1/Missy
+  if(a && (a.id==='A1' || a.id==='Missy')){
+    st.parryT = Math.max(st.parryT, 1000);
+    // per-swing reflect counts: A1 2–6, Missy 1–4
+    st._reflectOwnerId = a.id;
+    st._reflectLeft = (a.id==='A1') ? (2 + Math.floor(Math.random()*5)) : (1 + Math.floor(Math.random()*4));
+  }
+  addArcSlash(a.x+24, a.y-36, 1, (a.id==='A1')?'#ff4d4f':'#6aa8ff');
+  addAfterImage(a.x, a.y, (a.id==='A1')?'#ff4d4f':'#6aa8ff');
+  // A1K: on successful melee hit, apply sustain and DEF aura
+  if(hit && window.A1K && A1K.onMeleeHit){
+    try {
+      const prev = a.heal;
+      a.heal = (n)=>{ st.hp = Math.min(st.hpMax, st.hp + (n||0)); };
+      A1K.onMeleeHit(a, dmg);
+      if(prev) a.heal = prev; else delete a.heal;
+      // Optional heal floater for feedback
+      const ls = (A1K.config && A1K.config.globals && A1K.config.globals.sword_contact && A1K.config.globals.sword_contact.lifesteal_pct_of_damage) || 0;
+      const heal = Math.floor((dmg||0) * ls);
+      if(heal>0) addFloater(a.x, a.y - 28, '+' + heal, '#6aa8ff');
+      // Aura ring on sword contact
+      addCast(a.x+20, a.y-40, '#ff7a6a');
+    } catch {}
+  }
+}
+
+// Attempt to reflect enemy bullets during a melee strike.  Only heroes whose id is listed
+// in PATCH.combat.reflect.playerMelee.enabledFor will cause reflection.  For each overlapping
+// enemy projectile within a rectangular melee zone ahead of the attacker, convert it into a
+// friendly shot with mirrored horizontal velocity and reduced vertical velocity.  Reflected
+// shots gain piercing and scaled damage.
+function tryReflectDuringMelee(attacker){
+  if(!PATCH.combat.reflect.playerMelee.enabledFor.includes(attacker.id)) return;
+  if(st.parryT<=0) return;
+  const reachX = 54;
+  const reachY = 36;
+  for(const b of st.eShots){
+    if(!b || b.life <= 0) continue;
+    if(Math.abs(b.x - attacker.x) < reachX && Math.abs(b.y - (attacker.y - 20)) < reachY){
+      if(st._reflectLeft!=null && st._reflectLeft<=0) break;
+      // flip projectile to player
+      const nvx = Math.abs(b.vx); // ensure it travels rightward (toward enemies)
+      const nvy = b.vy * 0.5;
+      b.vx = nvx;
+      b.vy = nvy;
+      b.speed = Math.hypot(nvx, nvy);
+      b.owner = 'player';
+      b.team = 'player';
+      b.pierce = (b.pierce || 0) + 1;
+      const mul = PATCH.combat.reflect.playerMelee.dmgMul || 1.2;
+      b.dmg = Math.round((b.dmg || 10) * ( (st._reflectPingpong && st._reflectPingpong>0) ? (mul*2) : mul));
+      if(st._reflectLeft!=null) st._reflectLeft--;
+    }
+  }
+}
+
+
+/* ===== Progression & Leveling ===== */
+function xpToNext(L){ return Math.round(50 + 25*L + 5*L*L); }
+function grantXP(n){
+  // apply XP booster if active
+  let gain = n;
+  if(st.xpBoost && st.xpBoostT > 0){ gain = n * (1 + st.xpBoost); }
+  st.xp += gain;
+  while(st.xp >= xpToNext(st.level)){
+    st.xp -= xpToNext(st.level);
+    st.level++;
+    st._aiAggroT = Math.max(st._aiAggroT||0, 3000); // aggressive window on level-up
+    // restore party HP/MP on level up
+    st.hp = st.hpMax;
+    st.mp = st.mpMax;
+    // ability point gain: +2 per level, cap at PATCH.systems.talents.cap
+    if(st.level >= 2){ st.apTotal = Math.min(PATCH.systems.talents.cap, (st.apTotal||0) + 2); }
+  }
+}
+
+// Grant XP via floating orbs that home to the XP bar
+function grantXPOrbs(x,y,total){
+  const xpBarEl = document.querySelector('#xpDomFill') || document.querySelector('.xp-bar');
+  const orbs = Math.max(1, Math.min(3, Math.round(total/ Math.max(1,(total>50?40:20)))));
+  const per = Math.max(1, Math.floor(total / orbs));
+  if(window.A1K && A1K.spawnXPOrbs){ A1K.spawnXPOrbs({x,y}, xpBarEl, [orbs,orbs]); }
+  for(let i=0;i<orbs;i++) setTimeout(()=>{ grantXP(per); xpPulse(); }, 650 + i*80);
+}
+function xpPulse(){ const el=document.getElementById('xpDomFill'); if(!el) return; el.classList.add('pulse'); setTimeout(()=>el.classList.remove('pulse'),650); }
+
+/* ===== Rage Ultimates ===== */
+function spawnA1Ultimate(p){
+  // reduce A1 HP by 10% of current
+  st.hp = Math.max(1, st.hp - Math.round(st.hp * 0.10));
+  // spawn giant slash waves across three lanes (+extras by AP tier)
+  const lanes = [0,1,2];
+  let extra = 0; const ap=st.apSpent||0; if(ap>=60) extra=3; else if(ap>=30) extra=1;
+  lanes.forEach((ln, idx) => {
+    const yPos = laneY(ln);
+    for(let i=0;i<3+extra;i++){
+      setTimeout(() => {
+        st.shots.push({x:p.x+20, y:yPos-40, vx:800, vy:0, speed:800, dmg:150, life:1000, laneY:yPos, homing:false, pierce:5, aoe:0});
+      }, i*200);
+    }
+  });
+  // loot boost: raise coin drop chance for 15s
+  st._lootBoost = 15000;
+}
+function spawnUniqueUltimate(p){
+  // prolong overcharge beam for 12s; increase tick damage slightly
+  p.overT = 12000;
+  p.overCD = 0;
+}
+function spawnMissyUltimate(p){
+  // summon chest allies for 20s; these act like stronger cat allies and drop gifts on death
+  const positions = [40, 60, 80];
+  positions.forEach((off, idx) => {
+    st.pickups.push({kind:'catAlly', x:p.x + off, y:p.y - 30, vx:0.06 + idx*0.02, life:2000, fireT:0, strong:true});
+  });
+}
+
+/* ===== Enemies & Waves ===== */
+// Nearest enemy in any direction (fix: allow behind targeting)
+function nearestEnemy(a){
+  let best=null, bd=1e9; const ax=a.x, ay=a.y;
+  for(const e of st.enemies){
+    if(!e || e.hp<=0) continue;
+    const d = Math.hypot(e.x - ax, e.y - ay);
+    if(d < bd){ bd=d; best=e; }
+  }
+  return best;
+}
+function spawnWave(){
+  // spawn mobs for normal waves or a stage boss on the final wave.  The boss type scales
+  // with the current stage (capped at BOSS_COUNT) and may randomly be replaced by a chest boss.
+  if(st.wave < st.wavesPerStage){
+    // Determine number of enemies by stage using PATCH.waves.sizes.  Use enemiesPerWave() helper.
+    const n = enemiesPerWave(st.stage);
+    for(let i=0; i<n; i++){
+      const hpBase = 80 + (st.stage - 1) * 40 + st.wave * 8;
+      const e = {
+        kind: 'mob',
+        x: DESIGN_W + 120 + i * 60,
+        y: laneY([0,1,2][i % 3]),
+        hp: hpBase,
+        max: hpBase,
+        vx: -0.30 - 0.02 * st.stage,
+        fireCD: 1200 + Math.random() * 800
+      };
+      if(st._giantMode){
+        // Giant Mode: power up mobs and add a simple dash skill
+        e.hp = Math.round(e.hp * 1.5); e.max = e.hp;
+        e._dashCD = 1400 + Math.random()*800;
+        e._dashPow = 0.22;
+        e._dashT = 0;
+      }
+      applyEnemyScalars(e);
+      st.enemies.push(e);
+    }
+    // chance to spawn a miniboss between waves 5–7
+    if(st.wave >= PATCH.waves.miniboss.waveMin && st.wave <= PATCH.waves.miniboss.waveMax && Math.random() < PATCH.waves.miniboss.chance){
+      const hp = Math.round((350 + st.stage * 120) * 1.30);
+      const m = { kind:'miniboss', x: DESIGN_W - 140, y: laneY(1), hp: hp, max: hp, vx: -0.12, fireCD: 1000, shieldT:5000 };
+      if(st._giantMode){ m.hp = Math.round(m.hp * 1.7); m.max = m.hp; }
+      applyEnemyScalars(m);
+      st.enemies.push(m);
+    }
+    // chance to spawn a gift-box boss (piñata) between waves 2–9
+    if(st.wave >= PATCH.waves.giftBoxBoss.waveMin && st.wave <= PATCH.waves.giftBoxBoss.waveMax && Math.random() < PATCH.waves.giftBoxBoss.chance){
+      const hp = Math.round((420 + st.stage * 80) * 1.30);
+      const gb = { kind:'chestBoss', x: DESIGN_W - 220, y: laneY(1), hp: hp, max: hp, vx: -0.10, canHurt: false, shieldT:5000 };
+      if(st._giantMode){ gb.hp = Math.round(gb.hp * 2.0); gb.max = gb.hp; }
+      applyEnemyScalars(gb);
+      st.enemies.push(gb);
+    }
+    // Wave Leader on even waves: spawn behind frontline
+    if((st.wave % 2) === 0){
+      const LHP = 1000;
+      const leader = {
+        kind:'wave_leader', x: DESIGN_W - 260, y: laneY(1), hp:LHP, max:LHP, vx:-0.06, fireCD: 1600,
+        reflectCD: 0, reflectOn:false, reflectT:0,
+        nextSpell: 'heal', spellCD: 1500, spellIdx:0,
+        name: makeLeaderName(), atk: 30 + st.stage*2, def: 10 + st.stage,
+        secret: (st._leaderSecretScale||0)
+      };
+      if(st._giantMode){ leader.hp = Math.round(leader.hp * 1.7); leader.max = leader.hp; }
+      applyEnemyScalars(leader);
+      st.enemies.push(leader);
+    }
+  } else {
+    // Determine which boss pattern to use based on stage.  Only BOSS_COUNT unique patterns
+    // exist; later stages reuse the final pattern.  Chest boss still has a 50% chance.
+    const idx = Math.min(st.stage, BOSS_COUNT);
+    const useChest = rng() < 0.5;
+    const bossKind = useChest ? 'chestBoss' : 'boss' + idx;
+    const hp = Math.round((900 + (st.stage - 1) * 220) * 1.30);
+    const b = {
+      kind: bossKind,
+      x: DESIGN_W - 260,
+      y: laneY(1),
+      hp: hp,
+      max: hp,
+      vx: 0,
+      phase2: false,
+      fireCD: 600
+    };
+    if(st._giantMode){ b.hp = Math.round(b.hp * 2.0); b.max = b.hp; }
+    b.shieldT = 5000;
+    // If not a chest boss, set preferred distance and reflect/summon fields
+    if(!useChest){
+      b.preferredDist = Math.min(180, (PATCH.combat.boss && PATCH.combat.boss.preferredDistance) || 180);
+      b.defFlat = 25; b.defPct = 0.08;
+      b.reflectCD = 0;
+      b.reflectOn = false;
+      b.reflectT = 0;
+      b.reflected = 0;
+      b.summonCD = PATCH.combat.boss.summon.cooldownSec * 1000;
+    }
+    // scale fireCD via helper for global slowdown
+    applyEnemyScalars(b);
+    st.enemies.push(b);
+    st.bossAlive = true;
+    st.bossMax = hp;
+    st.bossHP = hp;
+    st.chestBoss = useChest;
+  }
+}
+// === PATCH v3 helpers ===
+// Determine number of enemies per wave by stage using the PATCH.waves.sizes table.
+function enemiesPerWave(stageNum){
+  const list = PATCH.waves.sizes;
+  let row = list.find(r => r.stage === stageNum);
+  if(!row) row = list[list.length - 1];
+  let base = Math.floor(row.min + Math.random() * (row.max - row.min + 1));
+  if(st._giantMode){ base = Math.max(1, Math.round(base * 0.65)); }
+  return base;
+}
+
+// Generate a simple leader name like "Sable Herald"
+function makeLeaderName(){
+  const A = ['Sable','Gloom','Iron','Azure','Crimson','Ivory','Umbral','Cinder'];
+  const B = ['Herald','Warden','Augur','Invoker','Captain','Marshal','Oracle'];
+  return A[Math.floor(Math.random()*A.length)] + ' ' + B[Math.floor(Math.random()*B.length)];
+}
+
+// Start/Exit Dungeon (Giant Mode)
+function startDungeon(){
+  st._dungeonSnap = { stage:st.stage, wave:st.wave, wavesPerStage:st.wavesPerStage, bossAlive:st.bossAlive, chestBoss:st.chestBoss };
+  st._inDungeon = true; st._giantMode = true;
+  st.stage = 99; st.wave = 1; st.wavesPerStage = 1; st.bossAlive=false; st.chestBoss=false;
+  st.enemies.length=0; st.shots.length=0; st.eShots.length=0; st.pickups.length=0;
+  addFloater(DESIGN_W/2, 80, 'Entering Dungeon', '#6aa8ff');
+  spawnWave();
+}
+function exitDungeon(success){
+  const snap = st._dungeonSnap || { stage:1, wave:1, wavesPerStage:PATCH.meta.wavesPerStage };
+  st._inDungeon = false; st._giantMode = false; st._dungeonSnap = null;
+  st.stage = snap.stage; st.wave = snap.wave; st.wavesPerStage = snap.wavesPerStage;
+  st.bossAlive = snap.bossAlive||false; st.chestBoss = snap.chestBoss||false;
+  st.enemies.length=0; st.shots.length=0; st.eShots.length=0; st.pickups.length=0;
+  addFloater(DESIGN_W/2, 80, success?'Dungeon Cleared':'Dungeon Failed', success?'#36c777':'#ff7a6a');
+  spawnWave();
+}
+// Apply global slowdowns to enemies.  Movement and fire rate are scaled by PATCH settings.
+function applyEnemyScalars(e){
+  if(e.vx !== undefined){ e.vx *= PATCH.systems.enemyMoveScale; }
+  if(e.fireCD !== undefined){ e.fireCD *= (1 / PATCH.systems.enemyFireRateScale); }
+  if(st._giantMode){
+    if(e.vx !== undefined) e.vx *= 0.70;     // run ~0.7x
+    if(e.fireCD !== undefined) e.fireCD *= (1/0.80); // attack ~0.8x pace (slower)
+  }
+}
+// === END PATCH v3 helpers ===
+function advanceWave(){
+  if(st.wave < st.wavesPerStage){
+    // normal wave advance
+    st.wave++;
+    spawnWave();
+  } else {
+    // end of stage: move to next stage
+    // If in Dungeon (Giant Mode), exit back to snapshot instead of advancing
+    if(st._inDungeon){ exitDungeon(true); return; }
+    st.stage++;
+    st.wave = 1;
+    st.bossAlive = false;
+    st.chestBoss = false;
+    // Rage Starter: set rage to full for next stage, but preserve cooldown
+    if(st.nextStageRageStart){
+      st.rage = st.rageMax;
+      st.nextStageRageStart = false;
+    }
+    // Boss Pass: if player has passes and has previously cleared this stage's boss
+    if(st.bossSkipPasses > 0 && st.bossCleared && st.bossCleared[st.stage]){
+      st.bossSkipPasses--;
+      // set wave to last wave to spawn boss immediately
+      st.wave = st.wavesPerStage;
+    }
+    spawnWave();
+  }
+}
+
+/* ===== Loop ===== */
+let last=performance.now();
+// Turn-around test (?test=1): spawns a mob behind leader, forces shoot, and asserts a leftward shot
+let _turnTestRun = false, _turnTestCheckT = 0;
+function maybeRunTurnaroundTest(){
+  try {
+    if(_turnTestRun) return;
+    if(typeof location!=='undefined' && !/(^|[?&])test=1(&|$)/.test(location.search)) return;
+    const l = leader();
+    // clear and spawn a target left-of-Unique but to the right of center (respects enemy clamp)
+    st.enemies.length = 0; st.shots.length = 0; st.eShots.length = 0;
+    try { st.players[1].x = Math.max(820, DESIGN_W*0.75); st.players[1].y = laneY(1); } catch {}
+    const ux = st.players[1].x;
+    st.enemies.push({kind:'mob', x: Math.max(DESIGN_W/2, ux - 100), y: laneY(1), hp:30, max:30, vx:0, fireCD:99999});
+    // Suppress initial wave spawn to isolate the test
+    st.started = true;
+    // Switch to Unique to guarantee a ranged shot, force auto and hold shoot
+    try { st.leader = 1; updateCharBtns(); } catch {}
+    try { const autoOpt = document.getElementById('optAuto'); if(autoOpt) autoOpt.checked = true; } catch {}
+    try { if(window.hold) hold.shoot = true; } catch {}
+    // fire S1 once explicitly; nearest enemy is behind so angle should point left
+    try { setTimeout(()=>{ const u = st.players[st.leader]; console.log('DEBUG: maybeRunTurnaroundTest leader', u?.id); if(u && u.id==='Unique'){ console.log('DEBUG: invoking useSkill Unique S1'); useSkill(u,'S1'); } }, 80); } catch {}
+    notify('TEST: Turn-around', '#a8b7ce'); console.log('[TEST] Turn-around: spawned target behind leader');
+    _turnTestRun = true; _turnTestCheckT = 1400; // ms
+  } catch {}
+}
+function loop(t){
+  const dt=(t-last)/1000; last=t;
+  if(!st.running){ requestAnimationFrame(loop); return; }
+  st.time+=dt*st.speed; st.dt=dt*st.speed;
+  // auto-run turn-around test if requested
+  maybeRunTurnaroundTest();
+  if(_turnTestCheckT>0){
+    _turnTestCheckT -= st.dt*1000;
+    if(_turnTestCheckT<=0){
+      const l = leader();
+      const shot = st.shots.find(s => s && typeof s.vx==='number' && s.vx < 0);
+      const pass = !!shot;
+      const msg = pass ? 'PASS: Shot left' : 'FAIL: Did not shoot left';
+      addFloater(l.x, l.y-60, msg, pass?'#36c777':'#ff7a6a');
+      console[pass?'log':'error']('[TEST] Turn-around:', msg, shot);
+    }
+  }
+
+  // initial spawn gate
+  if(!st.started){ st.started=true; spawnWave(); }
+
+  // timers
+  for(const id of ['A1','Unique','Missy']) for(const k of ['S1','S2','S3']) st.cds[id][k]=Math.max(0,st.cds[id][k]-st.dt*1000);
+  if(st._shieldOn){ st._shieldT-=st.dt*1000; if(st._shieldT<=0) st._shieldOn=false; }
+  if(st._bubbleT){ st._bubbleT-=st.dt*1000; if(st._bubbleT<=0) st._bubbleT=0; }
+  // Per-hero rage timers
+  for(const p of st.players){
+    if(p.rageOn){ p.rageDur -= st.dt*1000; if(p.rageDur<=0){ p.rageOn=false; p._rageAuraT = Math.max(p._rageAuraT||0, 1000); } }
+    else if(p.rageICD && p.rageICD>0){ p.rageICD -= st.dt*1000; if(p.rageICD<0) p.rageICD=0; }
+    if(p._rageAuraT && p._rageAuraT>0){ p._rageAuraT -= st.dt*1000; if(p._rageAuraT<0) p._rageAuraT=0; }
+  }
+  st._anyRageOn = st.players.some(p=>p.rageOn);
+  st.mp=Math.min(st.mpMax, st.mp+st.mpRegen*st.dt);
+  if(st.parryT>0){ st.parryT -= st.dt*1000; if(st.parryT < 0) st.parryT = 0; }
+  if(st._lootBoost && st._lootBoost > 0){ st._lootBoost -= st.dt * 1000; if(st._lootBoost < 0) st._lootBoost = 0; }
+
+  // decrement booster timers
+  if(st.xpBoostT > 0){ st.xpBoostT -= st.dt * 1000; if(st.xpBoostT <= 0){ st.xpBoostT = 0; st.xpBoost = 0; } }
+  if(st.dropBoostT > 0){ st.dropBoostT -= st.dt * 1000; if(st.dropBoostT <= 0){ st.dropBoostT = 0; st.dropBoost = 0; } }
+  if(st.magnetAuraT > 0){ st.magnetAuraT -= st.dt * 1000; if(st.magnetAuraT <= 0){ st.magnetAuraT = 0; } }
+
+  // formation + movement (followers orbit, dodge, retreat)
+  const l=leader(); l.vx=(joyX||0)*0.45*(st._anyRageOn?1.2:1); l.vy+=0.002; // slightly stronger gravity
+  // Facing: leader follows joystick; others face nearest enemy; fallback to right
+  try {
+    for(const p of st.players){
+      const controlDir = (p===l && Math.abs(joyX||0) > 0.05) ? Math.sign(joyX) : 0;
+      let dir = controlDir;
+      if(dir===0){ const t = nearestEnemy(p); if(t) dir = Math.sign(t.x - p.x); }
+      if(dir===0) dir = 1;
+      p.face = (dir>=0) ? 1 : -1;
+    }
+  } catch {}
+  // Decrement AI aggro window
+  st._aiAggroT = Math.max(0, (st._aiAggroT||0) - st.dt*1000);
+  for(const p of st.players){
+    p._orbitT = (p._orbitT||0) + st.dt; // idle orbit timer
+    const baseBehind = (st._aiAggroT>0? 60 : 90);
+    const orbit = (p===l? 0 : (Math.sin(p._orbitT*2 + (p.id==='Missy'?1.6:0)) * 10));
+    let targetX = (p===l? l.x : l.x - baseBehind - (p===st.players[2]?20:0) + orbit);
+    const targetY = laneY(p.lane);
+    // Defensive retreat if many enemies or low HP
+    const threat = (st.enemies.length>=6) || (st.hp < st.hpMax*0.35);
+    if(p!==l && threat) targetX -= 20;
+    // Hide behind ally: ensure follower X never exceeds leader X-30
+    if(p!==l) targetX = Math.min(targetX, l.x - 30);
+    if(p===l){ p.x+=l.vx*DESIGN_W*st.dt; p.y+=l.vy*DESIGN_H*st.dt; }
+    else { p.x+=(targetX-p.x)*0.09; p.y+=(targetY-p.y)*0.12; }
+    // Missy short flight window (<=10s, with cooldown)
+    if(p.id==='Missy'){
+      p.flightCD = Math.max(0, (p.flightCD||0) - st.dt*1000); p.flightT = Math.max(0, (p.flightT||0) - st.dt*1000);
+      if(p.flightCD<=0 && st.enemies.length>=5){ p.flightT = 6000 + Math.floor(Math.random()*4000); p.flightCD = 18000; }
+      if(p.flightT>0){ p.vy += 0.001; /* lighter gravity */ }
+    }
+    // Jump-dodge enemy bullets
+    // Jump-dodge with per-ally cooldown and larger radius
+    p._dodgeCD = Math.max(0, (p._dodgeCD||0) - st.dt*1000);
+    const nearShot = st.eShots.find(b=>{ const dx=b.x-p.x, dy=b.y-p.y; return (dx*dx+dy*dy) < (120*120); });
+    if(p._dodgeCD<=0 && nearShot && p.grounded){ p.vy = PATCH.systems.jump.v0; p.grounded=false; p._dodgeCD = 800 + Math.floor(Math.random()*400); }
+    // ground clamp
+    if(p.y>laneY(p.lane)){ p.y=laneY(p.lane); p.vy=0; p.grounded=true; } else p.grounded=false;
+    // widen playable range so leader can approach bosses on the right; clamp to screen
+    p.x=Math.max(40,Math.min(DESIGN_W-40,p.x));
+    p.y=Math.max(60,Math.min(DESIGN_H-60,p.y));
+    // Unique beam ticks (bug fix: timer-based)
+    if(p.overT>0){ p.overT-=st.dt*1000; p.overCD-=st.dt*1000; if(p.overCD<=0){ p.overCD=120; const t=nearestEnemy(p); if(t){ const ang=Math.atan2(t.y-(p.y-40), t.x-(p.x+10)); st.shots.push({x:p.x+10,y:p.y-40,vx:Math.cos(ang)*740,vy:Math.sin(ang)*740,speed:740,dmg:applySkillDmg(10),life:180,laneY:p.y,homing:true,pierce:3, spawnAir: !p.grounded, ownerId:p.id}); addBeam(p.x+10,p.y-40,t.x,t.y,'#63e6ff'); } } }
+  }
+
+  // auto & manual fire / skills
+  if(st.auto){
+    // always hold shoot
+    hold.shoot = true;
+    // schedule auto use of skills, shield, jump and rage sequentially
+    if(st.time >= st._autoNextSkill){
+      let acted = false;
+      // If Rage ready and not on cooldown, use it (disabled by default)
+      const lr = st.players[st.leader];
+      if(st.allowAutoRage && lr && !lr.rageOn && lr.rage >= (lr.rageMax||100) && (lr.rageICD||0) <= 0){
+        triggerRageFor(lr);
+        acted = true;
+      } else {
+        // Prioritize heal/shield if HP or MP low
+        // Use shield if not active and mp available
+        if(!st._shieldOn && st.mp >= 30){ st._shieldOn = true; st._shieldT = 2500; st.mp -= 30; acted = true; }
+        // Jump periodically to avoid contact
+        else if(st.time - (st._lastAutoJump||0) > 2.5){ jumpAll(); st._lastAutoJump = st.time; acted = true; }
+        // Auto skills for leader first, then others
+        const order = [st.leader, (st.leader+1)%3, (st.leader+2)%3];
+        for(const idx of order){ if(acted) break; const h = st.players[idx];
+          for(const sk of ['S3','S2','S1']){ if(cdReady(h.id, sk)){
+            // Unique healing only if HP below 70%
+            if(h.id==='Unique' && sk==='S2' && st.hp/st.hpMax > 0.7) continue;
+            // Missy bubble (S2) rarely used, only if many enemies
+            if(h.id==='Missy' && sk==='S2' && st.enemies.length < 3) continue;
+            useSkill(h, sk);
+            acted = true;
+            break;
+          } }
+        }
+      }
+      if(acted){
+        // delay next auto skill to avoid spamming
+        st._autoNextSkill = st.time + 0.8;
+      }
+    }
+  }
+  // manual/auto primary cadence
+  if(hold.shoot){
+    // A1 short melee cadence only; 3–5 hit combo with heavy swings; 4th/5th emits mid-size wave (70 dmg)
+    if((st.time%0.28)<0.02){
+      st._a1Combo = (st._a1Combo||0) + 1; if(st._a1Combo>5) st._a1Combo=1;
+      const base = enable_v13_7_damage_overrides ? (50 + Math.floor(Math.random()*71)) : (l.dmg||50);
+      melee(l,32,42,base);
+      addCrescent(l.x+24, l.y-36, 1, '#ff4d4f');
+      if(st._a1Combo>=4){ wave(l,1.0,'#ff7a6a', enable_v13_7_damage_overrides?70:Math.round(l.dmg*0.9)); }
+    }
+    // Unique & Missy patterned fire with cooldowns
+    st._autoState = st._autoState || {};
+    for(const p of st.players){ if(p.id==='A1') continue; const id=p.id; const state = (st._autoState[id] ||= { cd:0, seqIdx:0, last:0 });
+      state.cd = Math.max(0, state.cd - st.dt*1000);
+      if(state.cd>0) continue;
+      if(id==='Unique'){
+        // Big slow piercer: 1.0–2.0s cooldown, high damage 100–230, knockback on hit
+        const t=nearestEnemy(p)||{x:p.x+300,y:p.y}; const ang=Math.atan2(t.y-(p.y-40), t.x-(p.x+10));
+        const w=84, h=32; const sp=340; const dmg = enable_v13_7_damage_overrides ? (100 + Math.floor(Math.random()*131)) : Math.max(20, Math.round((p.dmg||20) * 2));
+        st.shots.push({kind:'unique_big', x:p.x+10,y:p.y-40,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,speed:sp,dmg,life:3200,laneY:p.y,homing:true, spawnAir: !p.grounded, w, h, ownerId:p.id});
+        state.cd = 1000 + Math.random()*1000;
+      } else if(id==='Missy'){
+        // Missy: sword, sword, pistol, pistol pattern
+        const pat = ['S','S','P','P']; const step = pat[state.seqIdx % pat.length]; state.seqIdx++;
+        if(step==='S'){
+          const base = enable_v13_7_damage_overrides ? (50 + Math.floor(Math.random()*71)) : (p.dmg||50);
+          melee(p, 32, 42, base);
+          // emit mid wave (30) using falloff table
+          wave(p, 1.0, '#ff8c6a', enable_v13_7_damage_overrides?30:Math.round(p.dmg*0.7));
+          addAfterImage(p.x, p.y, '#ff8c6a');
+          state.cd = 300; // quick slashes
+        } else {
+          const t=nearestEnemy(p)||{x:p.x+260,y:p.y}; const ang=Math.atan2(t.y-(p.y-40), t.x-(p.x+10));
+          const sp=500; const shots = 2 + Math.floor(Math.random()*2);
+          for(let k=0;k<shots;k++) setTimeout(()=>{
+            const pdmg = enable_v13_7_damage_overrides ? (40+Math.floor(Math.random()*61)) : Math.max(8, Math.round(p.dmg*0.9));
+            st.shots.push({kind:'missy_pistol', x:p.x+10,y:p.y-40,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,speed:sp,dmg:pdmg,life:2200,laneY:p.y,homing:true, spawnAir: !p.grounded, ownerId:p.id});
+          }, k*80);
+          state.cd = 520; // slower cadence
+        }
+      }
+    }
+  }
+
+  // shots (player)
+  for(const s of st.shots){
+    // One-time spawn FX
+    if(!s._fxSpawned){ s._fxSpawned = true; addMuzzle(s.x, s.y, (s.kind==='wave' ? (s.color||'#9ad1ff') : '#cfe3ff')); }
+    // Lightweight trailing effect
+    s._trailCD = (s._trailCD==null) ? 0 : s._trailCD - st.dt*1000;
+    if(s._trailCD<=0){ s._trailCD = (s.kind==='wave' ? 40 : 70); addTrail(s.x - s.vx*0.02, s.y - s.vy*0.02, (s.kind==='wave'?(s.color||'#9ad1ff'):'#cfe3ff'), (s.kind==='wave'?s.w||18:6), (s.kind==='wave'?s.h||6:3)); }
+    // Electric sparkle for Unique's big projectile
+    if(s.kind==='unique_big'){
+      s._elecCD = (s._elecCD==null) ? 0 : s._elecCD - st.dt*1000;
+      if(s._elecCD<=0){ s._elecCD = 60; addBolt(s.x-6, s.y-4, s.x+8, s.y+6, '#63e6ff'); }
+    }
+    // Late init: apply Aerial Fire Homing clamps to airborne-spawned projectiles
+    if(s.homing && s.spawnAir && !s._airInit){
+      if(!s.homingTurn && s.kind!=='wave'){
+        // Clamp non-wave projectiles to 240–300 deg/s and add reacquire
+        s.homingTurn = 270; // center; turning capped per update below
+        s.reacqMs = 150;
+      }
+      s._retargetCD = 0; s._target = null; s._airInit = true;
+    }
+    // Homing logic: if capped turn present, use it; else use legacy snap homing
+    if(s.homing){
+      if(s.homingTurn){
+        // decrement retarget cooldown
+        s._retargetCD = Math.max(0, (s._retargetCD||0) - st.dt*1000);
+        if(!s._target || (s._target && s._target.hp<=0) || s._retargetCD<=0){ s._target = nearestEnemy({x:s.x,y:s.y}); s._retargetCD = s.reacqMs || 150; }
+        const t = s._target;
+        if(t){
+          const desiredAx = t.x - s.x, desiredAy = t.y - s.y;
+          const desiredAng = Math.atan2(desiredAy, desiredAx);
+          const curAng = Math.atan2(s.vy, s.vx);
+          let dAng = desiredAng - curAng;
+          while(dAng>Math.PI) dAng -= Math.PI*2; while(dAng<-Math.PI) dAng += Math.PI*2;
+          // Per-type clamp: waves already set 180–220 via spawn; non-waves use 240–300; we clamp symmetrically here
+          let turnRate = s.homingTurn;
+          if(s.kind!=='wave'){ turnRate = Math.max(240, Math.min(300, turnRate)); }
+          const maxTurn = (turnRate||200) * (Math.PI/180) * st.dt;
+          const turn = Math.max(-maxTurn, Math.min(maxTurn, dAng));
+          const newAng = curAng + turn;
+          s.vx = Math.cos(newAng) * s.speed;
+          s.vy = Math.sin(newAng) * s.speed;
+        }
+      } else {
+        const t=nearestEnemy({x:s.x,y:s.laneY}); if(t){ const ax=t.x-s.x, ay=t.y-s.y; const m=Math.hypot(ax,ay)||1; s.vx=(ax/m)*s.speed; s.vy=(ay/m)*s.speed; }
+      }
+    }
+    // update position
+    s.x+=s.vx*st.dt; s.y+=s.vy*st.dt; s.life-=st.dt*1000;
+    // Floor-rider waves: stick to lane y with subtle bob; zero vertical drift
+    if(s.kind==='wave' && s.floorRider){
+      s._t = (s._t||0) + st.dt; s.vy = 0;
+      const hz = s.bobHz || 2.2; const ang = (s._t||0) * 2 * Math.PI * hz;
+      s.y = (s.laneY - 40) + Math.sin(ang) * (s.bobAmp||4);
+    }
+    // bounce off ground or ceiling or walls if bounce property is present
+    if(s.bounce && s.bounce>0){
+      // ground at DESIGN_H-120; ceiling at 0
+      if(s.y > DESIGN_H-120 && s.vy>0){ s.vy = -Math.abs(s.vy); s.bounce--; }
+      if(s.y < 0 && s.vy<0){ s.vy = Math.abs(s.vy); s.bounce--; }
+      // left and right walls
+      if(s.x < 0 && s.vx<0){ s.vx = Math.abs(s.vx); s.bounce--; }
+      if(s.x > DESIGN_W && s.vx>0){ s.vx = -Math.abs(s.vx); s.bounce--; }
+    }
+  }
+  st.shots=st.shots.filter(s=>s.life>0 && s.x<DESIGN_W+60 && s.y>-60 && s.y<DESIGN_H+60);
+
+  // enemies move & shoot
+  for(const e of st.enemies){
+    // tick status effects
+    if(e.atkDownT && e.atkDownT>0){ e.atkDownT-=st.dt*1000; if(e.atkDownT<=0){ e.atkDownT=0; e.atkMult=1; } }
+    if(e.dizzyT && e.dizzyT>0){ e.dizzyT-=st.dt*1000; if(e.dizzyT<0) e.dizzyT=0; }
+    // Apply slow and clamp approach to center screen
+    if(e.slowT && e.slowT>0){ e.slowT -= st.dt*1000; e.vx *= 0.9; }
+    e.x += (e.vx||0)*DESIGN_W*st.dt;
+    // prevent passing center of field
+    e.x = Math.max(DESIGN_W/2, e.x);
+    // Missy wall barrier: stop enemies at wall and let them chip it
+    if(st._wall && st._wall.hp>0){ const wx = st._wall.x; if(e.x < wx){ e.x = wx; if(Math.random()<0.02){ st._wall.hp -= 10; if(st._wall.hp<=0){ addFloater(wx, laneY(1)-60, 'Wall Broken', '#ff7a6a'); st._wall=null; } } } }
+    // light jitter and dodge to avoid sync walls for mobs
+    if(e.kind==='mob'){
+      e._jCD = Math.max(0, (e._jCD||0) - st.dt*1000);
+      if(e._jCD<=0){ e._jCD = 600 + Math.random()*800; e._jit = (Math.random()*2-1)*6; }
+      e.y += (e._jit||0) * st.dt;
+    }
+    // freeze state (Unique S2)
+    if(e.frozenT && e.frozenT>0){ e.frozenT -= st.dt*1000; e.vx = 0; }
+    // boss/miniboss spawn shield timer
+    if(e.shieldT && e.shieldT>0){ e.shieldT -= st.dt*1000; if(e.shieldT<0) e.shieldT = 0; }
+    // Boss reflect & summon logic (PATCH v3)
+    if(e.kind && e.kind.startsWith('boss') && !st.chestBoss){
+      // reflect window and cooldown
+      if(e.reflectOn){
+        e.reflectT -= st.dt * 1000;
+        if(e.reflectT <= 0){ e.reflectOn = false; addFloater(e.x, e.y - 60, 'Reflect Off', '#a8b7ce'); }
+      } else {
+        e.reflectCD = Math.max(0, (e.reflectCD || 0) - st.dt * 1000);
+        if(e.reflectCD <= 0){
+          e.reflectOn = true;
+          e.reflectT = PATCH.combat.reflect.boss.windowSec * 1000;
+          e.reflected = 0;
+          e.reflectCD = PATCH.combat.reflect.boss.cooldownSec * 1000 + e.reflectT;
+          addFloater(e.x, e.y - 60, 'Reflect!', '#ffd56a');
+        }
+      }
+      // Guardrail: keep boss ~240–300px ahead of leader
+      const L = leader();
+      if(L){ const minX = L.x + 240, maxX = L.x + 300; e.x = Math.max(minX, Math.min(maxX, e.x)); }
+      // summon adds
+      e.summonCD = (e.summonCD || 0) - st.dt * 1000;
+      if(e.summonCD <= 0){
+        const addsAlive = st.enemies.filter(x => x.kind === 'boss_add' && x.hp > 0).length;
+        if(addsAlive < PATCH.combat.boss.summon.maxAlive){
+          for(let i=0; i<PATCH.combat.boss.summon.count; i++){
+            const add = { kind:'boss_add', x: e.x - 40 - 20 * i, y: laneY([0,1,2][i % 3]), hp: 120 + st.stage * 20, max: 120 + st.stage * 20, vx: -0.20, fireCD: 1400 };
+            applyEnemyScalars(add);
+            st.enemies.push(add);
+          }
+        }
+        e.summonCD = PATCH.combat.boss.summon.cooldownSec * 1000;
+      }
+      // maintain preferred distance from leader (closer, slower)
+      if(e.preferredDist){
+        const want = Math.min(180, e.preferredDist || 180);
+        const targetX = Math.max(380, st.players[st.leader].x + want);
+        const ax = (targetX - e.x) * 0.0035;
+        e.vx = (e.vx || 0) + ax;
+        e.vx = Math.max(-0.12, Math.min(0.12, e.vx));
+      }
+    }
+    // Wave Leader AI (every other wave)
+    if(e.kind === 'wave_leader'){
+      // Deflect window: 0.6s every 5s
+      if(e.reflectOn){ e.reflectT -= st.dt*1000; if(e.reflectT<=0){ e.reflectOn=false; addFloater(e.x, e.y-60, 'Deflect Off', '#a8b7ce'); } }
+      else { e.reflectCD = Math.max(0, (e.reflectCD||0) - st.dt*1000); if(e.reflectCD<=0){ e.reflectOn=true; e.reflectT=600; e.reflectCD = 5000 + e.reflectT; addFloater(e.x, e.y-60, 'Deflect!', '#ffd56a'); } }
+      // Spell rotation (Heal -> DEF -> Summon)
+      e.spellCD = Math.max(0, (e.spellCD||0) - st.dt*1000);
+      if(e.spellCD<=0){
+        let success=false;
+        const order=['heal','def','summon']; e.nextSpell = order[(e.spellIdx||0)%order.length];
+        if(e.nextSpell==='heal'){
+          for(const a of st.enemies){ if(a===e) continue; if(a.hp>0 && a.hp < a.max){ const heal = Math.min(80, a.max - a.hp); a.hp += heal; success = success || heal>0; } }
+        } else if(e.nextSpell==='def'){
+          for(const a of st.enemies){ if(a===e) continue; if(a.hp>0){ a.shieldT = Math.max(a.shieldT||0, 2000); success = true; } }
+        } else if(e.nextSpell==='summon'){
+          const cnt = 1 + Math.floor(Math.random()*3);
+          for(let i=0;i<cnt;i++){
+            const hp = 120 + st.stage * 20;
+            const m = { kind:'mob', x: e.x - 40 - i*20, y: laneY([0,1,2][i % 3]), hp, max:hp, vx:-0.28, fireCD:1200 + Math.random()*600 };
+            applyEnemyScalars(m); st.enemies.push(m); success = true;
+          }
+        }
+        if(success){ st._leaderSecretScale = (st._leaderSecretScale||0) + 1; }
+        e.spellIdx = (e.spellIdx||0) + 1; e.spellCD = 1800;
+      }
+      // Slightly hover to stay behind line
+      e.x = Math.min(e.x, DESIGN_W - 220);
+    }
+    // boss patterns
+    if(!(e.frozenT && e.frozenT>0)) e.fireCD = (e.fireCD||600) - st.dt*1000; else e.fireCD = e.fireCD || 600;
+    if(e.fireCD<=0){
+      if(e.kind === 'mob'){
+        e.fireCD = 900 + Math.random() * 600;
+        enemyShoot(e, false);
+      } else if(e.kind && (e.kind.startsWith('boss') || e.kind === 'chestBoss')){
+        // Bosses and chest bosses shoot more frequently and can have homing bullets
+        e.fireCD = 420;
+        enemyShoot(e, rng() < 0.25);
+      }
+    }
+    // phase flip when a boss crosses half HP; applies to numbered bosses only
+    if(e.kind && e.kind.startsWith('boss') && !e.phase2 && e.hp < e.max * 0.5){
+      e.phase2 = true;
+    }
+  }
+
+  // enemy shots update
+  for(const b of st.eShots){
+    // parry reflection: if a parry window is active on A1 or Missy, convert enemy bullets into friendly shots
+    if(st.parryT > 0){
+      for(const p of st.players){
+        if((p.id==='A1' || p.id==='Missy') && Math.abs(p.x - b.x) < 28 && Math.abs(p.y - b.y) < 28){
+          // reflect bullet: remove from enemy shots and spawn a friendly piercing wave
+          b.life = 0;
+          // spawn reflected shot with same speed directed forward and piercing
+          const vx = b.vx > 0 ? b.vx : Math.abs(b.vx);
+          const vy = b.vy;
+          st.shots.push({x:b.x, y:b.y, vx:vx, vy:vy, speed:Math.hypot(vx,vy), dmg:20, life:600, laneY:b.y, homing:false, pierce:3});
+          break;
+        }
+      }
+    }
+    if(b.homing){
+      // Late-init homing fields
+      if(!b._init){ b._init=true; b._retargetCD=0; b.reacqMs = b.reacqMs || 500; b.turnRate = b.turnRate || 45; }
+      // Retarget periodically
+      b._retargetCD = Math.max(0, (b._retargetCD||0) - st.dt*1000);
+      if(!b._tgt || b._retargetCD<=0){ b._tgt = st.players[st.leader]; b._retargetCD = b.reacqMs; }
+      const t=b._tgt;
+      // Disable homing while target invuln
+      let inv=false; try { inv = (window.A1K && A1K.isInvuln && t && A1K.isInvuln(t)); } catch {}
+      if(!t || inv){ /* keep current vector */ }
+      else {
+        const ax=t.x-b.x, ay=t.y-b.y; const desiredAng=Math.atan2(ay,ax); const curAng=Math.atan2(b.vy,b.vx);
+        let dAng = desiredAng - curAng; while(dAng>Math.PI) dAng-=Math.PI*2; while(dAng<-Math.PI) dAng+=Math.PI*2;
+        const maxTurn = (b.turnRate||45) * (Math.PI/180) * st.dt;
+        const turn = Math.max(-maxTurn, Math.min(maxTurn, dAng)); const ang = curAng + turn;
+        b.vx = Math.cos(ang) * b.speed; b.vy = Math.sin(ang) * b.speed;
+      }
+    }
+    b.x+=b.vx*st.dt; b.y+=b.vy*st.dt; b.life-=st.dt*1000;
+  }
+  st.eShots = st.eShots.filter(b=>b.life>0 && b.x>-60 && b.x<DESIGN_W+60 && b.y>-60 && b.y<DESIGN_H+60);
+
+  // collisions: player shots vs enemies
+  for(const s of st.shots){
+    for(const e of st.enemies){
+      if(e.hp<=0) continue;
+      const dx=e.x-s.x, dy=e.y-s.y;
+      // Determine overlap: waves use their own size vs enemy AABB; others use point-in-AABB
+      const enemyHalfW = 24, enemyHalfH = 32;
+      let hit = false;
+      if(s.kind==='wave' && s.ownerId==='A1'){
+        const halfW = (s.w||18)/2, halfH = (s.h||6)/2;
+        if(Math.abs(dx) < (enemyHalfW + halfW) && Math.abs(dy) < (enemyHalfH + halfH)) hit = true;
+      } else {
+        // use projectile rectangle if provided to make hits reliable at range
+        const pHalfW = (s.w ? (s.w/2) : 4);
+        const pHalfH = (s.h ? (s.h/2) : 3);
+        if(Math.abs(dx) < (enemyHalfW + pHalfW) && Math.abs(dy) < (enemyHalfH + pHalfH)) hit = true;
+      }
+      if(hit){
+        // boss/miniboss spawn shield (5s)
+        if(e.shieldT && e.shieldT>0){ addFloater(e.x,e.y-50,'Shield','#6aa8ff'); s.life=0; continue; }
+        // reflect/deflect: bosses and leaders
+        if(((e.kind && e.kind.startsWith('boss')) || e.kind==='wave_leader') && e.reflectOn){
+          if(e.reflected < PATCH.combat.reflect.boss.maxBullets){
+            const nvx = (s.vx > 0 ? -Math.abs(s.vx) : Math.abs(s.vx));
+            const nvy = s.vy * 0.5;
+            st.eShots.push({x: s.x, y: s.y, vx: nvx, vy: nvy, speed: Math.hypot(nvx, nvy), life: 2000, homing: false});
+            e.reflected++;
+            addFloater(e.x, e.y - 50, 'Ping!', '#ffd56a');
+            s.life = 0; // remove wave when reflected
+            continue;
+          }
+        }
+        // Prevent multi-tick on same enemy for waves
+        if(s.kind==='wave' && s.ownerId==='A1'){
+          if(s._hit && s._hit.has(e)) continue;
+        }
+        // compute damage with rage and apply (any hero raging buffs damage) + crit
+        let mult = (st._anyRageOn ? (st._rageAtk || 1.25) : 1);
+        const isCrit = Math.random() < 0.10;
+        if(isCrit) mult *= 1.5;
+        let base = s.dmg;
+        if(s.kind==='wave' && s.ownerId==='A1'){
+          const arr = s._falloff || [40,30,20,10];
+          const idx = Math.max(0, Math.min(arr.length-1, s._fallIdx||0));
+          base = (s._fallIdx < arr.length ? arr[idx] : 10);
+        }
+        let dmgVal = Math.round(base * mult);
+        // boss defense
+        if(e.defFlat){ dmgVal = Math.max(1, dmgVal - e.defFlat); }
+        if(e.defPct){ dmgVal = Math.max(1, Math.round(dmgVal * (1 - e.defPct))); }
+        e.hp -= dmgVal;
+        // show damage floater
+        addFloater(e.x, e.y-20, '-' + dmgVal, isCrit?'#ffd56a':'#ff7a6a');
+        addImpact(e.x, e.y - 10, isCrit?'#ffd56a':'#ff7a6a');
+        // Unique knockback/slow; Missy dizzy
+        if(s.kind==='unique_big' && !(e.kind && e.kind.startsWith('boss'))){
+          e.slowT = Math.max(e.slowT||0, 2000); // ~-10% speed, applied in move
+          // knock back 3–5 nearby non-boss enemies
+          const list = st.enemies.filter(x=>x.hp>0 && !(x.kind && x.kind.startsWith('boss')))
+            .map(x=>({d:Math.hypot(x.x-s.x, x.y-s.y), e:x})).sort((a,b)=>a.d-b.d).slice(0, 3+Math.floor(Math.random()*3));
+          for(const it of list){ it.e.vx = Math.max(it.e.vx||0, 0.25); }
+          // apply -10% ATK for 5s
+          e.atkDownT = Math.max(e.atkDownT||0, 5000);
+          e.atkMult = Math.min(e.atkMult||1, 0.90);
+        }
+        if(s.kind==='missy_pistol' && e.kind==='mob'){ e.dizzyT = Math.max(e.dizzyT||0, 5000); }
+        if(s.kind==='wave' && s.ownerId==='A1'){
+          // mark as hit and advance falloff; wave keeps traveling (pierces)
+          if(s._hit) s._hit.add(e);
+          s._fallIdx = (s._fallIdx||0) + 1;
+        } else {
+          s.life = 0;
+        }
+        if(st.bossAlive){ st.bossHP=Math.max(0,Math.min(st.bossMax,e.hp)); }
+        // spawn extra coins from chest bosses
+        if(e.kind==='chestBoss' && Math.random()<0.35) spawnCoin(e.x,e.y-20, 4+Math.floor(Math.random()*5));
+        if(e.hp<=0){
+          // Rare revive for miniboss/boss (once): revive at 25% HP
+          if((e.kind==='miniboss' || (e.kind && e.kind.startsWith('boss'))) && !e.revived && !e._reviveRolled){
+            e._reviveRolled = true;
+            const chance = 0.01 + Math.random()*0.09; // 1–10%
+            if(Math.random() < chance){
+              e.revived = true; e.hp = Math.max(1, Math.round(e.max * 0.25));
+              addFloater(e.x, e.y - 50, 'Revived!', '#6aa8ff');
+              continue; // do not process kill
+            }
+          }
+          // Spawn small explosion VFX
+          spawnFlip('explosion', e.x, e.y-10);
+          st.kills++; notify('Kill +1');
+          // per-hero rage gain on kill: +20 if killer is raging (refund); else +6 to party baseline
+          const anyRage = st.players.some(p=>p.rageOn);
+          let killer = null; if(s.ownerId){ killer = st.players.find(p=>p.id===s.ownerId) || null; }
+          if(killer && killer.rageOn){
+            const now = performance.now();
+            if(!killer._refundUntil || now >= killer._refundUntil){
+              killer.rage = Math.min(killer.rageMax||100, (killer.rage||0) + 20);
+              killer._refundUntil = now + 250; // 0.25s ICD
+            }
+          } else {
+            const inc = anyRage ? 20 : 6;
+            for(const p of st.players){ p.rage = Math.min(p.rageMax||100, (p.rage||0) + inc); }
+          }
+          // Drops: 50% more overall, and richer tables.
+          const isBoss = !!(e.kind && e.kind.startsWith('boss'));
+          const isMini = e.kind === 'miniboss';
+          const isChest = e.kind === 'chestBoss';
+          // Gold ranges (approx): mob 20-120, mini 150-400, chest 400-800, boss 600-1000
+          let gMin=20, gMax=120;
+          if(isMini){ gMin=150; gMax=400; }
+          if(isChest){ gMin=400; gMax=800; }
+          if(isBoss && !isChest){ gMin=600; gMax=1000; }
+          let gold = Math.floor(gMin + Math.random()*(gMax-gMin+1));
+          // Boosts slightly increase gold
+          if(st._lootBoost && st._lootBoost>0) gold = Math.floor(gold*1.15);
+          if(st.dropBoost && st.dropBoostT>0) gold = Math.floor(gold*(1+st.dropBoost*0.5));
+          spawnCoin(e.x, e.y-20, gold);
+          // Gift chance: base 30% for mobs, guaranteed for bosses/chest/miniboss
+          let giftChance = (isBoss || isMini || isChest) ? 1.0 : 0.30;
+          if(st._lootBoost && st._lootBoost > 0){ giftChance += 0.10; }
+          if(st.dropBoost && st.dropBoostT > 0){ giftChance += st.dropBoost * 0.5; }
+          if(Math.random() < Math.min(1, giftChance)) spawnGift(e.x,e.y-28);
+          // Silver awards for tougher enemies
+          if(isBoss || isMini || isChest){
+            let sMin=80, sMax=180;
+            if(isMini){ sMin=100; sMax=220; }
+            if(isChest){ sMin=120; sMax=240; }
+            if(isBoss && !isChest){ sMin=200; sMax=400; }
+            const silver = Math.floor(sMin + Math.random()*(sMax-sMin+1));
+            spawnSilver(e.x+8, e.y-18, silver);
+          }
+          // award XP using floating orbs: base XP for mobs, large bonus for bosses
+          if((e.kind && e.kind.startsWith('boss')) || e.kind === 'chestBoss'){
+            grantXPOrbs(e.x, e.y-24, 120);
+            st.bossKills = (st.bossKills||0)+1; updateCurrencies();
+          } else {
+            grantXPOrbs(e.x, e.y-24, 6 + Math.floor(rng() * 4));
+          }
+          // mark boss kill if this enemy is any boss (boss1,boss2, etc.) or chest boss
+          if((e.kind && e.kind.startsWith('boss')) || e.kind === 'chestBoss'){
+            st.bossAlive = false;
+            if(e.kind && e.kind.startsWith('boss')){
+              if(!st.bossCleared) st.bossCleared = {};
+              st.bossCleared[st.stage] = true;
+            }
+          }
+        }
+      }
+    }
+  }
+  st.enemies = st.enemies.filter(e=>e.hp>0 && e.x>-80); // allow mobs to run past and despawn off left
+
+  // collisions: enemy shots vs players
+  for(const b of st.eShots){
+    for(const p of st.players){
+      if(Math.abs(p.x-b.x)<20 && Math.abs(p.y-b.y)<20){
+        if(st._shieldOn){
+          b.life = 0;
+        } else {
+          // A1K: ignore damage if invulnerable
+          try { if(window.A1K && A1K.isInvuln && A1K.isInvuln(p)) { b.life = 0; continue; } } catch {}
+          // subtract flat defense from damage but always inflict at least 1
+          let dmg = Math.max(1, Math.round((8 - (st._defFlat || 0)) * (b.atkScale||1)));
+          // A1K: apply DEF aura damage reduction if active
+          try { if(window.A1K && A1K.applyDefAuraDR) dmg = A1K.applyDefAuraDR(p, dmg); } catch {}
+          st.hp = Math.max(0, st.hp - dmg);
+          addFloater(p.x, p.y - 24, '-' + dmg, '#ff7a6a');
+          b.life = 0;
+        }
+      }
+    }
+  }
+
+  // contact damage: if enemies collide with players, apply damage before HP/MP. Shields absorb first.
+  for(const e of st.enemies){
+    if(e.hp <= 0) continue;
+    for(const p of st.players){
+      if(Math.abs(p.x - e.x) < 26 && Math.abs(p.y - e.y) < 34){
+        if(st._shieldOn){
+          // shield absorbs contact damage, but reduce shield duration slightly
+          st._shieldT = Math.max(0, st._shieldT - 200);
+        } else {
+          // A1K: ignore contact damage if invulnerable
+          try { if(window.A1K && A1K.isInvuln && A1K.isInvuln(p)) { continue; } } catch {}
+          let dmg2 = Math.max(1, Math.round((10 - (st._defFlat || 0)) * (e.atkMult||1)));
+          // A1K: apply DEF aura damage reduction if active
+          try { if(window.A1K && A1K.applyDefAuraDR) dmg2 = A1K.applyDefAuraDR(p, dmg2); } catch {}
+          st.hp = Math.max(0, st.hp - dmg2);
+          addFloater(p.x, p.y - 28, '-' + dmg2, '#ff7a6a');
+        }
+      }
+    }
+  }
+
+  // pickups & allies (coins, silvers, gifts, cat allies)
+  for(const it of st.pickups){
+    it.life-=st.dt*1000;
+    if(it.kind==='catAlly'){
+      // simple ally AI: drift forward, hover near lane center, fire at nearest enemy
+      it.x += (it.vx||0) * DESIGN_W * st.dt;
+      const laneY0 = laneY(1);
+      it.y += ((laneY0 - 40) - it.y) * 0.05; // hover
+      it.fireT = Math.max(0, (it.fireT||0) - st.dt*1000);
+      if(it.fireT<=0){
+        it.fireT = it.strong ? 260 : 380;
+        const t = st.enemies.find(e=>e.hp>0) || null;
+        if(t){
+          const ang = Math.atan2(t.y - (it.y), t.x - it.x);
+          const sp = 560;
+          st.shots.push({kind:'missy_pistol', x:it.x, y:it.y, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp, speed:sp, dmg: applyBasicDmg(50, st.players[2]), life:900, homing:true, ownerId:'Missy'});
+          addBeam(it.x, it.y, it.x + Math.cos(ang)*20, it.y + Math.sin(ang)*20, '#ff8c6a');
+        }
+      }
+      // fade out when life ends
+      continue;
+    }
+    const ld=leader(); const dx=ld.x-it.x, dy=ld.y-it.y; const d=Math.hypot(dx,dy) || 1;
+    const isLoot = (it.kind==='coin'||it.kind==='silver'||it.kind==='gift');
+    const magnetRange = (st.magnetAuraT > 0 ? 1000 : 480);
+    if(isLoot){
+      const speed = (st.magnetAuraT > 0 ? 900 : 700);
+      it.x += (dx/d) * speed * st.dt;
+      it.y += (dy/d) * speed * st.dt;
+    } else if(d<magnetRange){
+      it.x+=(dx/d)*magnetRange*st.dt; it.y+=(dy/d)*magnetRange*st.dt;
+    }
+    if(d<24){
+      if(it.kind === 'coin'){
+        grantGold(it.amt);
+        addFloater(it.x, it.y, '+Gold', '#ffd56a');
+        if(it.amt>=200) notify('+'+it.amt+' Gold');
+      } else if(it.kind === 'silver'){
+        grantSilver(it.amt);
+        addFloater(it.x, it.y, '+Silver', '#a8b7ce');
+        if(it.amt>=200) notify('+'+it.amt+' Silver');
+      } else if(it.kind === 'gift'){
+        // collecting a gift box awards a ticket and rolls a random item into the bag
+        st.tickets++;
+        addGiftBox();
+        addFloater(it.x, it.y, '+Ticket', '#ff8c6a');
+        notify('Gift Box added to Inventory');
+      }
+      it.life = 0;
+    }
+  }
+  st.pickups=st.pickups.filter(p=>p.life>0);
+
+  // update floating effects
+  for(const ef of st.effects){
+    ef.y += ef.vy * DESIGN_H * st.dt;
+    ef.life -= st.dt * 1000;
+  }
+  st.effects = st.effects.filter(e => e.life > 0);
+
+  // wave clear gating
+  if(st.enemies.length===0 && !st.bossAlive && st.pickups.filter(p=>p.kind!=='catAlly').length===0){
+    if(st.waveClearT<=0){ st.waveClearT=st.waveClearDelay; } else { st.waveClearT-=st.dt*1000; if(st.waveClearT<=0){ if(st._inDungeon){ exitDungeon(true); } else { advanceWave(); } } }
+  } else { st.waveClearT=0; }
+
+  // Aggressive AI window on HP drop
+  if(st._lastHP==null) st._lastHP = st.hp;
+  if(st.hp < st._lastHP){ st._aiAggroT = Math.max(st._aiAggroT||0, 2000); }
+  st._lastHP = st.hp;
+
+  // Auto-open Gift Boxes from inventory (with notification)
+  st._autoInvT = Math.max(0, (st._autoInvT||0) - st.dt*1000);
+  if(st._autoInvT<=0){
+    st._autoInvT = 2000;
+    const idx = inv.findIndex(x=>x && x.slot==='gift');
+    if(idx>=0 && st.enemies.length<3){ inv[idx]=null; refreshInv(); addFloater(DESIGN_W/2, 60, 'Gift Opened', '#ffd56a'); openGiftChest(); }
+  }
+
+  // hp death
+  if(st.hp<=0){
+    if(st.reviveTokens > 0){
+      // consume a revive token and restore 40% HP/Shield
+      st.reviveTokens--;
+      st.hp = Math.max(1, Math.round(st.hpMax * 0.40));
+      st.mp = Math.max(1, Math.round(st.mpMax * 0.40));
+      // clear enemy and bullet lists to give breathing room
+      st.enemies.length = 0;
+      st.shots.length = 0;
+      st.eShots.length = 0;
+      st.pickups.length = 0;
+      // reset overcharge and bubble states
+      for(const p of st.players){ p.overT = 0; }
+      // do not reset stage or wave; continue playing
+    } else {
+      if(st._inDungeon){ exitDungeon(false); }
+      else {
+        st.stage=1; st.wave=1; st.kills=0; st.hp=st.hpMax; st.mp=st.mpMax;
+        st.enemies.length=0; st.shots.length=0; st.eShots.length=0; st.pickups.length=0;
+        for(const p of st.players){ p.overT=0; }
+        spawnWave();
+      }
+    }
+  }
+
+  // draw & HUD
+  draw();
+  document.getElementById('hpFill').style.transform='scaleX('+(st.hp/st.hpMax)+')';
+  document.getElementById('mpFill').style.transform='scaleX('+(st.mp/st.mpMax)+')';
+  document.getElementById('bossFill').style.transform='scaleX('+(st.bossAlive? (st.bossHP/st.bossMax):0)+')';
+  // XP bar update
+  const _xpNext = xpToNext(st.level);
+  const _xpRatio = st.level >= 101 ? 1 : (st.xp / _xpNext);
+  const _xf = document.getElementById('xpDomFill'); if(_xf) _xf.style.transform='scaleX('+Math.max(0,Math.min(1,_xpRatio))+')';
+  const _xl = document.getElementById('xpDomLabel'); if(_xl) _xl.textContent = `${Math.floor(st.xp)}/${_xpNext} XP — Lv ${st.level}`;
+  document.getElementById('stagePill').textContent=`Stage ${st.stage} • Wave ${st.wave}/${st.wavesPerStage} • Kills ${st.kills}`;
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// begin loading optional sprite assets.  Once loading completes, the
+// status summary will populate in the Settings drawer.  If no files
+// are present (e.g. you didn't drop PNG/GIF assets next to this
+// HTML), proxies (colored shapes) will be used instead.
+loadAssets();
+
+// Apply initial stats recalculation to incorporate AP-based buffs and updated HP/def values
+recalcStats();
+// Build procedural flipbook VFX
+try { buildFlipbooks(); } catch {}
+// External flipbook loader: attempts to load 1xN PNG strips from assets/flipbooks
+// Keys supported (optional): skill_a1_shadow_claw, skill_a1_dark_ascent,
+// skill_unique_soul_siphon, skill_unique_prism_finish, skill_missy_winged_guard,
+// skill_missy_bubble_pop, proj_slashwave_dark, proj_cursed_bullet, fx_magnet_orbit
+;(function(){
+  async function loadStrip(key, frameSize=128){
+    return new Promise((resolve)=>{
+      const img = new Image();
+      img.onload = () => {
+        const frames = Math.max(1, Math.floor(img.width / frameSize));
+        const list = [];
+        for(let i=0;i<frames;i++){
+          const c=document.createElement('canvas'); c.width=frameSize; c.height=frameSize;
+          const g=c.getContext('2d'); g.clearRect(0,0,frameSize,frameSize); g.drawImage(img, -i*frameSize, 0);
+          list.push(c);
+        }
+        VFX.books[key] = list;
+        try { assetStatus && assetStatus.push(`flipbook:${key}: assets/flipbooks/${key}.png`); } catch {}
+        resolve(true);
+      };
+      img.onerror = () => { try { assetStatus && assetStatus.push(`flipbook:${key}: missing`); } catch {} resolve(false); };
+      img.src = `assets/flipbooks/${key}.png`;
+    });
+  }
+  async function loadAll(){
+    const keys = ['skill_a1_shadow_claw','skill_a1_dark_ascent','skill_unique_soul_siphon','skill_unique_prism_finish','skill_missy_winged_guard','skill_missy_bubble_pop','proj_slashwave_dark','proj_cursed_bullet','fx_magnet_orbit'];
+    for(const k of keys){ try { await loadStrip(k); } catch {} }
+    try { updateLoaderStatus && updateLoaderStatus(); } catch {}
+  }
+  try { loadAll(); } catch {}
+})();
+
+/* ===== Enemy shooting helpers ===== */
+function enemyShoot(e, homing){
+  // Determine base parameters by enemy kind.  Bosses increase difficulty per stage.  Mobs
+  // shoot a single slow bullet, chest bosses fire a modest spread with some homing, and
+  // numbered bosses scale with the stage index (up to BOSS_COUNT) to increase bullet count
+  // and speed.  Higher stage bosses may drop occasional minions or add vertical shock shots.
+  const t = st.players[st.leader];
+  const ang = Math.atan2((t.y - (e.y)), (t.x - (e.x)));
+  let sp = 420;
+  let count = 1;
+  let homingChance = 0;
+  if(e.kind === 'mob'){
+    sp = 420; count = 1; homingChance = 0; // mobs: no homing
+  } else if(e.kind === 'chestBoss'){
+    sp = 520; count = 5; homingChance = 0.3;
+  } else if(e.kind && e.kind.startsWith('boss')){
+    // extract stage index from 'bossN'
+    const sIdx = parseInt(e.kind.replace('boss','')) || 1;
+    sp = 520 + sIdx * 20;
+    count = 5 + (sIdx - 1) * 2;
+    homingChance = 0.25 + sIdx * 0.05; // bosses: light homing
+    // bosses beyond stage 1 occasionally spawn an extra mob
+    if(sIdx > 1 && Math.random() < 0.3){
+      const lane = [0,1,2][Math.floor(Math.random() * 3)];
+      const hpMob = 80 + (st.stage - 1) * 40 + st.wave * 8;
+      st.enemies.push({kind:'mob', x:e.x + 120, y:laneY(lane), hp:hpMob, max:hpMob, vx:-0.30 - 0.02*st.stage, fireCD:1200 + Math.random()*800});
+    }
+    // bosses beyond stage 2 also fire a downward shock bullet
+    if(sIdx > 2){
+      st.eShots.push({x:e.x, y:e.y, vx:0, vy:600, speed:600, life:2000, homing:false});
+    }
+  } else {
+    // default case: treat unknown as a basic single shot
+    sp = 520; count = 1; homingChance = 0;
+  }
+  // spawn spread bullets
+  for(let i=0; i<count; i++){
+    const spread = (count > 1 ? (i - (count - 1) / 2) * 0.15 : 0);
+    // decide if this bullet is homing: only bullets near the center of the spread may home
+    let hv = false;
+    if(homing && Math.abs(i - (count - 1) / 2) < 0.5 && Math.random() < homingChance) hv = true;
+    const vx = Math.cos(ang + spread) * sp;
+    const vy = Math.sin(ang + spread) * sp;
+    let turnRate = 0; if(hv){ if(e.kind==='miniboss') turnRate = 60; else if(e.kind && e.kind.startsWith('boss')) turnRate = 30; else turnRate = 0; }
+    // If shooter is dizzy (Missy pistol debuff), fire a friendly shot at the nearest enemy instead
+    if(e.dizzyT && e.dizzyT>0 && e.kind==='mob'){
+      const tgt = st.enemies.filter(x=>x!==e && x.hp>0).map(x=>({d:Math.hypot(x.x-e.x,x.y-e.y), e:x})).sort((a,b)=>a.d-b.d)[0];
+      if(tgt && tgt.e){
+        const a2 = Math.atan2(tgt.e.y - e.y, tgt.e.x - e.x);
+        const vx2 = Math.cos(a2) * sp, vy2 = Math.sin(a2) * sp;
+        st.shots.push({x:e.x, y:e.y, vx:vx2, vy:vy2, speed:sp, dmg:40 + Math.floor(Math.random()*61), life:1800, laneY:e.y, homing:false});
+      }
+    } else {
+      st.eShots.push({x:e.x, y:e.y, vx, vy, speed:sp, life:2000, homing:hv, turnRate:turnRate, reacqMs:500, atkScale:(e.atkMult||1)});
+    }
+  }
+}
+
+/* ===== Rendering ===== */
+function draw(){
+  ctx.clearRect(0,0,DESIGN_W,DESIGN_H);
+  // BG
+  ctx.fillStyle='#0f1826'; ctx.fillRect(0,0,DESIGN_W,DESIGN_H);
+  // ground stripes
+  ctx.fillStyle='#0e1c2e'; ctx.fillRect(0,DESIGN_H-120,DESIGN_W,120);
+  ctx.fillStyle='#14243a'; ctx.fillRect(0,DESIGN_H-260,DESIGN_W,140);
+  // players
+  for(const p of st.players){
+    // draw sprite if loaded; otherwise fallback to colored rectangle
+    const img = assets[p.id];
+    if(img){
+      // scale roughly to player size; adjust offsets to center
+      const w=40, h=60;
+      if(p.face && p.face < 0){
+        ctx.save(); ctx.translate(p.x, 0); ctx.scale(-1, 1);
+        ctx.drawImage(img, -p.x - w/2, p.y - h + 8, w, h);
+        ctx.restore();
+      } else {
+        ctx.drawImage(img, p.x - w/2, p.y - h + 8, w, h);
+      }
+    } else {
+      // fallback colored body
+      ctx.fillStyle = p===st.players[0] ? '#6aa8ff' : (p===st.players[1] ? '#a78bfa' : '#ffb4e6');
+      ctx.fillRect(p.x-18,p.y-34,36,52);
+    }
+    // overhead bars: HP, XP, Rage
+    const barW = 52;
+    const barH = 3;
+    const baseX = p.x - barW/2;
+    let yOff = p.y - 44;
+    // HP bar (global for now)
+    ctx.fillStyle = '#283f33'; ctx.fillRect(baseX, yOff, barW, barH);
+    ctx.fillStyle = '#36c777'; ctx.fillRect(baseX, yOff, barW * (st.hp / st.hpMax), barH);
+    yOff -= (barH + 2);
+    // XP bar
+    const xpRatio = st.level >= 101 ? 1 : (st.xp / xpToNext(st.level));
+    ctx.fillStyle = '#233850'; ctx.fillRect(baseX, yOff, barW, barH);
+    ctx.fillStyle = '#6aa8ff'; ctx.fillRect(baseX, yOff, barW * xpRatio, barH);
+    yOff -= (barH + 2);
+    // Rage bar (per-hero)
+    ctx.fillStyle = '#42310f'; ctx.fillRect(baseX, yOff, barW, barH);
+    const rRatio = Math.max(0, Math.min(1, (p.rage||0) / (p.rageMax||PATCH.systems.rage.max)));
+    ctx.fillStyle = '#f9cc2b'; ctx.fillRect(baseX, yOff, barW * rRatio, barH);
+  }
+  // Shield/Bubble FX around all characters
+  if(st._shieldOn || (st._bubbleT && st._bubbleT>0)){
+    const pulse = 0.5 + 0.5 * Math.sin(st.time * 6);
+    const r = (st._bubbleT && st._bubbleT>0) ? 38 : 30;
+    for(const p of st.players){
+      ctx.globalAlpha = 0.15 + 0.15 * pulse;
+      ctx.fillStyle = (st._bubbleT && st._bubbleT>0) ? '#63e6ff' : '#6aa8ff';
+      ctx.beginPath(); ctx.arc(p.x, p.y-20, r, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 0.9;
+      ctx.strokeStyle = (st._bubbleT && st._bubbleT>0) ? '#acebff' : '#c4dcff';
+      ctx.lineWidth = 2 + 2*pulse; ctx.beginPath(); ctx.arc(p.x, p.y-20, r, 0, Math.PI*2); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+  // Rage aura glow (per hero, with 1s fadeout)
+  for(const p of st.players){
+    const t = p.rageOn ? 1 : Math.max(0, Math.min(1, (p._rageAuraT||0)/1000));
+    if(t>0){
+      const pulse = 0.5 + 0.5 * Math.sin(st.time*8);
+      ctx.globalAlpha = 0.15 * t + 0.15 * pulse * t;
+      ctx.fillStyle = (p.id==='Unique') ? '#63e6ff' : (p.id==='Missy' ? '#ff8c6a' : '#ff4d4f');
+      ctx.beginPath(); ctx.arc(p.x, p.y-24, 42, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+  // Magnet Aura: draw flipbook if provided
+  try {
+    if(st.magnetAuraT > 0 && VFX.books && VFX.books['fx_magnet_orbit']){
+      const fb = VFX.books['fx_magnet_orbit'];
+      const idx = Math.floor((st.time * 14) % fb.length);
+      const L = leader();
+      try { ctx.drawImage(fb[idx], L.x-32, L.y-64); } catch {}
+    }
+  } catch {}
+  // non-leader skill icons
+  nonSkillRects = [];
+  st.players.forEach((p, idx) => {
+    if(idx === st.leader) return;
+    // base position above player head for skill icons
+    const iconR = 10;
+    let xPos = p.x - (iconR * 6) + 2;
+    const yPos = Math.min(DESIGN_H-16, p.y + 14); // under feet
+    // subtle pill background under feet for contrast
+    ctx.globalAlpha = 0.25; ctx.fillStyle = '#0b1421';
+    ctx.fillRect(xPos - 8, yPos - (iconR+4), iconR*6 + 36, (iconR*2)+8);
+    ctx.globalAlpha = 1;
+    ['S1','S2','S3'].forEach((key, k) => {
+      const cd = st.cds[p.id][key] || 0;
+      const ready = cd <= 0;
+      const cx = xPos + k * (iconR*2 + 6);
+      const cy = yPos;
+      // store rect for click detection
+      nonSkillRects.push({pIndex: idx, key, x: cx - iconR, y: cy - iconR, w: iconR*2, h: iconR*2});
+      // draw circular icon
+      ctx.beginPath();
+      ctx.arc(cx, cy, iconR, 0, Math.PI * 2);
+      ctx.fillStyle = ready ? '#ffd56a' : '#394d6f';
+      ctx.fill();
+      // inner ring to show cooldown percent
+      const pct = ready ? 1 : (1 - cd / CD[p.id][key]);
+      ctx.beginPath();
+      ctx.arc(cx, cy, iconR-3, -Math.PI/2, -Math.PI/2 + Math.PI*2 * pct);
+      ctx.strokeStyle = ready ? '#ffe9a3' : '#566c8e';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // label (small number)
+      ctx.fillStyle = '#0b1421';
+      ctx.font = '9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const label = key === 'S1' ? '1' : key === 'S2' ? '2' : '3';
+      ctx.fillText(label, cx, cy);
+    });
+    // Rage button '4' (manual, not auto)
+    {
+      const k = 3; // place after S3
+        const rp = st.players[idx];
+        const ready = (rp && !rp.rageOn && (rp.rage||0) >= (rp.rageMax||100) && (rp.rageICD||0) <= 0);
+      const cx = xPos + k * (iconR*2 + 6);
+      const cy = yPos;
+      nonSkillRects.push({pIndex: idx, key:'R', x: cx - iconR, y: cy - iconR, w: iconR*2, h: iconR*2});
+      ctx.beginPath();
+      ctx.arc(cx, cy, iconR, 0, Math.PI * 2);
+      ctx.fillStyle = ready ? '#ff4d4f' : '#394d6f';
+      ctx.fill();
+      // show rage ratio ring
+      const pct = Math.max(0, Math.min(1, (rp?.rage||0) / (rp?.rageMax||100)));
+      ctx.beginPath();
+      ctx.arc(cx, cy, iconR-3, -Math.PI/2, -Math.PI/2 + Math.PI*2 * pct);
+      ctx.strokeStyle = ready ? '#ff9a9c' : '#566c8e';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#0b1421';
+      ctx.font = '9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('4', cx, cy);
+    }
+  });
+
+  // Draw small rage bars above non-leader heroes if enabled by configuration.
+  if(PATCH.ui.showRageAboveNonLeaders){
+    drawRageOverheads();
+  }
+  // enemies
+  for(const e of st.enemies){
+    let color;
+    if(e.kind === 'mob'){
+      color = '#ff6e6e';
+    } else if(e.kind && e.kind.startsWith('boss')){
+      color = '#ffa566';
+    } else {
+      // chest boss or other special enemy
+      color = '#ffd56a';
+    }
+    ctx.fillStyle = color;
+    const w = (e.kind === 'mob' ? 34 : 56);
+    const h = (e.kind === 'mob' ? 40 : 60);
+    ctx.fillRect(e.x - 18, e.y - 28, w, h);
+    // status icons: ATK down and Dizzy
+    if(e.atkDownT && e.atkDownT>0){
+      ctx.fillStyle = '#ff4d4f';
+      ctx.beginPath(); ctx.moveTo(e.x-10, e.y-36); ctx.lineTo(e.x, e.y-46); ctx.lineTo(e.x+10, e.y-36); ctx.closePath(); ctx.fill();
+    }
+    if(e.dizzyT && e.dizzyT>0){
+      ctx.strokeStyle = '#ffd56a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(e.x+16, e.y-20, 6, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(e.x+10, e.y-20); ctx.lineTo(e.x+22, e.y-20); ctx.stroke();
+    }
+    // Draw wall barrier if active
+    if(st._wall && st._wall.hp>0){
+      let wx = st._wall.x; const hp = st._wall.hp; wx = Math.max(40, Math.min(DESIGN_W-40, wx));
+      ctx.fillStyle = 'rgba(99,230,255,0.35)';
+      ctx.fillRect(wx-4, laneY(1)-90, 8, 120);
+      ctx.fillStyle = '#63e6ff'; ctx.globalAlpha=0.7; ctx.fillRect(wx-3, laneY(1)-90, 6, 120*(hp/2000)); ctx.globalAlpha=1;
+    }
+    // Leader overlay: nameplate, ATK/DEF mini-line, next-spell hint
+    if(e.kind === 'wave_leader'){
+      ctx.save();
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillStyle = '#cfe3ff';
+      ctx.fillText(e.name||'Leader', e.x, e.y - 36);
+      ctx.font = '9px sans-serif'; ctx.fillStyle = '#a8b7ce';
+      ctx.fillText(`ATK ${e.atk||'-'}  DEF ${e.def||'-'}`, e.x, e.y - 26);
+      // Next spell icon (H/D/S)
+      const hint = (e.nextSpell==='def'?'D':(e.nextSpell==='summon'?'S':'H'));
+      ctx.fillStyle = '#6aa8ff';
+      ctx.fillText(`[${hint}]`, e.x, e.y - 16);
+      ctx.restore();
+    }
+    // draw boss/miniboss shield if active
+    if(e.shieldT && e.shieldT>0){
+      const pulse = 0.5 + 0.5*Math.sin(st.time*6);
+      ctx.globalAlpha = 0.20 + 0.2*pulse;
+      ctx.strokeStyle = '#6aa8ff'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(e.x, e.y-10, (e.kind==='mob'?26:34), 0, Math.PI*2); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+  // Shields/bubbles and invuln auras
+  try {
+    // Missy S2 bubble (global bubble timer)
+    if(st._bubbleT && st._bubbleT>0){
+      const L = leader();
+      ctx.globalAlpha = 0.15 + 0.05*Math.sin(st.time*8);
+      ctx.strokeStyle = '#63e6ff'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(L.x, L.y-20, 60, 0, Math.PI*2); ctx.stroke(); ctx.globalAlpha = 1;
+    }
+    // Casting/Rage invulnerability glow
+    for(const p of st.players){
+      if(window.A1K && A1K.isInvuln && A1K.isInvuln(p)){
+        ctx.globalAlpha = 0.25 + 0.25*Math.sin(st.time*10);
+        ctx.strokeStyle = '#ffd56a'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(p.x+8, p.y-36, 24, 0, Math.PI*2); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    }
+  } catch {}
+  // shots (player)
+  for(const s of st.shots){
+    if(s.kind==='wave'){
+      const w = s.w||18, h = s.h||6;
+      // core body
+      const grd = ctx.createLinearGradient(s.x - w/2, s.y, s.x + w/2, s.y);
+      grd.addColorStop(0, '#2e3a6a'); grd.addColorStop(0.5, s.color || '#9ad1ff'); grd.addColorStop(1, '#2e3a6a');
+      ctx.fillStyle = grd; ctx.fillRect(s.x - w/2, s.y - h/2, w, h);
+      // heavy aura for A1
+      if(s.ownerId==='A1'){
+        // Outer glow skirt (visual only; hitbox unchanged)
+        const rg = ctx.createRadialGradient(s.x, s.y, Math.max(6,h), s.x, s.y, Math.max(18,w));
+        rg.addColorStop(0,'rgba(255,77,79,0.35)'); rg.addColorStop(1,'rgba(255,77,79,0)');
+        ctx.fillStyle = rg; ctx.globalAlpha = 0.9; ctx.fillRect(s.x - (w*1.4)/2, s.y - (h*1.8)/2, w*1.4, h*1.8); ctx.globalAlpha = 1;
+        ctx.globalAlpha = 0.5; ctx.strokeStyle = '#ff4d4f'; ctx.lineWidth = Math.max(2, Math.floor(h*0.6));
+        ctx.strokeRect(s.x - w/2 - 2, s.y - h/2 - 2, w + 4, h + 4);
+        ctx.globalAlpha = 1;
+      }
+      // subtle glow border
+      ctx.globalAlpha = 0.35; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1;
+      ctx.strokeRect(s.x - w/2, s.y - h/2, w, h); ctx.globalAlpha = 1;
+    } else {
+      ctx.fillStyle = '#9ad1ff';
+      if(s.kind==='unique_big'){
+        const w = s.w||56, h = s.h||20;
+        const grd = ctx.createLinearGradient(s.x - w/2, s.y, s.x + w/2, s.y);
+        grd.addColorStop(0,'#3b2a8f'); grd.addColorStop(0.35,'#8a2be2'); grd.addColorStop(0.5,'#63e6ff'); grd.addColorStop(0.65,'#8a2be2'); grd.addColorStop(1,'#3b2a8f');
+        ctx.fillStyle = grd; ctx.fillRect(s.x - w/2, s.y - h/2, w, h);
+        ctx.globalAlpha = 0.4; ctx.strokeStyle = '#ffffff'; ctx.strokeRect(s.x - w/2, s.y - h/2, w, h); ctx.globalAlpha = 1;
+      } else if(s.kind==='missy_pistol'){
+        ctx.fillStyle = '#ffc94a'; ctx.fillRect(s.x-5,s.y-3.5,10,7);
+      } else {
+        ctx.fillRect(s.x-3,s.y-2,6,4);
+      }
+    }
+  }
+  ctx.fillStyle='#ffb18b'; for(const b of st.eShots){ ctx.fillRect(b.x-3,b.y-2,6,4); }
+  // Debug: Leader Scaler (dev only)
+  try {
+    if (/(^|[?&])dev=1(&|$)/.test(location.search)){
+      ctx.save(); ctx.font='10px sans-serif'; ctx.fillStyle='#a8b7ce'; ctx.textAlign='left'; ctx.textBaseline='top';
+      ctx.fillText('Leader Scaler: ' + (st._leaderSecretScale||0), 10, 10);
+      ctx.restore();
+    }
+  } catch {}
+  // pickups
+  for(const it of st.pickups){
+    if(it.kind==='catAlly'){
+      // draw a small floating orb with tail to represent the cat ally
+      const pulse = 0.5 + 0.5*Math.sin(st.time*8);
+      ctx.globalAlpha = 0.25 + 0.25*pulse;
+      ctx.fillStyle = '#ffb4e6'; ctx.beginPath(); ctx.arc(it.x, it.y, 10, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 0.9; ctx.strokeStyle = '#ff8cda'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(it.x, it.y, 10, 0, Math.PI*2); ctx.stroke();
+      ctx.globalAlpha = 1;
+      continue;
+    }
+    let img = null;
+    if(it.kind==='coin') img = assets.Coin;
+    else if(it.kind==='silver') img = assets.Silver;
+    else if(it.kind==='gift') img = assets.Gift;
+    if(img){
+      const sz = 16;
+      ctx.drawImage(img, it.x - sz/2, it.y - sz/2, sz, sz);
+    } else {
+      ctx.fillStyle = it.kind==='coin' ? '#ffd56a' : (it.kind==='silver' ? '#a8b7ce' : '#ff8c6a');
+      ctx.fillRect(it.x-5,it.y-5,10,10);
+    }
+  }
+
+  // floating text and simple slash FX
+  for(const ef of st.effects){
+    if(ef.kind === 'slash'){
+      const alpha = Math.max(0, ef.life / 240);
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = 'rgba(255,122,106,0.9)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      // draw a short diagonal slash
+      const dx = 22 * (ef.dir||1);
+      ctx.moveTo(ef.x - dx, ef.y - 10);
+      ctx.lineTo(ef.x + dx, ef.y + 10);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    } else if(ef.kind === 'cast'){
+      const p = 1 - (ef.life / (ef.max||320));
+      const r = 12 + p * 22;
+      ctx.globalAlpha = 0.7 * (1 - p);
+      ctx.strokeStyle = ef.color || '#6aa8ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(ef.x, ef.y, r, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    } else if(ef.kind === 'speed'){ // speedlines for rage burst
+      const t = ef.life / (ef.max||1800);
+      ctx.globalAlpha = 0.35 * t;
+      ctx.strokeStyle = ef.color || '#ff4d4f';
+      ctx.lineWidth = 2;
+      for(let i=0;i<12;i++){
+        const off = i*12;
+        ctx.beginPath();
+        ctx.moveTo(ef.x - 120 + off, ef.y - 80);
+        ctx.lineTo(ef.x + 140 + off, ef.y + 40);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    } else if(ef.kind === 'impact'){
+      const p = 1 - (ef.life / (ef.max||260));
+      ctx.globalAlpha = Math.max(0, 1 - p);
+      ctx.strokeStyle = ef.color || '#ffd56a';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(ef.x, ef.y, 8 + p*10, 0, Math.PI*2); ctx.stroke();
+      ctx.globalAlpha = 1;
+    } else if(ef.kind === 'muzzle'){
+      const p = 1 - (ef.life / (ef.max||160));
+      ctx.globalAlpha = Math.max(0, 0.8 - p*0.8);
+      ctx.fillStyle = ef.color || '#ffffff';
+      ctx.beginPath(); ctx.arc(ef.x, ef.y, 6 + p*8, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    } else if(ef.kind === 'trail'){
+      const p = Math.max(0, ef.life / (ef.max||180));
+      ctx.globalAlpha = 0.5 * p;
+      ctx.fillStyle = ef.color || '#ffffff';
+      const w = ef.w||6, h = ef.h||3;
+      ctx.fillRect(ef.x - (w/2), ef.y - (h/2), w, h);
+      ctx.globalAlpha = 1;
+    } else if(ef.kind === 'beam'){
+      const p = 1 - (ef.life / (ef.max||120));
+      ctx.globalAlpha = Math.max(0, 0.7 - p*0.7);
+      ctx.strokeStyle = ef.color || '#6aa8ff';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(ef.x1, ef.y1); ctx.lineTo(ef.x2, ef.y2); ctx.stroke();
+      ctx.globalAlpha = 1;
+    } else if(ef.kind === 'arcSlash'){
+      const p = 1 - (ef.life / (ef.max||260));
+      const r = 24 + p*14; const th = 0.9 - p*0.4; // thickness
+      ctx.save(); ctx.translate(ef.x, ef.y); ctx.rotate(ef.dir>0? -0.6 : 0.6);
+      ctx.globalAlpha = Math.max(0, 0.9 - p);
+      ctx.strokeStyle = ef.color || '#ff4d4f'; ctx.lineWidth = 6*th; ctx.beginPath(); ctx.arc(0, 0, r, -1.2, 0.2); ctx.stroke();
+      ctx.globalAlpha = 1; ctx.restore();
+    } else if(ef.kind === 'crescent'){
+      const p = 1 - (ef.life / (ef.max||260));
+      const baseR = 20, outer = baseR + 22, inner = baseR + 6;
+      ctx.save(); ctx.translate(ef.x, ef.y); ctx.rotate(ef.dir>0? -0.5 : 0.5);
+      // outer glow
+      ctx.globalAlpha = 0.35 * (1-p);
+      const grd = ctx.createRadialGradient(0,0, inner, 0,0, outer+8);
+      grd.addColorStop(0, (ef.color||'#ff7a31'));
+      grd.addColorStop(1, 'rgba(255,122,49,0)');
+      ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(0,0, outer+8, -1.1, 0.1); ctx.arc(0,0, inner-6, 0.1, -1.1, true); ctx.fill();
+      // core rim
+      ctx.globalAlpha = Math.max(0, 0.9 - p);
+      ctx.strokeStyle = ef.color || '#ff7a31'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(0,0, outer, -1.1, 0.1); ctx.stroke();
+      // dark core edge (purple-ish)
+      ctx.strokeStyle = '#401a70'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0,0, inner, -1.1, 0.1); ctx.stroke();
+      ctx.globalAlpha = 1; ctx.restore();
+    } else if(ef.kind === 'bolt'){
+      // jittered lightning segment between two points
+      const p = 1 - (ef.life / (ef.max||100));
+      const segs = 5; const dx = (ef.x2 - ef.x1)/segs; const dy = (ef.y2 - ef.y1)/segs;
+      ctx.save(); ctx.globalAlpha = Math.max(0, 0.9 - p);
+      ctx.strokeStyle = ef.color || '#63e6ff'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      let px = ef.x1, py = ef.y1; ctx.moveTo(px, py);
+      for(let i=1;i<=segs;i++){
+        const nx = ef.x1 + dx*i + (Math.random()-0.5)*4;
+        const ny = ef.y1 + dy*i + (Math.random()-0.5)*4;
+        ctx.lineTo(nx, ny); px=nx; py=ny;
+      }
+      ctx.stroke();
+      ctx.restore();
+    } else if(ef.kind === 'after'){
+      const p = Math.max(0, ef.life / (ef.max||180));
+      ctx.globalAlpha = 0.25 * p;
+      ctx.fillStyle = ef.color || '#ff4d4f';
+      ctx.beginPath(); ctx.arc(ef.x+6, ef.y-38, 10, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    } else if(ef.kind === 'flip'){
+      const fb = ef.fb; const idx = Math.min(fb.length-1, Math.floor((ef.max || (fb.length*40) - ef.life)/40));
+      try { ctx.drawImage(fb[idx], ef.x-32, ef.y-32); } catch {}
+    } else {
+      const alpha = Math.max(0, ef.life / 800);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = ef.color;
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      if(ef.txt) ctx.fillText(ef.txt, ef.x, ef.y);
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+
+// Draw small Rage bars above non-leader heroes.  Uses the global Rage value from st.rage and
+// st.rageMax.  These bars provide quick feedback on Rage accumulation for party members
+// that are not currently controlled by the player.  Configurable via PATCH.ui.showRageAboveNonLeaders.
+function drawRageOverheads(){
+  const barW = 36;
+  const barH = 4;
+  st.players.forEach((p, idx) => {
+    if(idx === st.leader) return;
+    const x = p.x - barW/2;
+    const y = p.y - 62;
+    // background
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(x, y, barW, barH);
+    // fill per-hero
+    const max = p.rageMax || PATCH.systems.rage.max;
+    const ratio = max > 0 ? Math.max(0, Math.min(1, (p.rage||0) / max)) : 0;
+    ctx.fillStyle = '#f9cc2b';
+    ctx.fillRect(x, y, barW * ratio, barH);
+  });
+}
+</script>
+<!-- A1K v13-buff-unified patch: merged config + helpers (non-intrusive) -->
+<script>
+(() => {
+  // ===== A1K v13-buff-unified — Cursor-ready patch =====
+  const log = (...a)=>console.log('[A1K PATCH]',...a);
+
+  // Deep merge that only upgrades numbers upward (never nerf), appends arrays, and merges objects.
+  function mergeUp(dst, src) {
+    if (Array.isArray(src)) {
+      if (!Array.isArray(dst)) return src.slice();
+      // union-ish append: keep src order, avoid dup scalars
+      const set = new Set(dst.map(v => JSON.stringify(v)));
+      src.forEach(v => { const s=JSON.stringify(v); if(!set.has(s)) dst.push(v); });
+      return dst;
+    }
+    if (src && typeof src === 'object') {
+      if (!dst || typeof dst !== 'object') dst = {};
+      for (const k of Object.keys(src)) {
+        dst[k] = mergeUp(dst[k], src[k]);
+      }
+      return dst;
+    }
+    // primitives: if number, take max; otherwise take src (upgrade/replace)
+    if (typeof src === 'number' && typeof dst === 'number') return Math.max(dst, src);
+    return src;
+  }
+
+  // ===== Unified config (ALL changes) =====
+  const PATCH = {
+    version: "v13-buff-unified",
+    scaling: {
+      stage_baselines: { boss_hp_stage1: 500 },
+      boss_hp_growth_per_stage: 1.04,
+      enemy_atk_growth_per_stage: 1.035,
+      enemy_def_growth_per_stage: 1.03,
+      player_rage_stage_bonus_per_10: 0.05
+    },
+    globals: {
+      casting_invuln_sec: 3,
+      sword_contact: {
+        lifesteal_pct_of_damage: 0.10,
+        def_bonus_pct: 10,
+        def_bonus_duration_sec: 4,
+        def_aura_dr_pct: 5,
+        aura_extra_radius_px: 12,
+        aura_contact_damage: 10
+      },
+      dash_barrier_sec: 3,
+      separate_rage_bars: true,
+      leader_switch_enabled: true,
+      projectile_unlimited_reach: true,
+      reflect_chain_rules: { base_melee_reflect_min: 3, base_melee_reflect_max: 6, specials_reflect_all: true, boss_pingpong_multiplier: 2.0 },
+      shop_price_multiplier: 0.5,
+      skill_fx_sec: { skill: 2, rage: 3 },
+      boss_mods: { hp_mult: 1.30, def_flat: 25, def_pct: 0.08 },
+      damage_formula: "final = max(1, (ATK + gear + AP) * multipliers - DEF_flat) * (1 - DEF_pct)",
+      rage_kill_refund_base: 25,
+      rage_tiers: [
+        { tier:1, ap_spent_req:0,   effect_mult:1.0, kill_refund_mult:1.00, extras:[] },
+        { tier:2, ap_spent_req:30,  effect_mult:2.0, kill_refund_mult:1.10, extras:[" +2-3 extra hits/projectiles"] },
+        { tier:3, ap_spent_req:60,  effect_mult:3.0, kill_refund_mult:1.25, extras:[" +4-6 extra combos/projectiles","+0.5s post-rage iframes"] },
+        { tier:4, ap_spent_req:100, effect_mult:3.5, kill_refund_mult:1.35, extras:[" start AoE 200 dmg pierce 10","+10% loot bonus"] },
+        { tier:5, ap_spent_req:150, effect_mult:4.0, kill_refund_mult:1.50, extras:[" cleanse on cast","+25% refund efficiency"] }
+      ],
+      ap: { max:200, per_level:2, atk_per_ap:120, def_per_ap:120, hp_per_ap:120 },
+      ui: {
+        xp_bar: {
+          gradient: ["#2EA8FF","#7B61FF"],
+          pulse_on_gain: true,
+          show_numeric: true,
+          label_format: "{cur}/{next} XP — Lv {level}"
+        },
+        boss_kills_counter: true,
+        icons: { hp:"icon_sword.png", mp:"icon_spark.png" },
+        show_portraits: true,
+        damage_floaters: {
+          crit_color:"#FFD54A",
+          hit_color:"#FFFFFF",
+          reflect_color:"#39E1FF",
+          dot_color:"#00E5FF",
+          heal_color:"#5CFF8A",
+          merge_fast_ticks: true
+        },
+        // Added per your delta
+        wave_tracker: { show:true, show_kills:true, show_gifts:true },
+        overhead_bars_non_leaders: true,
+        wave_debug_labels: true
+      },
+      xp_orbs: { min:1, max:3, speed:260, magnet_radius:420, target:"hud_xp_bar" },
+      homing_rules: { mob_turn_rate: 0, mini_turn_rate: 90, boss_turn_rate: 140 },
+      // Delta adds:
+      projectiles: { player_homing_turn_rate: 180, skill_homing_turn_rate: 220 },
+      boss_reflect: { enabled: true, cooldown_sec: 4, reflect_all: true },
+      // A1 wave tuning
+      a1_wave: { floor_bob_hz: 2.2, homing_turn_deg_min: 180, homing_turn_deg_max: 220 }
+    },
+    controls: {
+      jump_button: { enabled:true, position_hint:"above_shield_button" },
+      leader_switch_position: "near_joystick"
+    },
+    loot: { coin_magnet_radius: 220, gift_magnet_radius: 220 },
+    stage_flow: {
+      waves_per_stage: 10,
+      miniboss_waves: [5,6,7],
+      gift_boss_waves: [2,3,4,5,6,7,8,9],
+      victory_stage: 10,
+      endless_continue: true
+    },
+    ai_combat: {
+      boss_preferred_distance_px:[240,300],
+      fire_cooldown_jitter_ms:[70,160],
+      contact_knockback: { min_overlap_sec:0.3, tick_dmg:5, knock_px:18 }
+    },
+    economy: {
+      boosters: ["XP_30","DROP_25","MAGNET_AURA","RAGE_STARTER"],
+      consumables: ["REVIVE_TOKEN","RANDOM_GEAR_KIT","AP_RESET","BOSS_PASS"],
+      keys: { gift_key:true, boss_key:true, pity_epic_every:20, odds_screen:true }
+    },
+    inventory: {
+      slots: 36,
+      equip_slots: ["Weapon","Armor","Acc1","Acc2","Pet"],
+      quick_menu: ["Equip","Upgrade","Sell","Fuse"]
+    },
+    save_fields: ["gear","ap","currencies","boosters","pity","loadouts","settings"],
+    heroes: {
+      A1: {
+        role: "melee slayer (close-range carry)",
+        basic: { dmg_per_hit:[50,65], reflect_projectiles:[3,7], wave_dmg:28, waves_pierce:true },
+        passive: { reflect_mult:2.5 },
+        s1: { name:"Shadow Waves", cd:6, melee_swings:[4,8], melee_dmg:[45,90], out_of_range_waves:true, reflect_mult:3.5, wave_dmg:40, invuln:3 },
+        s2: { name:"Fuse Bomb", cd:10, fuse:0.6, hp_cost_pct:20, aoe_size:"med_large", boss_bonus_mult:1.25, invuln:3 },
+        s3: { name:"Combo Burst", cd:16, extra:"echo_tick", invuln:3 },
+        rage: {
+          cost:100, duration:10, icd_sec:20,
+          team_bonuses: { atk_pct:30, haste_pct:25, shieldmax_pct:25 },
+          dash_swings:[5,9], dash_dmg:[200,700], extra_jumps:3,
+          giant_wave_dmg:[150,400], loot_bonus_pct:25,
+          self_hp_loss_pct_range:[20,40], bleed_hp_per_sec:1, bleed_dur_sec:10
+        },
+        rage_tier_overrides: {
+          t2: { extra_dash_swings:[2,3], wave_size_mult:1.35, extra_wave_count:[1,2] },
+          t3: { extra_dash_swings:[4,6], dash_contact_tick_dmg:50, final_shockwave_dmg:200, extra_wave_count:[3,4] },
+          t4: { dash_contact_tick_dmg_range:[50,70], afterburn_dps:30, afterburn_sec:4, parry_window_bonus_pct_while_raging:10, extra_wave_count:[4,6] },
+          t5: { cleave_mark:{ vuln_pct:20, dur_sec:8 }, extra_wave_count:[8,9] }
+        },
+        keystone: { parry_window_leniency_pct:35 }
+      },
+      Unique: {
+        role: "ranged caster/marksman (lane control)",
+        basic: { shots:[2,3], dot_hp_pct_per_sec:1.5, dot_duration_sec:3, pierce:true },
+        s1: { name:"Burst Shot", cd:6, shots:[3,4], buffs_per_cast:{ drop_pct:7, def_pct:7, atk_pct:7 }, stacking:true, invuln:3 },
+        s2: { name:"Healing Rain", cd:10, dmg:[15,40], freeze_sec:3.5, heal:true, shield:true, drop_boost:true, invuln:3 },
+        s3: { name:"Overcharge Stream", cd:16, beam_sec:[8,12], dps:[120,360], hp_cost_pct_per_sec:0.8, invuln:3 },
+        rage: { cost:100, icd_sec:20, beam_sec:[8,18], dps:[250,750], hp_true_pct_per_sec:[5,12], hp_cost_pct_per_sec:2.5 },
+        rage_tier_overrides: {
+          t2: { extra_beam_arcs_per_sec:[1,2], extra_wave_count:[1,2] },
+          t3: { extra_beam_arcs_per_sec:[3,4], chain_on_kill:2, extra_wave_count:[3,4] },
+          t4: { beam_width_mult:1.3, pierce_cap:-1, extra_wave_count:[4,6] },
+          t5: { crit_spawns_volt_orb:{ dmg:200, cd_sec:0.5 }, extra_wave_count:[8,9] }
+        },
+        keystone: { extra_ticks_per_sec:2 }
+      },
+      Missy: {
+        role: "support/trickster (utility + reflect)",
+        basic: { pattern:["sword","sword","pistol_homing"] },
+        passive: { reflect_mult:2.5 },
+        s1: { name:"Claw + Wave", cd:6, combo_dmg:[15,60], reflects:[3,4], wave_dmg:28, on_kill:{ lifesteal_pct:12, drop_bonus_pct:25 }, invuln:3 },
+        s2: { name:"Safe Zone", cd:10, bubble_sec:8, team_heal:true, shield:true, rage_gain_boost:true, drop_boost:true, clone_stats_pct:60, invuln:3 },
+        s3: { name:"Black Cat Luck", cd:16, rush_hits:4, hit_dmg:[60,240], wave_dmg:130, reflects:[3,6], chest_allies:2, chest_hp:280, luck_bonus_pct:125, team_rage_bonus_pct:[15,45], gold_fountain_sec:12, invuln:3 },
+        rage: { cost:100, icd_sec:20, ally_life_mult:1.25, aggro:true, revive_one:true, drop_boost_mult:300, team_rage_on_cast_pct:[25,65] },
+        rage_tier_overrides: {
+          t2: { extra_chests:1, chest_aura_dps:20, extra_wave_count:[1,2] },
+          t3: { extra_chests_range:[2,3], on_chest_death_heal_pct_per_sec:3, heal_dur_sec:5, extra_wave_count:[3,4] },
+          t4: { chest_shot_fork:2, extra_wave_count:[4,6] },
+          t5: { gold_mimic:{ hp_mult:2, dmg_mult:2, guaranteed_rare:true }, extra_wave_count:[8,9] }
+        },
+        keystone: { bubble_reflect_power_mult:2.5, bubble_reflect_hitbox_scale_pct:20 }
+      }
+    }
+  };
+
+  // ===== Apply patch to whichever config you use =====
+  const root = (window.game && (window.game.config || window.game.CONFIG)) || window.CONFIG || window.A1K_CONFIG || {};
+  const merged = mergeUp(root, PATCH);
+  if (window.game?.config) window.game.config = merged;
+  else if (window.game?.CONFIG) window.game.CONFIG = merged;
+  else if (window.CONFIG) window.CONFIG = merged;
+  window.A1K_CONFIG = merged;
+  log('merged v13 config', merged);
+
+  // ===== CSS injection: XP gradient + pulse =====
+  const css = `
+  .xp-bar{background:linear-gradient(90deg,#2EA8FF 0%,#7B61FF 100%);position:relative;height:10px;border-radius:8px;box-shadow:0 0 8px rgba(123,97,255,.45);overflow:hidden}
+  .xp-bar.pulse{animation:xpPulse .6s ease-out}
+  @keyframes xpPulse{0%{box-shadow:0 0 6px rgba(123,97,255,0)}50%{box-shadow:0 0 14px rgba(123,97,255,.9)}100%{box-shadow:0 0 6px rgba(123,97,255,0)}}
+  .xp-label{position:absolute;top:-18px;left:0;right:0;text-align:center;font-weight:700;font-size:12px;text-shadow:0 1px 2px #000}
+  `;
+  if (!document.getElementById('a1k-xp-css')) {
+    const style = document.createElement('style');
+    style.id = 'a1k-xp-css';
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  // ===== Helper hooks you can call from your engine =====
+  const A1K = window.A1K || (window.A1K = {});
+  A1K.config = merged;
+
+  // Compute current Rage tier from spent AP
+  A1K.computeRageTier = (apSpent=0) => {
+    const tiers = merged.globals.rage_tiers;
+    let t = tiers[0];
+    for (const cand of tiers) if (apSpent >= cand.ap_spent_req) t = cand;
+    return t;
+  };
+
+  // Invulnerability on skill start (call when S1/S2/S3/Rage begins)
+  A1K.applyInvuln = (actor, ms = merged.globals.casting_invuln_sec*1000) => {
+    const now = performance.now();
+    actor.invulnUntil = Math.max(actor.invulnUntil||0, now + ms);
+  };
+  A1K.isInvuln = (actor) => (performance.now() < (actor.invulnUntil||0));
+
+  // Sword sustain & DEF aura (call on melee hit)
+  A1K.onMeleeHit = (actor, dmg)=> {
+    const g = merged.globals.sword_contact;
+    if (!g) return;
+    const heal = Math.floor((dmg||0) * g.lifesteal_pct_of_damage);
+    if (heal>0 && actor.heal) actor.heal(heal);
+    if (actor.addBuff) actor.addBuff({kind:'DEF', pct:g.def_bonus_pct, dur:g.def_bonus_duration_sec, id:'a1k_defbuf'});
+    actor.hasA1KDefAura = true;
+    clearTimeout(actor._a1kDefAuraT);
+    actor._a1kDefAuraT = setTimeout(()=>{ actor.hasA1KDefAura=false; }, g.def_bonus_duration_sec*1000);
+  };
+
+  // Damage reduction from DEF aura (call inside your damage intake)
+  A1K.applyDefAuraDR = (actor, incoming)=> {
+    const g = merged.globals.sword_contact;
+    return actor.hasA1KDefAura ? Math.max(0, incoming * (1 - (g.def_aura_dr_pct||0)/100)) : incoming;
+  };
+
+  // Stage-based player Rage scaling (+5% per 10 stages)
+  A1K.applyStageRageBonus = (base, stage)=> {
+    const b = merged.scaling.player_rage_stage_bonus_per_10||0;
+    return base * (1 + b * Math.floor((stage||0)/10));
+  };
+
+  // Spawn XP orbs (call on enemy death)
+  A1K.spawnXPOrbs = (fromPos, toElOrPos, countRange=[merged.xp_orbs.min, merged.xp_orbs.max])=>{
+    const [min,max] = countRange;
+    const n = Math.floor(Math.random()*(max-min+1))+min;
+    for (let i=0;i<n;i++){
+      const el = document.createElement('div');
+      el.className = 'xp-orb';
+      Object.assign(el.style,{position:'fixed',left:fromPos.x+'px',top:fromPos.y+'px',width:'6px',height:'6px',borderRadius:'50%',background:'radial-gradient(circle,#C3FF5B,#84F36D,#00FFA2)' ,pointerEvents:'none',zIndex:9999,transition:'transform .6s ease-out, opacity .6s ease-out'});
+      document.body.appendChild(el);
+      setTimeout(()=>{
+        const target = (toElOrPos && toElOrPos.getBoundingClientRect) ? toElOrPos.getBoundingClientRect() : toElOrPos;
+        const tx = (target?.left||20)+(target?.width?target.width/2:0);
+        const ty = (target?.top||20)+(target?.height?target.height/2:0);
+        el.style.transform = `translate(${tx-fromPos.x}px, ${ty-fromPos.y}px) scale(.7)`;
+        el.style.opacity = '0.2';
+        setTimeout(()=>{ el.remove(); const xpBar = document.querySelector('.xp-bar'); xpBar && xpBar.classList.add('pulse'); setTimeout(()=>xpBar && xpBar.classList.remove('pulse'), 650); }, 620);
+      }, 10);
+    }
+  };
+
+  // Simple damage floaters (call when dealing damage/heal/reflect/etc.)
+  A1K.floater = (pos, txt, kind='hit')=>{
+    const color = {
+      crit: merged.globals.ui.damage_floaters.crit_color,
+      hit: merged.globals.ui.damage_floaters.hit_color,
+      reflect: merged.globals.ui.damage_floaters.reflect_color,
+      dot: merged.globals.ui.damage_floaters.dot_color,
+      heal: merged.globals.ui.damage_floaters.heal_color
+    }[kind] || '#FFF';
+    const el = document.createElement('div');
+    el.textContent = txt;
+    Object.assign(el.style,{position:'fixed',left:pos.x+'px',top:pos.y+'px',color, fontWeight:'700',textShadow:'0 1px 2px #000',transform:'translate(-50%,-50%)',pointerEvents:'none',zIndex:10000, transition:'transform .7s ease-out, opacity .7s ease-out'});
+    document.body.appendChild(el);
+    requestAnimationFrame(()=>{ el.style.transform='translate(-50%,-80%)'; el.style.opacity='0'; setTimeout(()=>el.remove(), 720); });
+  };
+
+  // Boss engage helper (call in boss AI tick)
+  A1K.maintainBossRange = (boss, leaderX)=>{
+    const [lo,hi] = merged.ai_combat.boss_preferred_distance_px;
+    const desired = leaderX + ((boss.x < leaderX) ? lo : hi);
+    if (Math.abs(boss.x - desired) > 8) boss.x += Math.sign(desired - boss.x) * (boss.speed||1.4);
+  };
+
+  // Homing clamp util (degrees per second)
+  A1K.clampTurn = (projectile, targetAngleDeg, type='player')=>{
+    const rate = type==='skill' ? merged.globals.projectiles.skill_homing_turn_rate
+                : type==='boss' ? merged.globals.homing_rules.boss_turn_rate
+                : merged.globals.projectiles.player_homing_turn_rate;
+    // Your engine: adjust projectile.angle toward targetAngleDeg by <= rate * dt
+  };
+
+  log('hooks ready: A1K.applyInvuln, A1K.onMeleeHit, A1K.computeRageTier, A1K.spawnXPOrbs, A1K.floater, A1K.maintainBossRange, A1K.clampTurn');
+})();
+</script>
+</body>
+</html>

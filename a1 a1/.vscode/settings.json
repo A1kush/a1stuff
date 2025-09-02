@@ -1,0 +1,6 @@
+{
+    "inlineChat.notebookAgent": true,
+    "inlineChat.enableV2": true,
+    "inlineChat.finishOnType": true,
+    "inlineChat.lineEmptyHint": true
+}

@@ -1,0 +1,21 @@
+{
+  "version": "v13.7",
+  "auto_import": [
+    "sheets/characters/*.png",
+    "sheets/pets/*.png",
+    "vfx/projectiles/*.png",
+    "vfx/trails/*.png",
+    "vfx/impacts/*.png",
+    "vfx/auras/*.png",
+    "ui/icons/status/*.png"
+  ],
+  "projectiles_config": "raw_data/projectiles_v2.json",
+  "auras_config": "raw_data/auras.json",
+  "status_icons": {
+    "atk_down": "ui/icons/status/atk_down.png",
+    "dizzy": "ui/icons/status/dizzy.png"
+  },
+  "falloff_tables": "raw_data/falloff_tables.json",
+  "ai_behaviors": "raw_data/ai_behaviors.json",
+  "overrides_config": "raw_data/gameplay_overrides.json"
+}

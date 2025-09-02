@@ -1,0 +1,289 @@
+[
+  {
+    "path": "A1.png",
+    "w": 256,
+    "h": 256,
+    "label": "A1 Leader Placeholder\n256x256\npivot bottom-center",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "Unique.png",
+    "w": 256,
+    "h": 256,
+    "label": "Unique Gunner Placeholder\n256x256",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "Missy.png",
+    "w": 256,
+    "h": 256,
+    "label": "Missy Sword+Gun Placeholder\n256x256",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "characters/A1/A1.png",
+    "w": 256,
+    "h": 256,
+    "label": "A1 Leader\n/characters/A1/A1.png",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "characters/Unique/Unique.png",
+    "w": 256,
+    "h": 256,
+    "label": "Unique\n/characters/Unique/Unique.png",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "characters/Missy/Missy.png",
+    "w": 256,
+    "h": 256,
+    "label": "Missy\n/characters/Missy/Missy.png",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/buttons/btn_A.png",
+    "w": 96,
+    "h": 96,
+    "label": "Switch A (Leader)",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/buttons/btn_U.png",
+    "w": 96,
+    "h": 96,
+    "label": "Switch U",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/buttons/btn_M.png",
+    "w": 96,
+    "h": 96,
+    "label": "Switch M",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/buttons/btn_rage.png",
+    "w": 96,
+    "h": 96,
+    "label": "Rage",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/buttons/btn_shield.png",
+    "w": 96,
+    "h": 96,
+    "label": "Shield",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/joystick/joystick_base.png",
+    "w": 192,
+    "h": 192,
+    "label": "Joystick Base",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/joystick/joystick_stick.png",
+    "w": 96,
+    "h": 96,
+    "label": "Joystick Stick",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/hud/bar_hp_frame.png",
+    "w": 512,
+    "h": 32,
+    "label": "HP Bar Frame",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/hud/bar_hp_fill.png",
+    "w": 512,
+    "h": 32,
+    "label": "HP Bar Fill",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/hud/bar_sp_frame.png",
+    "w": 512,
+    "h": 24,
+    "label": "Shield/SP Frame",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/hud/bar_sp_fill.png",
+    "w": 512,
+    "h": 24,
+    "label": "Shield/SP Fill",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/hud/bar_exp_frame.png",
+    "w": 512,
+    "h": 20,
+    "label": "EXP Frame",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/hud/bar_exp_fill.png",
+    "w": 512,
+    "h": 20,
+    "label": "EXP Fill",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/hud/enemy_hp_frame.png",
+    "w": 96,
+    "h": 12,
+    "label": "Enemy HP Frame",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "ui/hud/enemy_hp_fill.png",
+    "w": 96,
+    "h": 12,
+    "label": "Enemy HP Fill",
+    "priority_batch": "batch_1_core_playability"
+  },
+  {
+    "path": "enemies/grunt_slug.png",
+    "w": 128,
+    "h": 128,
+    "label": "Enemy: Grunt Slug",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "enemies/grunt_imp.png",
+    "w": 128,
+    "h": 128,
+    "label": "Enemy: Grunt Imp",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "enemies/grunt_bot.png",
+    "w": 128,
+    "h": 128,
+    "label": "Enemy: Grunt Bot",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "bosses/boss_stage1.png",
+    "w": 256,
+    "h": 256,
+    "label": "Boss Stage 1",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "bosses/boss_stage2.png",
+    "w": 320,
+    "h": 320,
+    "label": "Boss Stage 2",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "projectiles/bullet_small.png",
+    "w": 32,
+    "h": 32,
+    "label": "Projectile: Small Bullet",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "projectiles/bullet_medium.png",
+    "w": 48,
+    "h": 48,
+    "label": "Projectile: Medium Bullet",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "projectiles/energy_bullet.png",
+    "w": 48,
+    "h": 48,
+    "label": "Projectile: Energy",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "projectiles/sword_trail.png",
+    "w": 128,
+    "h": 64,
+    "label": "Melee Trail / Slash",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "projectiles/muzzle_flash.png",
+    "w": 64,
+    "h": 64,
+    "label": "Muzzle Flash",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "vfx/hit_spark.png",
+    "w": 64,
+    "h": 64,
+    "label": "Hit Spark",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "vfx/shield_bubble.png",
+    "w": 220,
+    "h": 220,
+    "label": "Shield Bubble",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "vfx/rage_aura.png",
+    "w": 256,
+    "h": 256,
+    "label": "Rage Aura",
+    "priority_batch": "batch_2_enemies_projectiles_vfx"
+  },
+  {
+    "path": "bg/bg_ground.png",
+    "w": 1024,
+    "h": 128,
+    "label": "Ground Strip",
+    "priority_batch": "batch_3_backgrounds_icons_polish"
+  },
+  {
+    "path": "bg/bg_mid.png",
+    "w": 1024,
+    "h": 256,
+    "label": "Parallax Mid",
+    "priority_batch": "batch_3_backgrounds_icons_polish"
+  },
+  {
+    "path": "bg/bg_far.png",
+    "w": 1024,
+    "h": 256,
+    "label": "Parallax Far",
+    "priority_batch": "batch_3_backgrounds_icons_polish"
+  },
+  {
+    "path": "ui/icons/coin.png",
+    "w": 64,
+    "h": 64,
+    "label": "Coin Icon",
+    "priority_batch": "batch_3_backgrounds_icons_polish"
+  },
+  {
+    "path": "ui/icons/gem.png",
+    "w": 64,
+    "h": 64,
+    "label": "Gem Icon",
+    "priority_batch": "batch_3_backgrounds_icons_polish"
+  },
+  {
+    "path": "ui/icons/pause.png",
+    "w": 64,
+    "h": 64,
+    "label": "Pause Icon",
+    "priority_batch": "batch_3_backgrounds_icons_polish"
+  },
+  {
+    "path": "ui/icons/auto.png",
+    "w": 64,
+    "h": 64,
+    "label": "Auto Icon",
+    "priority_batch": "batch_3_backgrounds_icons_polish"
+  }
+]

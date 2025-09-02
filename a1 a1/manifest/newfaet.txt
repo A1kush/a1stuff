@@ -1,0 +1,1 @@
+Open index.html. New features: level label, boss proximity & engaged firing, boosted loot, empty bag + extra equip slots (acc3/acc4/pet2), pet ranks add ATK, new basic fire patterns for A1/Missy/Unique.

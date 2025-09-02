@@ -1,0 +1,34 @@
+{
+  "players": {
+    "a1": [
+      "assets/players/player_a1.png"
+    ],
+    "unique": [
+      "assets/players/player_unique.png"
+    ],
+    "missy": [
+      "assets/players/player_missy.png"
+    ],
+    "packs": [
+      "players/character",
+      "players/miss_and_pro"
+    ]
+  },
+  "pets": [
+    "assets/pets/Pets_sheet.png",
+    "assets/pets/cat_ally.png"
+  ],
+  "ui": [
+    "assets/ui/Pet_Icons.png"
+  ],
+  "fx": [
+    "assets/fx/a1_swing_1.png",
+    "assets/fx/a1_swing_2.png",
+    "assets/fx/a1_slash_red_arc.png"
+  ],
+  "backgrounds": [
+    "assets/backgrounds/parallax_1.png",
+    "assets/backgrounds/parallax_2.png",
+    "assets/backgrounds/parallax_3.png"
+  ]
+}

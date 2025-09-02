@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>A1K Runner — Fix v2 (wave/boss/inventory/beam)</title>
+<style>
+  :root{
+    --bg:#0d131c;--ink:#e9f4ff;--muted:#a8b7ce;--line:#293854;
+    --panel:#121b20;--panel2:#0f1826;--panel3:#0b1421;
+    --hp:#36c777;--hp2:#6de38e;--mp:#3ec5ff;--mp2:#6aa8ff;
+    --boss:#ff8c6a;--boss2:#ffbb9a;--rage:#f9cc2b;--rage2:#ff7a31;
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  *{box-sizing:border-box}
+  #wrap{position:relative;margin:0 auto;max-width:1280px;height:100vh;overflow:hidden;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;background:linear-gradient(#0c1420,#0a1018);}
+
+  /* HUD */
+  .hud{position:absolute;left:10px;right:10px;top:8px;display:flex;gap:10px;align-items:center;pointer-events:none;flex-wrap:wrap}
+  .pill{pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--muted)}
+  .bar{position:relative;height:12px;background:var(--panel);border:1px solid var(--line);border-radius:999px;overflow:hidden;min-width:200px}
+  .fill{position:absolute;inset:0;transform-origin:left center}
+  .hp{background:linear-gradient(90deg,var(--hp),var(--hp2))}
+  .mp{background:linear-gradient(90deg,var(--mp),var(--mp2))}
+  .boss{background:linear-gradient(90deg,var(--boss),var(--boss2))}
+
+  /* Dock */
+  /*
+   * Position the top dock lower so it doesn't overlap the stage/kills bar or currency.  This
+   * change moves the row of buttons (speed, inventory, auto, pause, shop, settings) down,
+   * leaving more vertical breathing room under the stage/wave/kills and currency bars.  See
+   * the updated top value below.  Note: currency positioning remains inline on the element.
+   */
+  .subdock{position:absolute;left:10px;top:70px;display:flex;gap:8px;pointer-events:auto;flex-wrap:wrap}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:6px 10px;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+
+  /* Drawers */
+  .drawer{position:absolute;top:70px;bottom:70px;width:420px;background:var(--panel);border:1px solid var(--line);box-shadow:0 12px 28px rgba(0,0,0,.35);display:none;border-radius:12px}
+  .drawer .in{padding:10px;overflow:auto;max-height:calc(100% - 42px)}
+  .drawer h3{margin:0;padding:10px 12px;border-bottom:1px solid var(--line)}
+  #inventory{right:10px} #shop{left:10px} #settings{left:50%;transform:translateX(-50%);max-width:92%;width:580px}
+  .card{background:#0f1826;border:1px solid var(--line);border-radius:10px;padding:10px;margin:10px 0}
+  .muted{color:var(--muted)}
+
+  /* Inventory grid & equipment slots */
+  .slots{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .slot{height:60px;border:1px dashed #41506a;border-radius:10px;background:#0c1826;display:flex;align-items:center;justify-content:center;color:#a8c0e0;cursor:pointer}
+  .slot.pet{outline:2px solid #5bd2b2}
+  .slot.equip{background:#0e1a2a;border-style:solid}
+  .slot:hover{filter:brightness(1.06)}
+
+  /* Controls */
+  .controls{position:absolute;left:10px;right:10px;bottom:10px;display:flex;align-items:flex-end;justify-content:space-between;pointer-events:none}
+  .stick{position:relative;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 50% 50%, #111b2a 0%, #0c1420 60%, #0c1420 100%);border:1px solid var(--line);box-shadow:inset 0 0 18px rgba(0,0,0,.55);pointer-events:auto}
+  .stick .nub{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:radial-gradient(circle at 35% 35%, #29384f, #1b2639);border:1px solid #3b4d71;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+  .joyWrap{position:relative;display:flex;flex-direction:column;align-items:flex-start;}
+  .char-buttons{position:absolute;bottom:100%;left:0;display:flex;gap:8px;margin-bottom:6px;}
+  .char-buttons .charBtn{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 40% 35%, #2a384f, #182235);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.35);color:#dfe9ff;display:flex;align-items:center;justify-content:center;user-select:none;cursor:pointer;font-size:12px;font-weight:600;}
+  .char-buttons .charBtn.active{background:radial-gradient(circle at 40% 35%, #334868, #25354d);box-shadow:0 3px 10px rgba(0,0,0,.45);}
+
+  .actions{position:relative;display:flex;gap:22px;pointer-events:auto;align-items:flex-end}
+  .col{display:flex;flex-direction:column;gap:16px;align-items:flex-end}
+  .btn-round{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 40% 35%, #2a384f, #182235);border:1px solid var(--line);box-shadow:0 3px 12px rgba(0,0,0,.35);color:#dfe9ff;display:flex;align-items:center;justify-content:center;user-select:none;cursor:pointer}
+  .btn-round.small{width:56px;height:56px;font-size:11px}
+  .btn-round.big{width:86px;height:86px;font-weight:700}
+  .btn-round:active{transform:translateY(1px)}
+  .btn-round.ready{box-shadow:0 0 14px 2px rgba(255,213,106,.8);border-color:#ffd56a;}
+
+  /* Drawer close button */
+  .drawer-close{
+    position:absolute;
+    top:6px;
+    right:8px;
+    width:20px;
+    height:20px;
+    border:0;
+    background:transparent;
+    color:var(--muted);
+    font-size:16px;
+    line-height:20px;
+    cursor:pointer;
+    pointer-events:auto;
+  }
+  .drawer-close:hover{color:var(--ink);}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="cv" width="1280" height="720"></canvas>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="pill" id="stagePill">Stage 1 • Wave 1/10 • Kills 0</div>
+    <div class="bar"><div class="fill hp" id="hpFill" style="transform:scaleX(1)"></div></div>
+    <div class="bar"><div class="fill mp" id="mpFill" style="transform:scaleX(1)"></div></div>
+    <div class="bar" style="min-width:320px"><div class="fill boss" id="bossFill" style="transform: scaleX(0);"></div></div>
+  </div>
+    <div id="currency" class="hud" style="top:30px;gap:8px;justify-content:flex-start;pointer-events:none;">
+      <div class="pill" style="pointer-events:auto">Gold: <b id="goldVal">0</b></div>
+      <div class="pill" style="pointer-events:auto">Silver: <b id="silverVal">0</b></div>
+      <div class="pill" style="pointer-events:auto">Tickets: <b id="ticketVal">0</b></div>
+      <div class="pill" style="pointer-events:auto">Gems: <b id="gemVal">0</b></div>
+    </div>
+
+  <!-- Dock -->
+  <div class="subdock">
+    <button class="btn" id="btnSpeed">×1</button>
+    <button class="btn" id="btnInventory">Inventory</button>
+    <button class="btn" id="btnAuto">Auto: ON</button>
+    <button class="btn" id="btnStart">Pause</button>
+    <button class="btn" id="btnShop">Shop</button>
+    <button class="btn" id="btnSettings">Settings</button>
+    <button class="btn" id="btnTalents">Talents</button>
+  </div>
+
+  <!-- Inventory Drawer -->
+  <aside id="inventory" class="drawer">
+    <h3>Inventory (32 slots) + Equipment<button class="drawer-close" aria-label="Close">×</button></h3>
+    <div class="in">
+      <div class="card">
+        <b>Equipment</b>
+        <div id="equip" class="slots" style="grid-template-columns:repeat(5,1fr)">
+          <div class="slot equip" data-slot="weapon">Weapon</div>
+          <div class="slot equip" data-slot="armor">Armor</div>
+          <div class="slot equip" data-slot="acc1">Accessory 1</div>
+          <div class="slot equip" data-slot="acc2">Accessory 2</div>
+          <div class="slot equip pet" data-slot="pet">Pet</div>
+        </div>
+      </div>
+      <div class="card">
+        <b>Bag</b>
+        <div id="invGrid" class="slots" style="grid-template-columns:repeat(8,1fr)"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Shop & Settings (same as before, brief for patch) -->
+  <aside id="shop" class="drawer">
+    <h3>Shop<button class="drawer-close" aria-label="Close">×</button></h3>
+    <div class="in">
+      <div class="card"><b>+Damage (All)</b> — 100 Gold <button class="btn" id="buyDmg">Buy</button></div>
+      <div class="card"><b>+Fire Rate (All)</b> — 100 Gold <button class="btn" id="buyRoF">Buy</button></div>
+      <div class="card"><b>Potion +50 HP</b> — 50 Gold <button class="btn" id="buyHP">Buy</button></div>
+      <div class="card"><b>Rage Pill</b> — 80 Gold <button class="btn" id="buyRage">Buy</button></div>
+    </div>
+  </aside>
+  <aside id="settings" class="drawer">
+    <h3>Settings<button class="drawer-close" aria-label="Close">×</button></h3>
+    <div class="in">
+      <div class="card">
+        <label><input type="checkbox" id="optAuto" checked> Auto‑AI</label>
+        <div style="margin-top:8px">Canvas Size: <select id="optSize">
+          <option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option>
+        </select></div>
+        <label style="display:block;margin-top:6px"><input type="checkbox" id="optPar" checked> Parallax</label>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Talents Drawer -->
+  <aside id="talents" class="drawer">
+    <h3>Talents<button class="drawer-close" aria-label="Close">×</button></h3>
+    <div class="in">
+      <canvas id="talentCanvas" width="800" height="440" style="image-rendering:pixelated;width:100%;background:var(--panel3);border:1px solid var(--line);border-radius:10px;"></canvas>
+      <div class="muted" style="margin-top:8px">Spend AP to unlock nodes. Keystone: <b>Rage II</b>. Press T to toggle.</div>
+    </div>
+  </aside>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="joyWrap">
+      <div class="char-buttons">
+        <div class="charBtn active" id="btnCharA">A</div>
+        <div class="charBtn" id="btnCharU">U</div>
+        <div class="charBtn" id="btnCharM">M</div>
+      </div>
+      <div class="stick" id="stick"><div class="nub" id="nub"></div></div>
+    </div>
+    <div class="actions">
+      <div class="col">
+        <div class="btn-round small" id="btnRage">R</div>
+        <div class="btn-round small" id="btnShield">Shield</div>
+        <div class="btn-round small" id="btnJump">Jump</div>
+        <div class="btn-round big" id="btnShoot"><b>•</b></div>
+      </div>
+      <div class="col">
+        <div class="btn-round small" id="btnS1">S1</div>
+        <div class="btn-round small" id="btnS2">S2</div>
+        <div class="btn-round small" id="btnS3">S3</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DESIGN_W=1280, DESIGN_H=720;
+const wrap=document.getElementById('wrap'); const cv=document.getElementById('cv'); let ctx=cv.getContext('2d');
+
+// store clickable rectangles for non-leader skill icons
+let nonSkillRects = [];
+function resize(){
+  const scale=Math.min(innerWidth/DESIGN_W, innerHeight/DESIGN_H);
+  const cssW=DESIGN_W*scale, cssH=DESIGN_H*scale;
+  Object.assign(cv.style,{width:cssW+'px',height:cssH+'px',position:'absolute',left:((innerWidth-cssW)/2)+'px',top:((innerHeight-cssH)/2)+'px'});
+  const dpr=Math.min(devicePixelRatio||1,2); cv.width=Math.round(DESIGN_W*dpr); cv.height=Math.round(DESIGN_H*dpr);
+  ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+addEventListener('resize',resize); resize();
+
+/* ===== State ===== */
+const st={
+  time:0, dt:0, running:true, speed:1, started:false,
+  stage:1, wave:1, wavesPerStage:10, kills:0,
+  gold:0, silver:0, tickets:0, gems:0,
+  hp:100, hpMax:100, mp:100, mpMax:100, mpRegen:8,
+  rage:0, rageMax:100, rageOn:false, rageDur:0, rageICD:0,
+  auto:false, useParallax:true,
+  waveClearDelay:800, waveClearT:0,
+  players:[
+    {id:'A1',x:220,y:DESIGN_H-160,vx:0,vy:0,grounded:true, dmg:20, alive:true, lane:0, overT:0, overCD:0},
+    {id:'Unique',x:260,y:DESIGN_H-130,vx:0,vy:0,grounded:true,dmg:18, alive:true, lane:1, overT:0, overCD:0},
+    {id:'Missy',x:240,y:DESIGN_H-100,vx:0,vy:0,grounded:true,dmg:18, alive:true, lane:2, overT:0, overCD:0}
+  ],
+  leader:0, lastSwap:0,
+  shots:[], eShots:[], enemies:[], pickups:[], effects:[],
+  bossHP:0, bossMax:1, bossAlive:false, chestBoss:false,
+  cds:{'A1':{S1:0,S2:0,S3:0}, 'Unique':{S1:0,S2:0,S3:0}, 'Missy':{S1:0,S2:0,S3:0}},
+
+  // Progression & talents
+  level:1,
+  xp:0,
+  apTotal:0,
+  apSpent:0,
+  apPicks: new Set(),
+  rageTier:1,
+  // auto skill management
+  _autoNextSkill:0,
+  _autoSkillIdx:0,
+  // parry timer for reflect
+  parryT:0,
+};
+// number of unique bosses.  Stages beyond this reuse the last boss pattern.
+const BOSS_COUNT = 4;
+const SPEEDS=[1,2,3,4,6];
+function rng(){return Math.random();}
+const $=q=>document.querySelector(q);
+
+/* ===== UI wiring ===== */
+$('#btnInventory').onclick=()=>toggle('#inventory');
+$('#btnShop').onclick=()=>toggle('#shop');
+$('#btnSettings').onclick=()=>toggle('#settings');
+$('#btnAuto').onclick=()=>{ st.auto=!st.auto; $('#btnAuto').textContent='Auto: '+(st.auto?'ON':'OFF'); };
+$('#btnStart').onclick=()=>{ st.running=!st.running; $('#btnStart').textContent=st.running?'Pause':'Start'; };
+$('#btnSpeed').onclick=()=>{ const i=SPEEDS.indexOf(st.speed); st.speed=SPEEDS[(i+1)%SPEEDS.length]; $('#btnSpeed').textContent='×'+st.speed; };
+
+function toggle(sel){ const e=$(sel); e.style.display=e.style.display==='block'?'none':'block'; }
+function updateCharBtns(){ ['A','U','M'].forEach((c,i)=>document.getElementById('btnChar'+c).classList.toggle('active',st.leader===i)); }
+document.getElementById('btnCharA').onclick=()=>{ st.leader=0; updateCharBtns(); };
+document.getElementById('btnCharU').onclick=()=>{ st.leader=1; updateCharBtns(); };
+document.getElementById('btnCharM').onclick=()=>{ st.leader=2; updateCharBtns(); };
+
+// Close button for drawers
+document.querySelectorAll('.drawer .drawer-close').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const d = btn.closest('.drawer');
+    if(d) d.style.display = 'none';
+  });
+});
+
+// Toggle talents drawer via button or T key
+$('#btnTalents').onclick = () => toggle('#talents');
+addEventListener('keydown', e => { if(e.code === 'KeyT') toggle('#talents'); });
+
+/* ===== Talents UI & logic ===== */
+const talentCanvas = document.getElementById('talentCanvas');
+let talentCtx;
+if(talentCanvas){ talentCtx = talentCanvas.getContext('2d'); }
+
+// define a simple talents tree: attack%, shield, and Rage II keystone
+const talents = [
+  {id:'atk1', x:120, y:340, cost:1, req:[], text:'+5% ATK', fx:(s)=>{ s.atkMul+=0.05; }},
+  {id:'atk2', x:220, y:280, cost:1, req:['atk1'], text:'+5% ATK', fx:(s)=>{ s.atkMul+=0.05; }},
+  {id:'atk3', x:320, y:220, cost:1, req:['atk2'], text:'+5% ATK', fx:(s)=>{ s.atkMul+=0.05; }},
+  {id:'shield1', x:520, y:340, cost:1, req:[], text:'+10 Shield', fx:(s)=>{ s.shield+=10; }},
+  {id:'shield2', x:620, y:280, cost:1, req:['shield1'], text:'+10 Shield', fx:(s)=>{ s.shield+=10; }},
+  {id:'crit1', x:320, y:340, cost:1, req:[], text:'+2% Crit', fx:(s)=>{ s.crit=(s.crit||0)+2; }},
+  {id:'move1', x:420, y:280, cost:1, req:[], text:'+5% Move', fx:(s)=>{ s.move=(s.move||0)+5; }},
+  {id:'skillHaste1', x:720, y:340, cost:1, req:[], text:'+5% Haste', fx:(s)=>{ s.haste=(s.haste||0)+5; }},
+  {id:'rage2', x:420, y:160, cost:3, req:['atk3','shield2'], keystone:true, text:'Rage II', fx:(s)=>{ st.rageTier=2; }}
+];
+
+function tallyTalentStats(){
+  const s = {atkMul:0, shield:0, crit:0, move:0, haste:0};
+  // reset rage tier
+  st.rageTier = 1;
+  for(const t of talents){
+    if(st.apPicks.has(t.id) && t.fx){ t.fx(s); }
+  }
+  st._talentStats = s;
+  recalcStats();
+}
+
+function drawTalents(){
+  if(!talentCtx) return;
+  const ctx2 = talentCtx;
+  ctx2.clearRect(0,0,talentCanvas.width, talentCanvas.height);
+  // connectors
+  ctx2.strokeStyle = '#2a3b58'; ctx2.lineWidth = 2; ctx2.beginPath();
+  const idMap = Object.fromEntries(talents.map(t => [t.id, t]));
+  talents.forEach(n => {
+    if(n.req){ n.req.forEach(rid => { const a=idMap[rid]; if(a){ ctx2.moveTo(a.x,a.y); ctx2.lineTo(n.x,n.y); } }); }
+  });
+  ctx2.stroke();
+  // nodes
+  talents.forEach(n => {
+    const owned = st.apPicks.has(n.id);
+    const canBuy = !owned && (st.apSpent < Math.min(30, st.apTotal)) && (!n.req || n.req.every(rid => st.apPicks.has(rid)));
+    // ring
+    ctx2.beginPath();
+    ctx2.fillStyle = owned ? '#20314d' : '#0f1e33';
+    ctx2.strokeStyle = canBuy ? '#63e6ff' : '#394d6f';
+    const rad = n.keystone ? 18 : 14;
+    ctx2.arc(n.x, n.y, rad, 0, Math.PI*2);
+    ctx2.fill(); ctx2.stroke();
+    // inner fill if owned
+    if(owned){ ctx2.beginPath(); ctx2.fillStyle = '#2d4a76'; ctx2.arc(n.x, n.y, rad-4, 0, Math.PI*2); ctx2.fill(); }
+    // text
+    ctx2.fillStyle = '#8fb6ff'; ctx2.font = '10px monospace';
+    ctx2.textAlign = 'left'; ctx2.textBaseline = 'middle';
+    ctx2.fillText(n.text, n.x + rad + 6, n.y);
+  });
+  // update header with AP spent/total
+  const hdr = document.querySelector('#talents h3');
+  if(hdr){ hdr.innerHTML = `Talents (${st.apSpent}/${st.apTotal})<button class="drawer-close" aria-label="Close">×</button>`; }
+  // rewire close button again (since we replaced innerHTML)
+  document.querySelectorAll('#talents .drawer-close').forEach(btn=>{
+    btn.onclick = (e) => { e.stopPropagation(); document.getElementById('talents').style.display='none'; };
+  });
+}
+
+if(talentCanvas){
+  // draw once at start
+  drawTalents();
+  // click to purchase
+  talentCanvas.addEventListener('click', e => {
+    const rect = talentCanvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width * talentCanvas.width;
+    const y = (e.clientY - rect.top) / rect.height * talentCanvas.height;
+    talents.forEach(n => {
+      const rad = n.keystone ? 18 : 14;
+      if(Math.hypot(n.x - x, n.y - y) <= rad + 4){
+        const owned = st.apPicks.has(n.id);
+        const canBuy = !owned && (st.apSpent < Math.min(30, st.apTotal)) && (!n.req || n.req.every(rid => st.apPicks.has(rid)));
+        if(canBuy){ st.apPicks.add(n.id); st.apSpent += n.cost || 1; tallyTalentStats(); drawTalents(); }
+      }
+    });
+  });
+}
+
+/* ===== Inventory scaffolding ===== */
+const inv=[]; const equip={weapon:null,armor:null,acc1:null,acc2:null,pet:null};
+const invGrid=document.getElementById('invGrid'); const equipBox=document.getElementById('equip');
+function makeItem(name,slot,atk=2){ return {id:Math.random(), name, slot, atk, rarity:['Common','Rare','Epic'][Math.floor(rng()*3)]}; }
+
+// Compute player stats from equipped items.  Each hero has a base damage which is
+// increased by the atk values of their currently equipped items.  Additional stats
+// (shield, move speed, etc.) could be added here using similar accumulation logic.
+function recalcStats(){
+  // base damage per hero
+  const baseDamage = {A1:20, Unique:18, Missy:18};
+  // accumulate atk bonuses by hero id
+  const bonus = {A1:0, Unique:0, Missy:0};
+  for(const slot in equip){
+    const it = equip[slot];
+    if(!it) continue;
+    if(it.atk){
+      // apply this bonus equally to all players for simplicity
+      bonus.A1 += it.atk;
+      bonus.Unique += it.atk;
+      bonus.Missy += it.atk;
+    }
+  }
+  for(const p of st.players){
+    const id = p.id;
+    let dmgBase = baseDamage[id] + bonus[id];
+    // apply talent attack multiplier if present
+    if(st._talentStats && st._talentStats.atkMul){ dmgBase *= (1 + st._talentStats.atkMul); }
+    p.dmg = Math.round(dmgBase);
+  }
+  // store shield bonus for applying to shield max (unused yet)
+  st._shieldMaxBonus = (st._talentStats && st._talentStats.shield) ? st._talentStats.shield : 0;
+}
+
+// Add a random item to the inventory, used when collecting gift boxes.  If there is
+// no empty slot, the item is discarded.  Item slots are chosen randomly from the
+// available equipment types.
+function addRandomItem(){
+  // find an empty inventory slot
+  for(let i=0; i<32; i++){
+    if(!inv[i]){
+      const slots = ['weapon','armor','acc1','acc2','pet'];
+      const sl = slots[Math.floor(Math.random() * slots.length)];
+      const newIt = makeItem('Gift Item', sl, 1 + Math.floor(Math.random()*4));
+      inv[i] = newIt;
+      refreshInv();
+      refreshEquip();
+      recalcStats();
+      return;
+    }
+  }
+}
+function refreshInv(){
+  // build grid cells
+  invGrid.innerHTML='';
+  for(let i=0;i<32;i++){
+    const d=document.createElement('div');
+    d.className='slot';
+    const it=inv[i];
+    d.textContent = it ? it.name : '•';
+    d.onclick = ()=>{
+      if(!it) return;
+      // equip the item into its slot and remove from bag
+      equip[it.slot] = it;
+      inv[i] = null;
+      refreshInv();
+      refreshEquip();
+      recalcStats();
+    };
+    invGrid.appendChild(d);
+  }
+}
+function refreshEquip(){
+  [...equipBox.children].forEach(d=>{
+    const k=d.dataset.slot; const it=equip[k]; d.textContent = (k.toUpperCase()) + (it?': '+it.name:'');
+  });
+}
+for(let i=0;i<8;i++) inv.push(makeItem('Blade +'+(i+1),'weapon',3+i));
+inv.push(makeItem('Pet: Mini‑Cat','pet',0)); refreshInv(); refreshEquip();
+recalcStats();
+
+/* ===== Input ===== */
+const keys={}; addEventListener('keydown',e=>{ keys[e.code]=true; if(e.code==='KeyQ'){ st.leader=(st.leader+1)%3; updateCharBtns(); } if(e.code==='Space') jumpAll(); });
+addEventListener('keyup',e=>{ keys[e.code]=false; });
+const stick=document.getElementById('stick'), nub=document.getElementById('nub'); let joyId=null, joyX=0, joyY=0, lastTap=0;
+stick.addEventListener('pointerdown',e=>{ stick.setPointerCapture(e.pointerId); joyId=e.pointerId; onJoy(e); });
+stick.addEventListener('pointermove',e=>{ if(e.pointerId===joyId) onJoy(e); });
+stick.addEventListener('pointerup',e=>{ if(e.pointerId===joyId){ joyId=null; joyX=0; joyY=0; nub.style.left='50%'; nub.style.top='50%'; const now=performance.now(); if(now-lastTap<260) jumpAll(); lastTap=now; }});
+function onJoy(e){ const r=stick.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2; let dx=e.clientX-cx, dy=e.clientY-cy; const m=Math.hypot(dx,dy); const lim=r.width*0.38; if(m>lim){ dx=dx/m*lim; dy=dy/m*lim; } nub.style.left=(50+dx/r.width*100)+'%'; nub.style.top=(50+dy/r.height*100)+'%'; joyX=dx/lim; joyY=dy/lim; }
+
+// click detection for non-leader skill icons
+cv.addEventListener('pointerdown', e => {
+  // ignore if clicking on UI (buttons are above canvas) by checking pointer-events: none on hud; pointer still captured though
+  const rect = cv.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width * DESIGN_W;
+  const y = (e.clientY - rect.top) / rect.height * DESIGN_H;
+  for(const r of nonSkillRects){
+    if(x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h){
+      // ensure skill is ready
+      const hero = st.players[r.pIndex];
+      if(cdReady(hero.id, r.key)){
+        useSkill(hero, r.key);
+      }
+      break;
+    }
+  }
+});
+
+/* ===== Helpers ===== */
+function leader(){ return st.players[st.leader]; }
+function laneY(l){ return (DESIGN_H-100) + (l===0?-30:l===2?30:0); }
+function jumpAll(){ for(const p of st.players){ if(p.grounded){ p.vy=-0.28; p.grounded=false; } } } // lowered jump
+function grantGold(n){ st.gold+=n; updateCurrencies(); }
+function spawnCoin(x,y,amt){ st.pickups.push({kind:'coin',x,y,amt,vy:-0.2,life:500}); }
+function spawnGift(x,y){ st.pickups.push({kind:'gift',x,y,vy:-0.1,life:300}); }
+
+// Add a floating text effect (damage/resource indicator)
+function addFloater(x,y,txt,color){ st.effects.push({x,y,txt,color,vy:-0.25,life:800}); }
+
+/* ===== Skills & CDs ===== */
+const CD={ 'A1':{S1:6000,S2:10000,S3:16000}, 'Unique':{S1:4000,S2:20000,S3:40000}, 'Missy':{S1:3000,S2:25000,S3:30000} };
+function cdReady(id,k){ return st.cds[id][k]<=0; } function startCD(id,k){ st.cds[id][k]=CD[id][k]; }
+document.getElementById('btnS1').onclick=()=>useSkill(leader(),'S1');
+document.getElementById('btnS2').onclick=()=>useSkill(leader(),'S2');
+document.getElementById('btnS3').onclick=()=>useSkill(leader(),'S3');
+document.getElementById('btnRage').onclick=()=>{
+  if(st.rage>=st.rageMax && !st.rageOn){
+    st.rageOn=true; st.rage=0; st.rageICD=20000;
+    // tiered buffs: set duration and multipliers based on Rage Tier
+    if(st.rageTier===2){ st.rageDur=12000; st._rageAtk=1.40; st._rageSpd=1.30; st._rageShield=1.30; }
+    else { st.rageDur=10000; st._rageAtk=1.25; st._rageSpd=1.20; st._rageShield=1.20; }
+    // hero ultimate when activating Rage
+    const h = leader();
+    if(h.id==='A1') spawnA1Ultimate(h);
+    else if(h.id==='Unique') spawnUniqueUltimate(h);
+    else if(h.id==='Missy') spawnMissyUltimate(h);
+  }
+};
+document.getElementById('btnShield').onclick=()=>{ if(!st._shieldOn && st.mp>=30){ st._shieldOn=true; st._shieldT=2500; st.mp-=30; } };
+document.getElementById('btnJump').onclick=()=>jumpAll();
+const hold={shoot:false}; document.getElementById('btnShoot').onpointerdown=()=>hold.shoot=true; document.getElementById('btnShoot').onpointerup=()=>hold.shoot=false;
+
+function useSkill(a,key){
+  const id = a.id;
+  if(!cdReady(id,key)) return;
+  if(id==='A1'){
+    if(key==='S1'){
+      // launch multiple forward waves and open parry window
+      for(let i=0;i<5;i++){
+        const ang=(i-2)*0.22;
+        st.shots.push({x:a.x+20,y:a.y-40,vx:Math.cos(ang)*560,vy:Math.sin(ang)*560,speed:560,dmg:18,life:520,laneY:a.y,homing:true,pierce:2});
+      }
+      // extend parry window for A1
+      st.parryT = Math.max(st.parryT, 350);
+    }
+    else if(key==='S2'){ const tx=a.x+120, ty=a.y-40; setTimeout(()=>st.shots.push({x:tx,y:ty,vx:0,vy:0,dmg:360,life:80,aoe:72}),800); }
+    else { a.x=Math.min(420,a.x+80); for(let i=0;i<7;i++){ const ang=(i-3)*0.28; st.shots.push({x:a.x+20,y:a.y-40,vx:Math.cos(ang)*600,vy:Math.sin(ang)*600,speed:600,dmg:16,life:480,laneY:a.y,homing:true}); } }
+  } else if(id==='Unique'){
+    if(key==='S1'){ const n=1+Math.floor(Math.random()*3); for(let i=0;i<n;i++){ setTimeout(()=>{ const t=nearestEnemy(a)||{x:a.x+300,y:a.y}; const ang=Math.atan2(t.y-(a.y-40), t.x-(a.x+10)); st.shots.push({x:a.x+10,y:a.y-40,vx:Math.cos(ang)*560,vy:Math.sin(ang)*560,speed:560,dmg:20,life:520,laneY:a.y,homing:true,pierce:2}); }, i*90); } }
+    else if(key==='S2'){ st.hp=Math.min(st.hpMax, st.hp+20); st._shieldOn=true; st._shieldT=Math.max(st._shieldT||0,4000); }
+    else { a.overT=7000; a.overCD=0; } // BEAM FIX: timer-based, no setInterval
+  } else { // Missy
+    if(key==='S1'){ melee(a,36,42,24); wave(a,0.9); }
+    else if(key==='S2'){ st._bubbleT=7000; st._shieldOn=true; st._shieldT=Math.max(st._shieldT||0,7000); st.rage=Math.min(st.rageMax, st.rage+20); }
+    else { st.pickups.push({kind:'catAlly',x:a.x+40,y:a.y-30,vx:0.08,life:900,fireT:0}); st.pickups.push({kind:'catAlly',x:a.x+58,y:a.y-30,vx:0.08,life:900,fireT:0}); }
+  }
+  startCD(id,key);
+}
+function wave(a, mul){ st.shots.push({x:a.x+24,y:a.y-40,vx:560,vy:0,speed:560,dmg:Math.round(a.dmg*mul),life:620,laneY:a.y,homing:false,pierce:2}); }
+function melee(a, reach, height, dmg){ for(const e of st.enemies){ if(e.hp>0 && e.x>a.x && (e.x-a.x)<=reach && Math.abs(e.y-a.y)<=height/2){ e.hp-=dmg; } } }
+  // open a parry window during sword swings for A1 and Missy
+  if(a.id==='A1' || a.id==='Missy'){
+    // grant a brief parry window (300ms) that reflects incoming shots
+    st.parryT = Math.max(st.parryT, 300);
+  }
+
+/* ===== Progression & Leveling ===== */
+function xpToNext(L){ return Math.round(50 + 25*L + 5*L*L); }
+function grantXP(n){
+  st.xp += n;
+  while(st.xp >= xpToNext(st.level)){
+    st.xp -= xpToNext(st.level);
+    st.level++;
+    // restore party HP/MP on level up
+    st.hp = st.hpMax;
+    st.mp = st.mpMax;
+    // ability point gain starting at level 2
+    if(st.level >= 2 && st.apTotal < 30){ st.apTotal++; }
+  }
+}
+
+/* ===== Rage Ultimates ===== */
+function spawnA1Ultimate(p){
+  // reduce A1 HP by 10% of current
+  st.hp = Math.max(1, st.hp - Math.round(st.hp * 0.10));
+  // spawn three giant slash waves across three lanes
+  const lanes = [0,1,2];
+  lanes.forEach((ln, idx) => {
+    const yPos = laneY(ln);
+    for(let i=0;i<3;i++){
+      setTimeout(() => {
+        st.shots.push({x:p.x+20, y:yPos-40, vx:800, vy:0, speed:800, dmg:150, life:1000, laneY:yPos, homing:false, pierce:5, aoe:0});
+      }, i*200);
+    }
+  });
+  // loot boost: raise coin drop chance for 15s
+  st._lootBoost = 15000;
+}
+function spawnUniqueUltimate(p){
+  // prolong overcharge beam for 12s; increase tick damage slightly
+  p.overT = 12000;
+  p.overCD = 0;
+}
+function spawnMissyUltimate(p){
+  // summon chest allies for 20s; these act like stronger cat allies and drop gifts on death
+  const positions = [40, 60, 80];
+  positions.forEach((off, idx) => {
+    st.pickups.push({kind:'catAlly', x:p.x + off, y:p.y - 30, vx:0.06 + idx*0.02, life:2000, fireT:0, strong:true});
+  });
+}
+
+/* ===== Enemies & Waves ===== */
+function nearestEnemy(a){ let best=null,bd=1e9; for(const e of st.enemies){ if(e.hp<=0) continue; const dx=e.x-a.x; if(dx<=0) continue; const d=Math.hypot(dx,e.y-a.y); if(d<bd){bd=d;best=e;} } return best; }
+function spawnWave(){
+  // spawn mobs for normal waves or a stage boss on the final wave.  The boss type scales
+  // with the current stage (capped at BOSS_COUNT) and may randomly be replaced by a chest boss.
+  if(st.wave < st.wavesPerStage){
+    // Basic mob spawn: count scales modestly with random variation.  HP scales with stage
+    // and wave to keep later waves tougher.
+    const n = 5 + Math.floor(rng()*3);
+    for(let i=0;i<n;i++){
+      st.enemies.push({
+        kind:'mob',
+        x:DESIGN_W + 120 + i*60,
+        y:laneY([0,1,2][i%3]),
+        hp:80 + (st.stage-1)*40 + st.wave*8,
+        max:80 + (st.stage-1)*40 + st.wave*8,
+        vx:-0.30 - 0.02*st.stage,
+        fireCD: 1200 + Math.random()*800
+      });
+    }
+  } else {
+    // Determine which boss pattern to use based on stage.  Only BOSS_COUNT unique patterns
+    // exist; later stages reuse the final pattern.  Chest boss still has a 50% chance.
+    const idx = Math.min(st.stage, BOSS_COUNT);
+    const useChest = rng() < 0.5;
+    const bossKind = useChest ? 'chestBoss' : 'boss' + idx;
+    const hp = 900 + (st.stage - 1) * 220;
+    st.enemies.push({
+      kind: bossKind,
+      x:DESIGN_W - 260,
+      y:laneY(1),
+      hp: hp,
+      max: hp,
+      vx: 0, // bosses do not walk off screen
+      phase2: false,
+      fireCD: 600
+    });
+    st.bossAlive = true;
+    st.bossMax = hp;
+    st.bossHP = hp;
+    st.chestBoss = useChest;
+  }
+}
+function advanceWave(){ if(st.wave<st.wavesPerStage){ st.wave++; spawnWave(); } else { st.stage++; st.wave=1; st.bossAlive=false; st.chestBoss=false; spawnWave(); } }
+
+/* ===== Loop ===== */
+let last=performance.now();
+function loop(t){
+  const dt=(t-last)/1000; last=t;
+  if(!st.running){ requestAnimationFrame(loop); return; }
+  st.time+=dt*st.speed; st.dt=dt*st.speed;
+
+  // initial spawn gate
+  if(!st.started){ st.started=true; spawnWave(); }
+
+  // timers
+  for(const id of ['A1','Unique','Missy']) for(const k of ['S1','S2','S3']) st.cds[id][k]=Math.max(0,st.cds[id][k]-st.dt*1000);
+  if(st._shieldOn){ st._shieldT-=st.dt*1000; if(st._shieldT<=0) st._shieldOn=false; }
+  if(st._bubbleT){ st._bubbleT-=st.dt*1000; if(st._bubbleT<=0) st._bubbleT=0; }
+  if(st.rageOn){ st.rageDur-=st.dt*1000; if(st.rageDur<=0) st.rageOn=false; } else if(st.rageICD>0){ st.rageICD-=st.dt*1000; }
+  st.mp=Math.min(st.mpMax, st.mp+st.mpRegen*st.dt);
+  if(st.parryT>0){ st.parryT -= st.dt*1000; if(st.parryT < 0) st.parryT = 0; }
+  if(st._lootBoost && st._lootBoost > 0){ st._lootBoost -= st.dt * 1000; if(st._lootBoost < 0) st._lootBoost = 0; }
+
+  // formation + movement
+  const l=leader(); l.vx=(joyX||0)*0.45*(st.rageOn?1.2:1); l.vy+=0.002; // slightly stronger gravity
+  for(const p of st.players){
+    const targetX = (p===l? l.x : l.x-90-(p===st.players[2]?20:0));
+    const targetY = laneY(p.lane);
+    if(p===l){ p.x+=l.vx*DESIGN_W*st.dt; p.y+=l.vy*DESIGN_H*st.dt; }
+    else { p.x+=(targetX-p.x)*0.08; p.y+=(targetY-p.y)*0.10; }
+    if(p.y>laneY(p.lane)){ p.y=laneY(p.lane); p.vy=0; p.grounded=true; } else p.grounded=false;
+    p.x=Math.max(60,Math.min(520,p.x));
+    // Unique beam ticks (bug fix: timer-based)
+    if(p.overT>0){ p.overT-=st.dt*1000; p.overCD-=st.dt*1000; if(p.overCD<=0){ p.overCD=120; const t=nearestEnemy(p); if(t){ const ang=Math.atan2(t.y-(p.y-40), t.x-(p.x+10)); st.shots.push({x:p.x+10,y:p.y-40,vx:Math.cos(ang)*740,vy:Math.sin(ang)*740,speed:740,dmg:10,life:180,laneY:p.y,homing:true,pierce:3}); } } }
+  }
+
+  // auto & manual fire / skills
+  if(st.auto){
+    // always hold shoot
+    hold.shoot = true;
+    // schedule auto use of skills, shield, jump and rage sequentially
+    if(st.time >= st._autoNextSkill){
+      let acted = false;
+      // If Rage ready and not on cooldown, use it
+      if(!st.rageOn && st.rage >= st.rageMax && st.rageICD <= 0){
+        st.rageOn = true; st.rage = 0; st.rageICD = 20000; st.rageDur = 10000;
+        acted = true;
+      } else {
+        // Prioritize heal/shield if HP or MP low
+        // Use shield if not active and mp available
+        if(!st._shieldOn && st.mp >= 30){ st._shieldOn = true; st._shieldT = 2500; st.mp -= 30; acted = true; }
+        // Jump periodically to avoid contact
+        else if(st.time - (st._lastAutoJump||0) > 2.5){ jumpAll(); st._lastAutoJump = st.time; acted = true; }
+        // Auto skills for leader first, then others
+        const order = [st.leader, (st.leader+1)%3, (st.leader+2)%3];
+        for(const idx of order){ if(acted) break; const h = st.players[idx];
+          for(const sk of ['S3','S2','S1']){ if(cdReady(h.id, sk)){
+            // Unique healing only if HP below 70%
+            if(h.id==='Unique' && sk==='S2' && st.hp/st.hpMax > 0.7) continue;
+            // Missy bubble (S2) rarely used, only if many enemies
+            if(h.id==='Missy' && sk==='S2' && st.enemies.length < 3) continue;
+            useSkill(h, sk);
+            acted = true;
+            break;
+          } }
+        }
+      }
+      if(acted){
+        // delay next auto skill to avoid spamming
+        st._autoNextSkill = st.time + 0.8;
+      }
+    }
+  }
+  // manual fire if hold.shoot
+  if(hold.shoot){
+    // A1 short melee cadence
+    if((st.time%0.35)<0.02){ melee(l,32,42,20); wave(l,0.7); }
+    // Unique & Missy occasional shots
+    for(const p of st.players){
+      if(p.id!=='A1'){
+        const t=nearestEnemy(p)||{x:p.x+280,y:p.y}; const ang=Math.atan2(t.y-(p.y-40), t.x-(p.x+10));
+        st.shots.push({x:p.x+10,y:p.y-40,vx:Math.cos(ang)*520,vy:Math.sin(ang)*520,speed:520,dmg:p.dmg,life:980,laneY:p.y,homing:true});
+      }
+    }
+  }
+
+  // shots (player)
+  for(const s of st.shots){
+    if(s.homing){ const t=nearestEnemy({x:s.x,y:s.laneY}); if(t){ const ax=t.x-s.x, ay=t.y-s.y; const m=Math.hypot(ax,ay)||1; s.vx=(ax/m)*s.speed; s.vy=(ay/m)*s.speed; } }
+    // update position
+    s.x+=s.vx*st.dt; s.y+=s.vy*st.dt; s.life-=st.dt*1000;
+    // bounce off ground or ceiling or walls if bounce property is present
+    if(s.bounce && s.bounce>0){
+      // ground at DESIGN_H-120; ceiling at 0
+      if(s.y > DESIGN_H-120 && s.vy>0){ s.vy = -Math.abs(s.vy); s.bounce--; }
+      if(s.y < 0 && s.vy<0){ s.vy = Math.abs(s.vy); s.bounce--; }
+      // left and right walls
+      if(s.x < 0 && s.vx<0){ s.vx = Math.abs(s.vx); s.bounce--; }
+      if(s.x > DESIGN_W && s.vx>0){ s.vx = -Math.abs(s.vx); s.bounce--; }
+    }
+  }
+  st.shots=st.shots.filter(s=>s.life>0 && s.x<DESIGN_W+60 && s.y>-60 && s.y<DESIGN_H+60);
+
+  // enemies move & shoot
+  for(const e of st.enemies){
+    e.x += (e.vx||0)*DESIGN_W*st.dt;
+    // boss patterns
+    e.fireCD = (e.fireCD||600) - st.dt*1000;
+    if(e.fireCD<=0){
+      if(e.kind === 'mob'){
+        e.fireCD = 900 + Math.random() * 600;
+        enemyShoot(e, false);
+      } else if(e.kind && (e.kind.startsWith('boss') || e.kind === 'chestBoss')){
+        // Bosses and chest bosses shoot more frequently and can have homing bullets
+        e.fireCD = 420;
+        enemyShoot(e, rng() < 0.25);
+      }
+    }
+    // phase flip when a boss crosses half HP; applies to numbered bosses only
+    if(e.kind && e.kind.startsWith('boss') && !e.phase2 && e.hp < e.max * 0.5){
+      e.phase2 = true;
+    }
+  }
+
+  // enemy shots update
+  for(const b of st.eShots){
+    // parry reflection: if a parry window is active on A1 or Missy, convert enemy bullets into friendly shots
+    if(st.parryT > 0){
+      for(const p of st.players){
+        if((p.id==='A1' || p.id==='Missy') && Math.abs(p.x - b.x) < 28 && Math.abs(p.y - b.y) < 28){
+          // reflect bullet: remove from enemy shots and spawn a friendly piercing wave
+          b.life = 0;
+          // spawn reflected shot with same speed directed forward and piercing
+          const vx = b.vx > 0 ? b.vx : Math.abs(b.vx);
+          const vy = b.vy;
+          st.shots.push({x:b.x, y:b.y, vx:vx, vy:vy, speed:Math.hypot(vx,vy), dmg:20, life:600, laneY:b.y, homing:false, pierce:3});
+          break;
+        }
+      }
+    }
+    if(b.homing){ const t=st.players[st.leader]; const ax=t.x-b.x, ay=t.y-b.y; const m=Math.hypot(ax,ay)||1; b.vx=(ax/m)*b.speed; b.vy=(ay/m)*b.speed; }
+    b.x+=b.vx*st.dt; b.y+=b.vy*st.dt; b.life-=st.dt*1000;
+  }
+  st.eShots = st.eShots.filter(b=>b.life>0 && b.x>-60 && b.x<DESIGN_W+60 && b.y>-60 && b.y<DESIGN_H+60);
+
+  // collisions: player shots vs enemies
+  for(const s of st.shots){
+    for(const e of st.enemies){
+      if(e.hp<=0) continue;
+      const dx=e.x-s.x, dy=e.y-s.y;
+      if(Math.abs(dx)<24 && Math.abs(dy)<32){
+        const dmgVal = Math.round(s.dmg * (st.rageOn ? 1.25 : 1));
+        e.hp -= dmgVal;
+        // show damage floater
+        addFloater(e.x, e.y-20, '-' + dmgVal, '#ff7a6a');
+        s.life = 0;
+        if(st.bossAlive){ st.bossHP=Math.max(0,Math.min(st.bossMax,e.hp)); }
+        if(e.kind==='chestBoss' && Math.random()<0.35) spawnCoin(e.x,e.y-20, 4+Math.floor(Math.random()*5));
+        if(e.hp<=0){
+          st.kills++; st.rage=Math.min(st.rageMax, st.rage + (st.rageOn?20:6));
+          // spawn coins and gifts, boosted if lootBoost active
+          let baseCoins = 5 + Math.floor(Math.random()*8);
+          if(st._lootBoost && st._lootBoost > 0){ baseCoins += 3; }
+          spawnCoin(e.x,e.y-20, baseCoins);
+          const giftChance = st._lootBoost && st._lootBoost > 0 ? 0.2 : 0.08;
+          if(Math.random() < giftChance) spawnGift(e.x,e.y-28);
+          // award XP on kill: base XP for mobs, large bonus for bosses
+          if((e.kind && e.kind.startsWith('boss')) || e.kind === 'chestBoss'){
+            // boss kill: large XP
+            grantXP(120);
+          } else {
+            // mob kill: small XP with slight variation
+            grantXP(6 + Math.floor(rng() * 4));
+          }
+          // mark boss kill if this enemy is any boss (boss1,boss2, etc.) or chest boss
+          if((e.kind && e.kind.startsWith('boss')) || e.kind === 'chestBoss'){
+            st.bossAlive = false;
+          }
+        }
+      }
+    }
+  }
+  st.enemies = st.enemies.filter(e=>e.hp>0 && e.x>-80); // allow mobs to run past and despawn off left
+
+  // collisions: enemy shots vs players
+  for(const b of st.eShots){
+    for(const p of st.players){
+      if(Math.abs(p.x-b.x)<20 && Math.abs(p.y-b.y)<20){
+        if(st._shieldOn){
+          b.life=0;
+        } else {
+          st.hp = Math.max(0, st.hp - 8);
+          addFloater(p.x, p.y - 24, '-8', '#ff7a6a');
+          b.life = 0;
+        }
+      }
+    }
+  }
+
+  // contact damage: if enemies collide with players, apply damage before HP/MP. Shields absorb first.
+  for(const e of st.enemies){
+    if(e.hp <= 0) continue;
+    for(const p of st.players){
+      if(Math.abs(p.x - e.x) < 26 && Math.abs(p.y - e.y) < 34){
+        if(st._shieldOn){
+          // shield absorbs contact damage, but reduce shield duration slightly
+          st._shieldT = Math.max(0, st._shieldT - 200);
+        } else {
+          st.hp = Math.max(0, st.hp - 10);
+          addFloater(p.x, p.y - 28, '-10', '#ff7a6a');
+        }
+      }
+    }
+  }
+
+  // pickups magnet
+  for(const it of st.pickups){
+    it.life-=st.dt*1000;
+    const ld=leader(); const dx=ld.x-it.x, dy=ld.y-it.y; const d=Math.hypot(dx,dy);
+    if(d<220){ it.x+=(dx/d)*220*st.dt; it.y+=(dy/d)*220*st.dt; }
+    if(d<24){
+      if(it.kind === 'coin'){
+        grantGold(it.amt);
+        addFloater(it.x, it.y, '+Gold', '#ffd56a');
+      }
+      if(it.kind === 'gift'){
+        // collecting a gift box awards a ticket and rolls a random item into the bag
+        st.tickets++;
+        addRandomItem();
+        addFloater(it.x, it.y, '+Ticket', '#ff8c6a');
+      }
+      it.life = 0;
+    }
+  }
+  st.pickups=st.pickups.filter(p=>p.life>0);
+
+  // update floating effects
+  for(const ef of st.effects){
+    ef.y += ef.vy * DESIGN_H * st.dt;
+    ef.life -= st.dt * 1000;
+  }
+  st.effects = st.effects.filter(e => e.life > 0);
+
+  // wave clear gating
+  if(st.enemies.length===0 && !st.bossAlive && st.pickups.filter(p=>p.kind!=='catAlly').length===0){
+    if(st.waveClearT<=0){ st.waveClearT=st.waveClearDelay; } else { st.waveClearT-=st.dt*1000; if(st.waveClearT<=0){ advanceWave(); } }
+  } else { st.waveClearT=0; }
+
+  // hp death
+  if(st.hp<=0){ st.stage=1; st.wave=1; st.kills=0; st.hp=st.hpMax; st.mp=st.mpMax; st.enemies.length=0; st.shots.length=0; st.eShots.length=0; st.pickups.length=0; for(const p of st.players){ p.overT=0; } spawnWave(); }
+
+  // draw & HUD
+  draw();
+  document.getElementById('hpFill').style.transform='scaleX('+(st.hp/st.hpMax)+')';
+  document.getElementById('mpFill').style.transform='scaleX('+(st.mp/st.mpMax)+')';
+  document.getElementById('bossFill').style.transform='scaleX('+(st.bossAlive? (st.bossHP/st.bossMax):0)+')';
+  document.getElementById('stagePill').textContent=`Stage ${st.stage} • Wave ${st.wave}/${st.wavesPerStage} • Kills ${st.kills}`;
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ===== Enemy shooting helpers ===== */
+function enemyShoot(e, homing){
+  // Determine base parameters by enemy kind.  Bosses increase difficulty per stage.  Mobs
+  // shoot a single slow bullet, chest bosses fire a modest spread with some homing, and
+  // numbered bosses scale with the stage index (up to BOSS_COUNT) to increase bullet count
+  // and speed.  Higher stage bosses may drop occasional minions or add vertical shock shots.
+  const t = st.players[st.leader];
+  const ang = Math.atan2((t.y - (e.y)), (t.x - (e.x)));
+  let sp = 420;
+  let count = 1;
+  let homingChance = 0;
+  if(e.kind === 'mob'){
+    sp = 420; count = 1; homingChance = 0;
+  } else if(e.kind === 'chestBoss'){
+    sp = 520; count = 5; homingChance = 0.3;
+  } else if(e.kind && e.kind.startsWith('boss')){
+    // extract stage index from 'bossN'
+    const sIdx = parseInt(e.kind.replace('boss','')) || 1;
+    sp = 520 + sIdx * 20;
+    count = 5 + (sIdx - 1) * 2;
+    homingChance = 0.25 + sIdx * 0.05;
+    // bosses beyond stage 1 occasionally spawn an extra mob
+    if(sIdx > 1 && Math.random() < 0.3){
+      const lane = [0,1,2][Math.floor(Math.random() * 3)];
+      const hpMob = 80 + (st.stage - 1) * 40 + st.wave * 8;
+      st.enemies.push({kind:'mob', x:e.x + 120, y:laneY(lane), hp:hpMob, max:hpMob, vx:-0.30 - 0.02*st.stage, fireCD:1200 + Math.random()*800});
+    }
+    // bosses beyond stage 2 also fire a downward shock bullet
+    if(sIdx > 2){
+      st.eShots.push({x:e.x, y:e.y, vx:0, vy:600, speed:600, life:2000, homing:false});
+    }
+  } else {
+    // default case: treat unknown as a basic single shot
+    sp = 520; count = 1; homingChance = 0;
+  }
+  // spawn spread bullets
+  for(let i=0; i<count; i++){
+    const spread = (count > 1 ? (i - (count - 1) / 2) * 0.15 : 0);
+    // decide if this bullet is homing: only bullets near the center of the spread may home
+    let hv = false;
+    if(homing && Math.abs(i - (count - 1) / 2) < 0.5 && Math.random() < homingChance) hv = true;
+    const vx = Math.cos(ang + spread) * sp;
+    const vy = Math.sin(ang + spread) * sp;
+    st.eShots.push({x:e.x, y:e.y, vx, vy, speed:sp, life:2000, homing:hv});
+  }
+}
+
+/* ===== Rendering ===== */
+function draw(){
+  ctx.clearRect(0,0,DESIGN_W,DESIGN_H);
+  // BG
+  ctx.fillStyle='#0f1826'; ctx.fillRect(0,0,DESIGN_W,DESIGN_H);
+  // ground stripes
+  ctx.fillStyle='#0e1c2e'; ctx.fillRect(0,DESIGN_H-120,DESIGN_W,120);
+  ctx.fillStyle='#14243a'; ctx.fillRect(0,DESIGN_H-260,DESIGN_W,140);
+  // players
+  for(const p of st.players){
+    // player body
+    ctx.fillStyle = p===st.players[0] ? '#6aa8ff' : (p===st.players[1] ? '#a78bfa' : '#ffb4e6');
+    ctx.fillRect(p.x-18,p.y-34,36,52);
+    // overhead bars: HP, XP, Rage
+    const barW = 52;
+    const barH = 3;
+    const baseX = p.x - barW/2;
+    let yOff = p.y - 44;
+    // HP bar (global for now)
+    ctx.fillStyle = '#283f33'; ctx.fillRect(baseX, yOff, barW, barH);
+    ctx.fillStyle = '#36c777'; ctx.fillRect(baseX, yOff, barW * (st.hp / st.hpMax), barH);
+    yOff -= (barH + 2);
+    // XP bar
+    const xpRatio = st.level >= 101 ? 1 : (st.xp / xpToNext(st.level));
+    ctx.fillStyle = '#233850'; ctx.fillRect(baseX, yOff, barW, barH);
+    ctx.fillStyle = '#6aa8ff'; ctx.fillRect(baseX, yOff, barW * xpRatio, barH);
+    yOff -= (barH + 2);
+    // Rage bar
+    ctx.fillStyle = '#42310f'; ctx.fillRect(baseX, yOff, barW, barH);
+    ctx.fillStyle = '#f9cc2b'; ctx.fillRect(baseX, yOff, barW * (st.rage / st.rageMax), barH);
+  }
+  // non-leader skill icons
+  nonSkillRects = [];
+  st.players.forEach((p, idx) => {
+    if(idx === st.leader) return;
+    // base position above player head for skill icons
+    const iconR = 10;
+    let xPos = p.x - (iconR * 6) + 2;
+    const yPos = p.y - 66;
+    ['S1','S2','S3'].forEach((key, k) => {
+      const cd = st.cds[p.id][key] || 0;
+      const ready = cd <= 0;
+      const cx = xPos + k * (iconR*2 + 6);
+      const cy = yPos;
+      // store rect for click detection
+      nonSkillRects.push({pIndex: idx, key, x: cx - iconR, y: cy - iconR, w: iconR*2, h: iconR*2});
+      // draw circular icon
+      ctx.beginPath();
+      ctx.arc(cx, cy, iconR, 0, Math.PI * 2);
+      ctx.fillStyle = ready ? '#ffd56a' : '#394d6f';
+      ctx.fill();
+      // inner ring to show cooldown percent
+      const pct = ready ? 1 : (1 - cd / CD[p.id][key]);
+      ctx.beginPath();
+      ctx.arc(cx, cy, iconR-3, -Math.PI/2, -Math.PI/2 + Math.PI*2 * pct);
+      ctx.strokeStyle = ready ? '#ffe9a3' : '#566c8e';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // label (small number)
+      ctx.fillStyle = '#0b1421';
+      ctx.font = '9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const label = key === 'S1' ? '1' : key === 'S2' ? '2' : '3';
+      ctx.fillText(label, cx, cy);
+    });
+  });
+  // enemies
+  for(const e of st.enemies){
+    let color;
+    if(e.kind === 'mob'){
+      color = '#ff6e6e';
+    } else if(e.kind && e.kind.startsWith('boss')){
+      color = '#ffa566';
+    } else {
+      // chest boss or other special enemy
+      color = '#ffd56a';
+    }
+    ctx.fillStyle = color;
+    const w = (e.kind === 'mob' ? 34 : 56);
+    const h = (e.kind === 'mob' ? 40 : 60);
+    ctx.fillRect(e.x - 18, e.y - 28, w, h);
+  }
+  // shots
+  ctx.fillStyle='#9ad1ff'; for(const s of st.shots){ ctx.fillRect(s.x-3,s.y-2,6,4); }
+  ctx.fillStyle='#ffb18b'; for(const b of st.eShots){ ctx.fillRect(b.x-3,b.y-2,6,4); }
+  // pickups
+  for(const it of st.pickups){ ctx.fillStyle = it.kind==='coin' ? '#ffd56a' : '#ff8c6a'; ctx.fillRect(it.x-5,it.y-5,10,10); }
+
+  // floating damage/resource text
+  for(const ef of st.effects){
+    const alpha = Math.max(0, ef.life / 800);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = ef.color;
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(ef.txt, ef.x, ef.y);
+    ctx.globalAlpha = 1;
+  }
+}
+</script>
+<script>
+
+/* === A1K Runner – Light Merge Patch (wrapper) ==============================
+ * Adds: 
+ *  - mob proximity + bounce (updateMobBehavior)
+ *  - knockback damping (dampKnockback)
+ *  - hit-stun shimmer feedback
+ *  - homing rule helpers (spawnMobBullet/spawnEliteBullet stubs if unused)
+ * Hooked by wrapping window.loop() after it is defined.
+ * This avoids invasive edits to your core logic.
+ * ========================================================================== */
+(function(){
+  // Tunables
+  const MOB_STANDOFF = 42, MOB_BACKSTEP = 26, MOB_BACKSPD = 0.12;
+  const MOB_HALT_T = 420, CONTACT_TICK = 350, KB_FORCE = 0.6, KB_TIME = 220;
+
+  function hitStunCSS(){
+    if(document.getElementById('hit-shimmer-style')) return;
+    const css = `.hit-shimmer{animation:hitsh 120ms ease-out;}
+    @keyframes hitsh{0%{filter:brightness(1.6) contrast(1.2)}100%{filter:none}}`;
+    const el = document.createElement('style'); el.id='hit-shimmer-style'; el.textContent = css; document.head.appendChild(el);
+  }
+  function hitStunShimmer(ms=120){
+    const w = document.getElementById('wrap') || document.body;
+    w.classList.remove('hit-shimmer'); void w.offsetWidth;
+    w.classList.add('hit-shimmer');
+    setTimeout(()=>w.classList.remove('hit-shimmer'), ms+20);
+  }
+  function applyKnockback(actor, fromX, force=KB_FORCE){
+    const dir = Math.sign(actor.x - fromX) || 1;
+    actor.vx = (actor.vx||0) + dir * force;
+    actor.kbT = KB_TIME;
+    hitStunShimmer(120);
+  }
+  function applyContactDamage(player, dmg){
+    try{
+      if(window.st && st._shieldOn){ st._shieldT = Math.max(0, (st._shieldT||0) - 120); }
+      else if(window.st){ st.hp = Math.max(0, (st.hp|0) - (dmg|0)); }
+    }catch(e){}
+  }
+  function updateMobBehavior(m, dt, leader){
+    if(!leader) return;
+    const dx = leader.x - m.x, ax = Math.abs(dx);
+    m._haltT  = (m._haltT  || 0) - dt;
+    m._ctickT = (m._ctickT || 0) - dt;
+    m._stickT = (m._stickT || 0) - dt;
+    const touching = ax < 14 && Math.abs(leader.y - m.y) < 28;
+    if (touching && m._ctickT <= 0){
+      applyContactDamage(leader, m.contactDmg || 6);
+      m._ctickT = CONTACT_TICK;
+      m._stickT = (m._stickT > 0 ? m._stickT : 0) + dt;
+      if (m._stickT > 180){ applyKnockback(leader, m.x); m._stickT = 0; }
+    } else { m._stickT = 0; }
+    if (dx < 0) {
+      if (ax <= MOB_BACKSTEP) { m.state='backstep'; m.vx = +MOB_BACKSPD; }
+      else if (ax <= MOB_STANDOFF && m._haltT <= 0){ m.state='halt'; m.vx = 0; m._haltT = MOB_HALT_T; }
+      else if (m.state !== 'backstep'){ m.state='advance'; }
+    }
+  }
+  function dampKnockback(p, dt){
+    if (p && p.kbT && p.kbT > 0){ p.kbT -= dt; p.vx *= 0.94; if(p.kbT<=0) p.kbT=0; }
+  }
+
+  // Optional helpers for clarity (won't override your existing spawners)
+  function spawnMobBullet(m){ return {x:m.x-10,y:m.y,vx:-0.9,vy:0,dmg:8,pierce:0,owner:'enemy',seek:false,turn:0}; }
+  function spawnEliteBullet(e){ return {x:e.x-12,y:e.y,vx:-1.0,vy:0,dmg:12,pierce:0,owner:'enemy',seek:true,turn:8}; }
+
+  // Wrap the main loop when available
+  hitStunCSS();
+  let wrapped=false;
+  const waiter = setInterval(()=>{
+    try{
+      if(wrapped) return;
+      if(typeof window.loop === 'function' && window.st && typeof window.leader === 'function'){
+        wrapped = true;
+        const orig = window.loop;
+        window.loop = function(t){
+          orig(t);
+          try{
+            const L = leader();
+            const dtms = (st.dt||0)*1000;
+            if(L) dampKnockback(L, dtms);
+            if(st.enemies && st.enemies.length){
+              for(let i=0;i<st.enemies.length;i++){ updateMobBehavior(st.enemies[i], dtms, L); }
+            }
+          }catch(err){ /* swallow */ }
+        };
+        clearInterval(waiter);
+      }
+    }catch(e){}
+  }, 60);
+})();
+
+</script>
+</body>
+</html>

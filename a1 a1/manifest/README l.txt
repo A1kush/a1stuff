@@ -1,0 +1,3 @@
+Included art copied: {'A1.png': 'players/player_a1.png', 'A1_swing_1.png': 'fx/a1_swing_1.png', 'A1_swing_2.png': 'fx/a1_swing_2.png', 'a1_slash_red_arc.png': 'fx/a1_slash_red_arc.png', 'cat_ally.png': 'pets/cat_ally.png', 'Pet_Icons.png': 'ui/Pet_Icons.png', 'Pets_sheet.png': 'pets/Pets_sheet.png'}
+Unpacked zips: {'character.zip': 'players/character', 'miss and pro.zip': 'players/miss_and_pro'}
+Drop more PNGs into assets/... using same names.

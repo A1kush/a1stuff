@@ -1,0 +1,56 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic:
+      - generic [ref=e4]: Stage 1 • Wave 2/10 • Kills 1
+      - generic:
+        - generic: 8/80 XP — Lv 1
+    - generic:
+      - generic [ref=e5]:
+        - text: "Gold:"
+        - generic [ref=e6]: "34"
+      - generic [ref=e7]:
+        - text: "Silver:"
+        - generic [ref=e8]: "0"
+      - generic [ref=e9]:
+        - text: "Tickets:"
+        - generic [ref=e10]: "0"
+      - generic [ref=e11]:
+        - text: "Gems:"
+        - generic [ref=e12]: "0"
+      - generic [ref=e13]:
+        - text: "Boss Kills:"
+        - generic [ref=e14]: "0"
+      - generic [ref=e15]:
+        - text: "Gift Keys:"
+        - generic [ref=e16]: "0"
+      - generic [ref=e17]:
+        - text: "Boss Keys:"
+        - generic [ref=e18]: "0"
+    - generic [ref=e19]:
+      - button "×1" [ref=e20] [cursor=pointer]
+      - button "Inventory" [ref=e21] [cursor=pointer]
+      - 'button "Auto: ON" [ref=e22] [cursor=pointer]'
+      - button "Pause" [ref=e23] [cursor=pointer]
+      - button "Shop" [ref=e24] [cursor=pointer]
+      - button "Settings" [ref=e25] [cursor=pointer]
+      - button "Talents" [ref=e26] [cursor=pointer]
+      - button "Dungeon" [ref=e27] [cursor=pointer]
+    - generic:
+      - generic [ref=e28] [cursor=pointer]: Switch (Unique)
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - generic [ref=e33] [cursor=pointer]: R
+          - generic [ref=e34] [cursor=pointer]: Shield
+          - generic [ref=e35] [cursor=pointer]: Jump
+          - generic [ref=e37] [cursor=pointer]: •
+        - generic [ref=e38]:
+          - generic [ref=e39] [cursor=pointer]: S1
+          - generic [ref=e40] [cursor=pointer]: S2
+          - generic [ref=e41] [cursor=pointer]: S3
+  - generic:
+    - generic: "TEST: Turn-around"
+    - generic: Kill +1
+```

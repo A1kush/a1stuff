@@ -1,0 +1,39 @@
+{
+  "seed": 1,
+  "canvas": {
+    "w": 960,
+    "h": 540,
+    "scale": 1
+  },
+  "player": {
+    "hero": "A1",
+    "hp": 120,
+    "atk": 12,
+    "speed": 2.2,
+    "fireRate": 0.22,
+    "skills": {
+      "pulse": {
+        "cd": 4,
+        "dmg": 120,
+        "radius": 96
+      },
+      "shield": {
+        "cd": 6,
+        "dur": 3,
+        "absorb": 60
+      },
+      "slash": {
+        "cd": 5,
+        "dmg": 80,
+        "arc": 140
+      },
+      "rage": {
+        "cd": 18,
+        "dur": 5,
+        "atkMult": 2.5,
+        "fireRateMult": 0.6
+      }
+    },
+    "autopilot": true
+  }
+}

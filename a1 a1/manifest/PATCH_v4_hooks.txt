@@ -1,0 +1,7 @@
+// Paste into your game at the indicated spots. See README for guidance.
+/* draw() -> after drawing heroes and rage bars */
+// drawLevelOverheads();
+
+/* per-enemy update */
+// boss approach + in-range firing with cooldowns
+/* … see full file … */

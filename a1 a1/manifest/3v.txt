@@ -1,0 +1,6 @@
+A1K Runner — Unique 8-Tile Sheet (v3)
+Paths:
+- assets/characters/Unique.png
+- assets/characters/Unique_sheet_256x128.png
+Order: [idle_1, idle_2, run_1, run_2, aim_1, fire_1, reload, hurt]
+Pivot: (32,56); Facing: right; Transparent PNG.

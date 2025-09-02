@@ -1,0 +1,16 @@
+{
+  "atk_down": {
+    "type": "multiplier",
+    "stat": "atk_mult",
+    "mult": 0.9,
+    "duration_s": 5.0,
+    "icon": "ui/icons/status/atk_down.png"
+  },
+  "dizzy": {
+    "type": "behavior_override",
+    "effect": "infighting",
+    "duration_s": 5.0,
+    "boss_immune": true,
+    "icon": "ui/icons/status/dizzy.png"
+  }
+}

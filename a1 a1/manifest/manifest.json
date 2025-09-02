@@ -1,0 +1,785 @@
+{
+  "source_zip": "Best Runner Data 2 copy.zip",
+  "total_files_in_zip": 154,
+  "organized_into": "/mnt/data/A1K_assets",
+  "category_counts": {
+    "misc": 74,
+    "ui": 68,
+    "mobs": 2,
+    "effects": 2,
+    "bullets": 7,
+    "tiles": 1
+  },
+  "mapping": [
+    {
+      "source": "Best Runner Data 2 copy/slot_highlight_96_afb5675f366b.png",
+      "target": "assets/misc/slot_highlight_96_afb5675f366b.png",
+      "bytes": 1416336
+    },
+    {
+      "source": "Best Runner Data 2 copy/bg_mid_e2c53a2918b2.png",
+      "target": "assets/ui/backgrounds/bg_mid.png",
+      "bytes": 6194
+    },
+    {
+      "source": "Best Runner Data 2 copy/bg_ground_a2bd725d2ddc.png",
+      "target": "assets/ui/backgrounds/bg_ground.png",
+      "bytes": 546
+    },
+    {
+      "source": "Best Runner Data 2 copy/paperdoll_silhouette.png",
+      "target": "assets/misc/paperdoll_silhouette.png",
+      "bytes": 2063168
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_legs_pants_4f0d1467e157.png",
+      "target": "assets/ui/icon_legs_pants_4f0d1467e157.png",
+      "bytes": 487
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_pet_demons_f1720e5bcf0c.png",
+      "target": "assets/ui/icon_pet_demons_f1720e5bcf0c.png",
+      "bytes": 526
+    },
+    {
+      "source": "Best Runner Data 2 copy/icons_slot_legs_5798df8d2cff.png",
+      "target": "assets/ui/icons_slot_legs_5798df8d2cff.png",
+      "bytes": 1352082
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_button_secondary_default_2ad83895dd30.png",
+      "target": "assets/ui/ui_button_secondary_default_2ad83895dd30.png",
+      "bytes": 1475891
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_button_secondary_pressed_8b040eb62066.png",
+      "target": "assets/ui/ui_button_secondary_pressed_8b040eb62066.png",
+      "bytes": 1522962
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_square_highlight.png",
+      "target": "assets/misc/slot_square_highlight.png",
+      "bytes": 3738
+    },
+    {
+      "source": "Best Runner Data 2 copy/skills_icon_skill_1_92e51a6efcf6.png",
+      "target": "assets/ui/skills_icon_skill_1_92e51a6efcf6.png",
+      "bytes": 2139315
+    },
+    {
+      "source": "Best Runner Data 2 copy/BG_ground.png.gif",
+      "target": "assets/ui/backgrounds/bg_ground.gif",
+      "bytes": 5650661
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_chest_vest_b505f24c0236.png",
+      "target": "assets/ui/icon_chest_vest_b505f24c0236.png",
+      "bytes": 585
+    },
+    {
+      "source": "Best Runner Data 2 copy/beam_tick_08x16.png",
+      "target": "assets/misc/beam_tick_08x16.png",
+      "bytes": 1309395
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_button_primary_hover_d5676c0324b7.png",
+      "target": "assets/ui/ui_button_primary_hover_d5676c0324b7.png",
+      "bytes": 1673442
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_pet_0f8f6a56ae38.png",
+      "target": "assets/misc/slot_pet_0f8f6a56ae38.png",
+      "bytes": 219
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_legs_pants_d22d137d5b84.png",
+      "target": "assets/ui/icon_legs_pants_d22d137d5b84.png",
+      "bytes": 747
+    },
+    {
+      "source": "Best Runner Data 2 copy/index.html",
+      "target": "assets/misc/index.html",
+      "bytes": 5621
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_weapon_sword_fb3f91968c31.png",
+      "target": "assets/ui/icon_weapon_sword_fb3f91968c31.png",
+      "bytes": 782
+    },
+    {
+      "source": "Best Runner Data 2 copy/.DS_Store",
+      "target": "assets/misc/ds_store.png",
+      "bytes": 8196
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_pet_demonS.png",
+      "target": "assets/ui/icon_pet_demons.png",
+      "bytes": 609
+    },
+    {
+      "source": "Best Runner Data 2 copy/btn_circle_pressed_overlay_96_7357e75169b2.png",
+      "target": "assets/misc/btn_circle_pressed_overlay_96_7357e75169b2.png",
+      "bytes": 653
+    },
+    {
+      "source": "Best Runner Data 2 copy/Pets_sheet.png",
+      "target": "assets/misc/pets_sheet.png",
+      "bytes": 2219613
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_chest_vest_af692c9ab88d.png",
+      "target": "assets/ui/icon_chest_vest_af692c9ab88d.png",
+      "bytes": 878
+    },
+    {
+      "source": "Best Runner Data 2 copy/btn_fight_pressed.png",
+      "target": "assets/misc/btn_fight_pressed.png",
+      "bytes": 1349673
+    },
+    {
+      "source": "Best Runner Data 2 copy/banner_boss.png",
+      "target": "assets/misc/banner_boss.png",
+      "bytes": 6661
+    },
+    {
+      "source": "Best Runner Data 2 copy/BG_ground.png",
+      "target": "assets/ui/backgrounds/bg_ground_1.png",
+      "bytes": 143
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_square.png",
+      "target": "assets/misc/slot_square.png",
+      "bytes": 2321
+    },
+    {
+      "source": "Best Runner Data 2 copy/panel_frame_9slice_80b69c606bd3.png",
+      "target": "assets/ui/panel_frame_9slice_80b69c606bd3.png",
+      "bytes": 1348522
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_weapon_sword_75846fade019.png",
+      "target": "assets/ui/icon_weapon_sword_75846fade019.png",
+      "bytes": 1103
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_head_a981c08f0506.png",
+      "target": "assets/misc/slot_head_a981c08f0506.png",
+      "bytes": 136
+    },
+    {
+      "source": "Best Runner Data 2 copy/BG_mid.png",
+      "target": "assets/ui/backgrounds/bg_mid_1.png",
+      "bytes": 1866
+    },
+    {
+      "source": "Best Runner Data 2 copy/hud_skill_preview.html",
+      "target": "assets/misc/hud_skill_preview.html",
+      "bytes": 10234
+    },
+    {
+      "source": "Best Runner Data 2 copy/Boss_sheet.png",
+      "target": "assets/misc/boss_sheet.png",
+      "bytes": 3138866
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_chest_0a1e90247679.png",
+      "target": "assets/misc/slot_chest_0a1e90247679.png",
+      "bytes": 140
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_chest_vest.png",
+      "target": "assets/ui/icon_chest_vest.png",
+      "bytes": 585
+    },
+    {
+      "source": "Best Runner Data 2 copy/paper_doll.png",
+      "target": "assets/misc/paper_doll.png",
+      "bytes": 4716
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_shield_8c5653487d5a.png",
+      "target": "assets/misc/slot_shield_8c5653487d5a.png",
+      "bytes": 200
+    },
+    {
+      "source": "Best Runner Data 2 copy/fog_wisp_03_58107e761689.png",
+      "target": "assets/misc/fog_wisp_03_58107e761689.png",
+      "bytes": 3461
+    },
+    {
+      "source": "Best Runner Data 2 copy/uibtn_fight_hover_154a510fbf79.png",
+      "target": "assets/ui/uibtn_fight_hover_154a510fbf79.png",
+      "bytes": 1365430
+    },
+    {
+      "source": "Best Runner Data 2 copy/Boss_sheet 2.gif",
+      "target": "assets/misc/boss_sheet_2.gif",
+      "bytes": 12634728
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_weapon_sword.png",
+      "target": "assets/ui/icon_weapon_sword.png",
+      "bytes": 782
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_weapon.png",
+      "target": "assets/misc/slot_weapon.png",
+      "bytes": 1344232
+    },
+    {
+      "source": "Best Runner Data 2 copy/Boss_sheet 3.gif",
+      "target": "assets/misc/boss_sheet_3.gif",
+      "bytes": 5508264
+    },
+    {
+      "source": "Best Runner Data 2 copy/Slots.png",
+      "target": "assets/misc/slots.png",
+      "bytes": 842
+    },
+    {
+      "source": "Best Runner Data 2 copy/bg_ground_71fad45d2d09.png",
+      "target": "assets/ui/backgrounds/bg_ground_2.png",
+      "bytes": 1036
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_weapon_c81b0b5e0272.png",
+      "target": "assets/misc/slot_weapon_c81b0b5e0272.png",
+      "bytes": 245
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_boots_74a5e7d0e225.png",
+      "target": "assets/ui/icon_boots_74a5e7d0e225.png",
+      "bytes": 366
+    },
+    {
+      "source": "Best Runner Data 2 copy/icons_slot_weapon_bc7e606d3217.png",
+      "target": "assets/ui/icons_slot_weapon_bc7e606d3217.png",
+      "bytes": 1330395
+    },
+    {
+      "source": "Best Runner Data 2 copy/UI_Icons.png",
+      "target": "assets/ui/ui_icons.png",
+      "bytes": 3700
+    },
+    {
+      "source": "Best Runner Data 2 copy/btn_circle_base_96_025141eda1d8.png",
+      "target": "assets/misc/btn_circle_base_96_025141eda1d8.png",
+      "bytes": 1023
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_square_disabled_21f0b49eacd8.png",
+      "target": "assets/misc/slot_square_disabled_21f0b49eacd8.png",
+      "bytes": 2150158
+    },
+    {
+      "source": "Best Runner Data 2 copy/Boxes.png",
+      "target": "assets/misc/boxes.png",
+      "bytes": 2083545
+    },
+    {
+      "source": "Best Runner Data 2 copy/ico_coin_silver.png",
+      "target": "assets/ui/icons/coin_silver.png",
+      "bytes": 439
+    },
+    {
+      "source": "Best Runner Data 2 copy/hudSkills.js",
+      "target": "assets/misc/hudskills.js",
+      "bytes": 3317
+    },
+    {
+      "source": "Best Runner Data 2 copy/Mobs_sheet 2.png",
+      "target": "assets/mobs/mobs.png",
+      "bytes": 2109913
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_legs_pants.png",
+      "target": "assets/ui/icon_legs_pants.png",
+      "bytes": 487
+    },
+    {
+      "source": "Best Runner Data 2 copy/Effects_atlas.png",
+      "target": "assets/effects/effects_atlas.png",
+      "bytes": 1477044
+    },
+    {
+      "source": "Best Runner Data 2 copy/icons_slot_chest_29fe80af4f9e.png",
+      "target": "assets/ui/icons_slot_chest_29fe80af4f9e.png",
+      "bytes": 1352129
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_button_tertiary_disabled_4902f4ef0759.png",
+      "target": "assets/ui/ui_button_tertiary_disabled_4902f4ef0759.png",
+      "bytes": 1481676
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_head_cap.png",
+      "target": "assets/ui/icon_head_cap.png",
+      "bytes": 576
+    },
+    {
+      "source": "Best Runner Data 2 copy/btn_fight_idle.png",
+      "target": "assets/misc/btn_fight_idle.png",
+      "bytes": 1367137
+    },
+    {
+      "source": "Best Runner Data 2 copy/icons_slot_shield_e5a3fa5b64b0.png",
+      "target": "assets/ui/icons_slot_shield_e5a3fa5b64b0.png",
+      "bytes": 1349989
+    },
+    {
+      "source": "Best Runner Data 2 copy/btn_circle_pressed_overlay_96_e54c9dc9be85.png",
+      "target": "assets/misc/btn_circle_pressed_overlay_96_e54c9dc9be85.png",
+      "bytes": 1035
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_wide.png",
+      "target": "assets/misc/slot_wide.png",
+      "bytes": 2508
+    },
+    {
+      "source": "Best Runner Data 2 copy/Projectiles.png",
+      "target": "assets/bullets/projectiles.png",
+      "bytes": 2154550
+    },
+    {
+      "source": "Best Runner Data 2 copy/bg_mid_82ff6a39548f.png",
+      "target": "assets/ui/backgrounds/bg_mid_2.png",
+      "bytes": 16459
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_pet_dfa719760e83.png",
+      "target": "assets/misc/slot_pet_dfa719760e83.png",
+      "bytes": 168
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_head_60ca36ce8562.png",
+      "target": "assets/misc/slot_head_60ca36ce8562.png",
+      "bytes": 163
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_button_tertiary_default_e97ceef0eaf6.png",
+      "target": "assets/ui/ui_button_tertiary_default_e97ceef0eaf6.png",
+      "bytes": 1325904
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_head_cap_74bfc6d532f3.png",
+      "target": "assets/ui/icon_head_cap_74bfc6d532f3.png",
+      "bytes": 815
+    },
+    {
+      "source": "Best Runner Data 2 copy/Mobs_sheet.png",
+      "target": "assets/mobs/mobs_1.png",
+      "bytes": 2109913
+    },
+    {
+      "source": "Best Runner Data 2 copy/fog_wisp_01_cae887ee4a30.png",
+      "target": "assets/misc/fog_wisp_01_cae887ee4a30.png",
+      "bytes": 3185
+    },
+    {
+      "source": "Best Runner Data 2 copy/ico_coin_gold.png",
+      "target": "assets/ui/icons/coin_gold.png",
+      "bytes": 438
+    },
+    {
+      "source": "Best Runner Data 2 copy/projectile_missy_shard@2x.png",
+      "target": "assets/bullets/projectile_missy_shard_2x.png",
+      "bytes": 24367
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_boots_193b01069bb1.png",
+      "target": "assets/misc/slot_boots_193b01069bb1.png",
+      "bytes": 105
+    },
+    {
+      "source": "Best Runner Data 2 copy/animation_manifest.json",
+      "target": "assets/misc/animation_manifest.json",
+      "bytes": 626
+    },
+    {
+      "source": "Best Runner Data 2 copy/balance_seed_no_traps.json",
+      "target": "assets/misc/balance_seed_no_traps.json",
+      "bytes": 365
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_button_tertiary_pressed_png_728a9b38c216.png",
+      "target": "assets/ui/ui_button_tertiary_pressed_png_728a9b38c216.png",
+      "bytes": 1526994
+    },
+    {
+      "source": "Best Runner Data 2 copy/MiniBoss_sheet.png",
+      "target": "assets/misc/miniboss_sheet.png",
+      "bytes": 2167055
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_skill_icon_frame_a437726fb7dd.png",
+      "target": "assets/ui/ui_skill_icon_frame_a437726fb7dd.png",
+      "bytes": 1569013
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_square_selected_529be1bde15e.png",
+      "target": "assets/misc/slot_square_selected_529be1bde15e.png",
+      "bytes": 1376782
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_chest_18eeb9cf8aa3.png",
+      "target": "assets/misc/slot_chest_18eeb9cf8aa3.png",
+      "bytes": 105
+    },
+    {
+      "source": "Best Runner Data 2 copy/icons_slot_boots_22ee052b557c.png",
+      "target": "assets/ui/icons_slot_boots_22ee052b557c.png",
+      "bytes": 1342030
+    },
+    {
+      "source": "Best Runner Data 2 copy/hud_embed_example.html",
+      "target": "assets/misc/hud_embed_example.html",
+      "bytes": 1300
+    },
+    {
+      "source": "Best Runner Data 2 copy/icons_slot_pet_14799bfa611f.png",
+      "target": "assets/ui/icons_slot_pet_14799bfa611f.png",
+      "bytes": 1340576
+    },
+    {
+      "source": "Best Runner Data 2 copy/btn_fight_pressed_c85a904b8503.png",
+      "target": "assets/misc/btn_fight_pressed_c85a904b8503.png",
+      "bytes": 1335837
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_boots_9679aff08632.png",
+      "target": "assets/misc/slot_boots_9679aff08632.png",
+      "bytes": 130
+    },
+    {
+      "source": "Best Runner Data 2 copy/icons_slot_head_9a486dc078cd.png",
+      "target": "assets/ui/icons_slot_head_9a486dc078cd.png",
+      "bytes": 1364871
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_shield_buckler_b0424ac37194.png",
+      "target": "assets/ui/icon_shield_buckler_b0424ac37194.png",
+      "bytes": 804
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_shield_buckler_36f8fbde1122.png",
+      "target": "assets/ui/icon_shield_buckler_36f8fbde1122.png",
+      "bytes": 1227
+    },
+    {
+      "source": "Best Runner Data 2 copy/projectile_a1_blade@2x.png",
+      "target": "assets/bullets/projectile_a1_blade_2x.png",
+      "bytes": 18771
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_icons_2_e4389ccaead0.png",
+      "target": "assets/ui/ui_icons_2_e4389ccaead0.png",
+      "bytes": 4604
+    },
+    {
+      "source": "Best Runner Data 2 copy/fog_wisp_04_2640f0114798.png",
+      "target": "assets/misc/fog_wisp_04_2640f0114798.png",
+      "bytes": 3666
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_skill_1.png",
+      "target": "assets/ui/icon_skill_1.png",
+      "bytes": 2153836
+    },
+    {
+      "source": "Best Runner Data 2 copy/cooldown_ring_96_d6b3fc132f06.png",
+      "target": "assets/misc/cooldown_ring_96_d6b3fc132f06.png",
+      "bytes": 813
+    },
+    {
+      "source": "Best Runner Data 2 copy/inventory_ui_preview.html",
+      "target": "assets/ui/inventory_ui_preview.html",
+      "bytes": 7245
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_weapon_e17e1c094078.png",
+      "target": "assets/misc/slot_weapon_e17e1c094078.png",
+      "bytes": 177
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_button_tertiary_hover_e8d0839b678e.png",
+      "target": "assets/ui/ui_button_tertiary_hover_e8d0839b678e.png",
+      "bytes": 1539419
+    },
+    {
+      "source": "Best Runner Data 2 copy/projectile_unique_orb@2x.png",
+      "target": "assets/bullets/projectile_unique_orb_2x.png",
+      "bytes": 27992
+    },
+    {
+      "source": "Best Runner Data 2 copy/fog_wisp_03_68e5ec056007.png",
+      "target": "assets/misc/fog_wisp_03_68e5ec056007.png",
+      "bytes": 4496
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_legs_dd3ff931819b.png",
+      "target": "assets/misc/slot_legs_dd3ff931819b.png",
+      "bytes": 108
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_pet_demons_7876eab71449.png",
+      "target": "assets/ui/icon_pet_demons_7876eab71449.png",
+      "bytes": 841
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_head_cap_f21bb10885dc.png",
+      "target": "assets/ui/icon_head_cap_f21bb10885dc.png",
+      "bytes": 576
+    },
+    {
+      "source": "Best Runner Data 2 copy/BG_ground.gif",
+      "target": "assets/ui/backgrounds/bg_ground_1.gif",
+      "bytes": 5650661
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_chest.png",
+      "target": "assets/misc/slot_chest.png",
+      "bytes": 1365965
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_skill_2.png",
+      "target": "assets/ui/icon_skill_2.png",
+      "bytes": 1693873
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_pet.png",
+      "target": "assets/misc/slot_pet.png",
+      "bytes": 185
+    },
+    {
+      "source": "Best Runner Data 2 copy/icons_preview.jpg",
+      "target": "assets/ui/icons_preview.jpg",
+      "bytes": 20210
+    },
+    {
+      "source": "Best Runner Data 2 copy/hud_skill_preview_v2.html",
+      "target": "assets/misc/hud_skill_preview_v2.html",
+      "bytes": 5701
+    },
+    {
+      "source": "Best Runner Data 2 copy/preview_sheet.jpg",
+      "target": "assets/misc/preview_sheet.jpg",
+      "bytes": 32703
+    },
+    {
+      "source": "Best Runner Data 2 copy/fog_wisp_02_99a1772f5c76.png",
+      "target": "assets/misc/fog_wisp_02_99a1772f5c76.png",
+      "bytes": 2396
+    },
+    {
+      "source": "Best Runner Data 2 copy/cooldown_ring_96_254358cf6a74.png",
+      "target": "assets/misc/cooldown_ring_96_254358cf6a74.png",
+      "bytes": 1269
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_frame_96_a824b43e4c86.png",
+      "target": "assets/misc/slot_frame_96_a824b43e4c86.png",
+      "bytes": 1337157
+    },
+    {
+      "source": "Best Runner Data 2 copy/BG_mid.gif",
+      "target": "assets/ui/backgrounds/bg_mid.gif",
+      "bytes": 8275601
+    },
+    {
+      "source": "Best Runner Data 2 copy/Pet_Icons.png",
+      "target": "assets/ui/pet_icons.png",
+      "bytes": 1346195
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_icons_2_38b9816dc932.png",
+      "target": "assets/ui/ui_icons_2_38b9816dc932.png",
+      "bytes": 2822
+    },
+    {
+      "source": "Best Runner Data 2 copy/paperdoll_silhouette_4b30019e8ce6.png",
+      "target": "assets/misc/paperdoll_silhouette_4b30019e8ce6.png",
+      "bytes": 2048704
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_boots_bdf63f9c2c82.png",
+      "target": "assets/ui/icon_boots_bdf63f9c2c82.png",
+      "bytes": 602
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_boots.png",
+      "target": "assets/misc/slot_boots.png",
+      "bytes": 1355866
+    },
+    {
+      "source": "Best Runner Data 2 copy/BG_mid_2.gif",
+      "target": "assets/ui/backgrounds/bg_mid_1.gif",
+      "bytes": 4972293
+    },
+    {
+      "source": "Best Runner Data 2 copy/fog_wisp_04_29b346907930.png",
+      "target": "assets/misc/fog_wisp_04_29b346907930.png",
+      "bytes": 2804
+    },
+    {
+      "source": "Best Runner Data 2 copy/Effects.png",
+      "target": "assets/effects/effects.png",
+      "bytes": 2014771
+    },
+    {
+      "source": "Best Runner Data 2 copy/panel_header_tab_1a917e286d66.png",
+      "target": "assets/ui/panel_header_tab_1a917e286d66.png",
+      "bytes": 1316154
+    },
+    {
+      "source": "Best Runner Data 2 copy/assets_rename_map.json",
+      "target": "assets/tiles/assets_rename_map.json",
+      "bytes": 1477
+    },
+    {
+      "source": "Best Runner Data 2 copy/skill_icon_frame.png",
+      "target": "assets/ui/skill_icon_frame.png",
+      "bytes": 3222
+    },
+    {
+      "source": "Best Runner Data 2 copy/rune_particles_5ad263cc9ea0.png",
+      "target": "assets/misc/rune_particles_5ad263cc9ea0.png",
+      "bytes": 317
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_legs.png",
+      "target": "assets/misc/slot_legs.png",
+      "bytes": 139
+    },
+    {
+      "source": "Best Runner Data 2 copy/rune_particles_3001141eb836.png",
+      "target": "assets/misc/rune_particles_3001141eb836.png",
+      "bytes": 289
+    },
+    {
+      "source": "Best Runner Data 2 copy/btn_circle_base_96_cd6b5dc2e797.png",
+      "target": "assets/misc/btn_circle_base_96_cd6b5dc2e797.png",
+      "bytes": 1628
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_head.png",
+      "target": "assets/misc/slot_head.png",
+      "bytes": 1378707
+    },
+    {
+      "source": "Best Runner Data 2 copy/Loot.png",
+      "target": "assets/misc/loot.png",
+      "bytes": 2166384
+    },
+    {
+      "source": "Best Runner Data 2 copy/skills_icon_rage_e0142c2d9913.png",
+      "target": "assets/ui/skills_icon_rage_e0142c2d9913.png",
+      "bytes": 1560244
+    },
+    {
+      "source": "Best Runner Data 2 copy/skills_icon_skill_3_38557da0fa99.png",
+      "target": "assets/ui/skills_icon_skill_3_38557da0fa99.png",
+      "bytes": 1578043
+    },
+    {
+      "source": "Best Runner Data 2 copy/projectile_unique_orb.png",
+      "target": "assets/bullets/projectile_unique_orb.png",
+      "bytes": 21197
+    },
+    {
+      "source": "Best Runner Data 2 copy/skills_icon_skill_2_20163eb908fd.png",
+      "target": "assets/ui/skills_icon_skill_2_20163eb908fd.png",
+      "bytes": 1679751
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_icons_017e15ca5eac.png",
+      "target": "assets/ui/ui_icons_017e15ca5eac.png",
+      "bytes": 3700
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_boots.png",
+      "target": "assets/ui/icon_boots.png",
+      "bytes": 366
+    },
+    {
+      "source": "Best Runner Data 2 copy/a1k_runner_singlefile(2).html",
+      "target": "assets/misc/a1k_runner_singlefile_2.html",
+      "bytes": 29758834
+    },
+    {
+      "source": "Best Runner Data 2 copy/fog_wisp_02_d64e2d64f8f1.png",
+      "target": "assets/misc/fog_wisp_02_d64e2d64f8f1.png",
+      "bytes": 3201
+    },
+    {
+      "source": "Best Runner Data 2 copy/projectile_a1_blade.png",
+      "target": "assets/bullets/projectile_a1_blade.png",
+      "bytes": 13576
+    },
+    {
+      "source": "Best Runner Data 2 copy/Boss_sheet 4.png",
+      "target": "assets/misc/boss_sheet_4.png",
+      "bytes": 2633476
+    },
+    {
+      "source": "Best Runner Data 2 copy/fog_wisp_01_264f671be65c.png",
+      "target": "assets/misc/fog_wisp_01_264f671be65c.png",
+      "bytes": 2498
+    },
+    {
+      "source": "Best Runner Data 2 copy/ui_icons_3c5d076d4241.png",
+      "target": "assets/ui/ui_icons_3c5d076d4241.png",
+      "bytes": 5809
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_shield.png",
+      "target": "assets/misc/slot_shield.png",
+      "bytes": 199
+    },
+    {
+      "source": "Best Runner Data 2 copy/btn_fight_idle_69e8befdcc25.png",
+      "target": "assets/misc/btn_fight_idle_69e8befdcc25.png",
+      "bytes": 1353301
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_legs_ac4f54f6e226.png",
+      "target": "assets/misc/slot_legs_ac4f54f6e226.png",
+      "bytes": 139
+    },
+    {
+      "source": "Best Runner Data 2 copy/projectile_missy_shard.png",
+      "target": "assets/bullets/projectile_missy_shard.png",
+      "bytes": 18511
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_square_3da0f06b59b1.png",
+      "target": "assets/misc/slot_square_3da0f06b59b1.png",
+      "bytes": 1420200
+    },
+    {
+      "source": "Best Runner Data 2 copy/placeholder_light_gray_block.png",
+      "target": "assets/misc/placeholder_light_gray_block.png",
+      "bytes": 3954
+    },
+    {
+      "source": "Best Runner Data 2 copy/slot_shield_62b54021345a.png",
+      "target": "assets/misc/slot_shield_62b54021345a.png",
+      "bytes": 239
+    },
+    {
+      "source": "Best Runner Data 2 copy/icon_shield_buckler.png",
+      "target": "assets/ui/icon_shield_buckler.png",
+      "bytes": 804
+    },
+    {
+      "source": "Best Runner Data 2 copy/BG_mid 2.png.gif",
+      "target": "assets/ui/backgrounds/bg_mid_2.gif",
+      "bytes": 4972293
+    },
+    {
+      "source": "Best Runner Data 2 copy/pets/Pet_Icons.png",
+      "target": "assets/ui/pet_icons_1.png",
+      "bytes": 1346195
+    }
+  ]
+}

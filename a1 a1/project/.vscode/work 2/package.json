@@ -1,0 +1,17 @@
+{
+  "name": "work-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Use npm run test:agent\"",
+    "test:agent": "playwright test",
+    "test:agent:ui": "playwright test --ui"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}

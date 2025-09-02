@@ -1,0 +1,736 @@
+{
+  "meta": {
+    "version": "7.0.0",
+    "meter_px": 64,
+    "notes": "A1/Unique/Missy skill bundle — homing, train formation, A/U/M leader switch, assist mirror, parry frames."
+  },
+  "formation": {
+    "mode": "train",
+    "min_spacing_px": 52,
+    "reform_speed": 6
+  },
+  "input_map": {
+    "A": "switch_leader_A1",
+    "U": "switch_leader_Unique",
+    "M": "switch_leader_Missy",
+    "BTN_ATTACK": "basic_attack",
+    "BTN_S1": "skill_1",
+    "BTN_S2": "skill_2",
+    "BTN_S3": "skill_3",
+    "BTN_RAGE": "rage",
+    "BTN_AUTO": "toggle_auto",
+    "JOYSTICK_LEFT": "move"
+  },
+  "ui": {
+    "floating_text": {
+      "enabled": true,
+      "format": "-{dmg}",
+      "crit_format": "CRIT -{dmg}"
+    },
+    "rage_meter": {
+      "duration_bar": true
+    }
+  },
+  "hitbox_groups": {
+    "friendly_melee_short": {
+      "mask": [
+        "enemy_hurt"
+      ],
+      "radius_m": 0.6
+    },
+    "friendly_melee_medium": {
+      "mask": [
+        "enemy_hurt"
+      ],
+      "radius_m": 0.8
+    },
+    "friendly_proj": {
+      "mask": [
+        "enemy_hurt"
+      ]
+    },
+    "friendly_beam": {
+      "mask": [
+        "enemy_hurt"
+      ]
+    },
+    "trap_aoe": {
+      "mask": [
+        "enemy_hurt"
+      ]
+    },
+    "shield_bubble": {
+      "mask": [
+        "ally_hurt"
+      ]
+    },
+    "enemy_proj": {
+      "mask": [
+        "ally_hurt"
+      ]
+    },
+    "loot": {
+      "mask": []
+    }
+  },
+  "physics_defaults": {
+    "homing": {
+      "turn_rate_deg_per_s": 480,
+      "seek_accel": 2200,
+      "seek_max_speed": 900
+    },
+    "bounce": {
+      "elasticity": 0.6
+    }
+  },
+  "projectiles": {
+    "A1_Wave": {
+      "type": "slash_wave",
+      "speed_px_s": 900,
+      "lifetime_ms": 900,
+      "pierce": 2,
+      "bounce": 0,
+      "homing": {
+        "enabled": true,
+        "turn_rate_deg_per_s": 540
+      },
+      "hitbox_group": "friendly_proj",
+      "dmg": {
+        "source": "ATK",
+        "mult": 0.8
+      },
+      "on_hit": {
+        "stagger_ms": 60,
+        "shake": 0.2
+      }
+    },
+    "A1_GiantWave": {
+      "inherit": "A1_Wave",
+      "speed_px_s": 980,
+      "pierce": 4,
+      "dmg": {
+        "source": "ATK",
+        "mult": 1.5
+      }
+    },
+    "Unique_Bullet": {
+      "type": "bullet",
+      "speed_px_s": 1100,
+      "lifetime_ms": 700,
+      "pierce": 1,
+      "bounces": 1,
+      "homing": {
+        "enabled": true
+      },
+      "hitbox_group": "friendly_proj",
+      "dmg": {
+        "flat": {
+          "min": 20,
+          "max": 30
+        }
+      }
+    },
+    "Unique_LargeBullet": {
+      "inherit": "Unique_Bullet",
+      "lifetime_ms": 900,
+      "pierce": 99,
+      "bounces": 0,
+      "scale": 1.2,
+      "dmg": {
+        "source": "ATK",
+        "mult": 0.9
+      }
+    },
+    "Missy_Wave": {
+      "inherit": "A1_Wave",
+      "dmg": {
+        "source": "ATK",
+        "mult": 0.7
+      }
+    },
+    "Missy_Bullet": {
+      "inherit": "Unique_Bullet",
+      "flat_overrides": {
+        "min": 10,
+        "max": 20
+      }
+    },
+    "GiftChest_Faller": {
+      "type": "drop",
+      "speed_px_s": 350,
+      "gravity_px_s2": 1400,
+      "lifetime_ms": 3000,
+      "hitbox_group": "friendly_proj",
+      "dmg": {
+        "percent_hp_to_enemy": {
+          "min": 0.01,
+          "max": 0.1
+        }
+      },
+      "on_death": {
+        "spawn_loot": {
+          "currency": [
+            3,
+            12
+          ],
+          "chest": true
+        }
+      }
+    },
+    "Enemy_Arrow": {
+      "type": "arrow",
+      "speed_px_s": 820,
+      "lifetime_ms": 1200,
+      "pierce": 0,
+      "homing": {
+        "enabled": true,
+        "turn_rate_deg_per_s": 260
+      },
+      "hitbox_group": "enemy_proj",
+      "dmg": {
+        "source": "ENEMY_ATK",
+        "mult": 1.0
+      }
+    }
+  },
+  "beams": {
+    "Unique_OverchargeBeam": {
+      "type": "line_beam",
+      "tick_ms": 100,
+      "width_px": {
+        "base": 12,
+        "charged_add_per_s": 6,
+        "max": 42
+      },
+      "duration_ms": 2500,
+      "hitbox_group": "friendly_beam",
+      "dmg_per_tick": {
+        "source": "ATK",
+        "mult": 0.25
+      },
+      "pierce": "infinite"
+    },
+    "Unique_SystemOverload_Beam": {
+      "inherit": "Unique_OverchargeBeam",
+      "duration_ms": 12000,
+      "width_px": {
+        "base": 18,
+        "charged_add_per_s": 0,
+        "max": 54
+      }
+    }
+  },
+  "traps": {
+    "A1_SecretBomb": {
+      "fuse_ms": 800,
+      "radius_m": 2.5,
+      "hitbox_group": "trap_aoe",
+      "dmg": {
+        "source": "ATK",
+        "mult": 1.5,
+        "also_percent_hp_to_enemy": 0.2
+      },
+      "feedback": {
+        "shake": 0.6,
+        "hitstop_ms": 90
+      }
+    }
+  },
+  "entities": {
+    "players": {
+      "A1": {
+        "role": "Leader/Slayer",
+        "basic": {
+          "id": "A1_BasicCombo",
+          "cooldown_ms": 0,
+          "sequence": [
+            {
+              "name": "swing1",
+              "anim": "a1_swing1",
+              "hitbox_group": "friendly_melee_short",
+              "dmg": {
+                "flat": {
+                  "min": 30,
+                  "max": 50
+                }
+              },
+              "parry": {
+                "enabled": true,
+                "start_ms": 50,
+                "end_ms": 140,
+                "reflect_scale": 1.0
+              }
+            },
+            {
+              "name": "swing2",
+              "anim": "a1_swing2",
+              "hitbox_group": "friendly_melee_short",
+              "dmg": {
+                "flat": {
+                  "min": 30,
+                  "max": 50
+                }
+              },
+              "parry": {
+                "enabled": true,
+                "start_ms": 40,
+                "end_ms": 130,
+                "reflect_scale": 1.0
+              }
+            },
+            {
+              "name": "swing3",
+              "anim": "a1_swing3",
+              "hitbox_group": "friendly_melee_medium",
+              "dmg": {
+                "flat": {
+                  "min": 30,
+                  "max": 50
+                }
+              },
+              "parry": {
+                "enabled": true,
+                "start_ms": 60,
+                "end_ms": 160,
+                "reflect_scale": 1.0
+              }
+            }
+          ]
+        },
+        "skills": [
+          {
+            "key": "S1",
+            "name": "Shadow Slash",
+            "cooldown_ms": 6000,
+            "on_cast": {
+              "effects": [
+                {
+                  "melee_strike": {
+                    "group": "friendly_melee_medium",
+                    "mult": 1.0
+                  }
+                },
+                {
+                  "spawn_projectile": {
+                    "id": "A1_Wave",
+                    "count": 1,
+                    "origin": "weapon",
+                    "angle": 0
+                  }
+                }
+              ],
+              "mirror_on_each_swing": {
+                "projectile_id": "A1_Wave"
+              }
+            }
+          },
+          {
+            "key": "S2",
+            "name": "Secret Bomb",
+            "cooldown_ms": 10000,
+            "auto_cast_interval_ms": 20000,
+            "on_cast": {
+              "place_trap": "A1_SecretBomb"
+            }
+          },
+          {
+            "key": "S3",
+            "name": "Dualblade Forcefield Assault",
+            "cooldown_ms": 12000,
+            "on_cast": {
+              "effects": [
+                {
+                  "dash": {
+                    "distance_m": 2.2,
+                    "invuln_ms": 180
+                  }
+                },
+                {
+                  "melee_strike": {
+                    "group": "friendly_melee_medium",
+                    "mult": 1.1,
+                    "repeat": 3,
+                    "interval_ms": 120
+                  }
+                },
+                {
+                  "spawn_projectile": {
+                    "id": "A1_Wave",
+                    "count": 2
+                  }
+                },
+                {
+                  "spawn_projectile": {
+                    "id": "A1_GiantWave",
+                    "count": 1,
+                    "delay_ms": 180
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "rage": {
+          "key": "R",
+          "name": "Hidden Sword Style",
+          "cooldown_ms": 60000,
+          "duration_ms": 10000,
+          "costs": {
+            "self_hp_cost_on_cast_percent": 50,
+            "self_hp_cost_on_end_percent": 20
+          },
+          "on_start": [
+            {
+              "split_enemies": {
+                "clone_count": 3,
+                "clone_stats_mult": 0.75,
+                "boss_stats_mult": 0.7
+              }
+            },
+            {
+              "leap": {
+                "distance_m": 2.0
+              }
+            },
+            {
+              "spawn_projectile": {
+                "id": "A1_GiantWave",
+                "count": 3,
+                "spread_deg": 14
+              }
+            },
+            {
+              "buff": {
+                "drop_rate_mult": 1.3
+              }
+            }
+          ]
+        },
+        "ai_hints": {
+          "role": "melee_engage",
+          "keep_range_m": 0.5,
+          "priority": [
+            "dash_in",
+            "melee",
+            "s1_when_grouped",
+            "s3_on_cluster"
+          ]
+        }
+      },
+      "Unique": {
+        "role": "Gunner/Healer",
+        "basic": {
+          "id": "Unique_BasicGun",
+          "cooldown_ms": 0,
+          "burst": {
+            "min": 1,
+            "max": 2,
+            "interval_ms": 80
+          },
+          "projectile": "Unique_Bullet"
+        },
+        "skills": [
+          {
+            "key": "S1",
+            "name": "Burst Shot",
+            "cooldown_ms": 4000,
+            "on_cast": {
+              "spawn_projectile": {
+                "id": "Unique_LargeBullet",
+                "count": {
+                  "min": 1,
+                  "max": 3
+                },
+                "spread_deg": 10
+              }
+            }
+          },
+          {
+            "key": "S2",
+            "name": "Healing Rain",
+            "cooldown_ms": 30000,
+            "on_cast": [
+              {
+                "team_heal_percent": 25
+              },
+              {
+                "apply_shield": {
+                  "group": "shield_bubble",
+                  "hp": 20,
+                  "duration_ms": 20000
+                }
+              },
+              {
+                "team_buff": {
+                  "drop_rate_mult": 1.3,
+                  "duration_ms": 15000
+                }
+              }
+            ]
+          },
+          {
+            "key": "S3",
+            "name": "Overcharge Beam",
+            "cooldown_ms": 40000,
+            "charge": {
+              "max_ms": 30000
+            },
+            "on_release": {
+              "spawn_beam": "Unique_OverchargeBeam"
+            }
+          }
+        ],
+        "rage": {
+          "key": "R",
+          "name": "System Overload",
+          "cooldown_ms": 90000,
+          "duration_ms": 12000,
+          "tap_again_to_widen": {
+            "add_ms": 5000,
+            "width_bonus_px": 12
+          },
+          "hp_costs": {
+            "self_hp_drain_per_s_percent": 2.5,
+            "self_hp_blast_on_end_percent": 50,
+            "ally_hp_on_end_percent": 10
+          },
+          "on_start": {
+            "spawn_beam": "Unique_SystemOverload_Beam"
+          },
+          "on_end": {
+            "aoe_percent_hp_to_enemies": 10
+          }
+        },
+        "ai_hints": {
+          "role": "backline",
+          "keep_range_m": 3.5,
+          "priority": [
+            "s2_if_ally_low",
+            "s1_on_cd",
+            "s3_when_safe"
+          ]
+        }
+      },
+      "Missy": {
+        "role": "Support/Shield",
+        "basic": {
+          "id": "Missy_Hybrid",
+          "cooldown_ms": 0,
+          "sequence": [
+            {
+              "name": "swing1",
+              "anim": "missy_swing1",
+              "hitbox_group": "friendly_melee_short",
+              "dmg": {
+                "flat": {
+                  "min": 15,
+                  "max": 20
+                }
+              },
+              "parry": {
+                "enabled": true,
+                "start_ms": 40,
+                "end_ms": 120,
+                "reflect_scale": 1.0
+              }
+            },
+            {
+              "name": "swing2",
+              "anim": "missy_swing2",
+              "hitbox_group": "friendly_melee_short",
+              "dmg": {
+                "flat": {
+                  "min": 15,
+                  "max": 20
+                }
+              },
+              "parry": {
+                "enabled": true,
+                "start_ms": 40,
+                "end_ms": 120,
+                "reflect_scale": 1.0
+              }
+            },
+            {
+              "name": "gunshot",
+              "projectile": "Missy_Bullet",
+              "dmg": {
+                "flat": {
+                  "min": 10,
+                  "max": 20
+                }
+              }
+            }
+          ]
+        },
+        "skills": [
+          {
+            "key": "S1",
+            "name": "Cat's Claw",
+            "cooldown_ms": 3000,
+            "on_cast": [
+              {
+                "melee_strike": {
+                  "group": "friendly_melee_medium",
+                  "mult": 0.9
+                }
+              },
+              {
+                "spawn_projectile": {
+                  "id": "Missy_Wave",
+                  "count": 1
+                }
+              }
+            ]
+          },
+          {
+            "key": "S2",
+            "name": "Halo Shield",
+            "cooldown_ms": 25000,
+            "on_cast": [
+              {
+                "apply_shield_team": {
+                  "hp": 40,
+                  "duration_ms": 20000
+                }
+              },
+              {
+                "spawn_miniclones": {
+                  "per_ally": 1,
+                  "lifetime_ms": 20000,
+                  "dmg_mult": 0.5,
+                  "mirror_leader": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "S3",
+            "name": "Black Cat Luck",
+            "cooldown_ms": 30000,
+            "on_cast": {
+              "summon": [
+                {
+                  "id": "ChestMonster",
+                  "hp": 50,
+                  "weapon": "Enemy_Arrow"
+                },
+                {
+                  "id": "ChestMonster",
+                  "hp": 50,
+                  "weapon": "Enemy_Arrow"
+                }
+              ]
+            }
+          }
+        ],
+        "rage": {
+          "key": "R",
+          "name": "Black Cat Luck II",
+          "cooldown_ms": 80000,
+          "duration_ms": 20000,
+          "on_start": [
+            {
+              "summon_random_boss_companion": {
+                "pool": [
+                  "MiniBoss_Wolf",
+                  "MiniBoss_Turret",
+                  "MiniBoss_Golem"
+                ],
+                "stats_mult": 0.5,
+                "lifetime_ms": 20000
+              }
+            },
+            {
+              "team_heal_percent": 20
+            },
+            {
+              "team_rage_gain_percent": 20
+            },
+            {
+              "apply_shield_team": {
+                "percent_max_hp": 15,
+                "duration_ms": 15000
+              }
+            },
+            {
+              "rain_projectiles": {
+                "id": "GiftChest_Faller",
+                "count": 12,
+                "area_m": {
+                  "w": 8,
+                  "h": 4
+                }
+              }
+            }
+          ]
+        },
+        "ai_hints": {
+          "role": "support_front",
+          "keep_range_m": 1.0,
+          "priority": [
+            "parry_projectiles",
+            "s2_on_cd",
+            "s3_when_safe",
+            "s1_if_cluster"
+          ]
+        }
+      }
+    }
+  },
+  "assist_rules": {
+    "shadow_copy": {
+      "enabled": true,
+      "who": "middle_runner",
+      "delay_ms": {
+        "min": 180,
+        "max": 320
+      },
+      "fallback_to_basic_if_cd": true
+    },
+    "leader_trigger_random_ally": {
+      "enabled": true,
+      "when": [
+        "basic_attack",
+        "skill_cast"
+      ],
+      "chance": 0.45,
+      "delay_ms": {
+        "min": 120,
+        "max": 260
+      }
+    }
+  },
+  "enemy_templates": {
+    "Mob_Ranged": {
+      "hp": 80,
+      "atk": 8,
+      "shoots": {
+        "projectile": "Enemy_Arrow",
+        "interval_ms": 1100,
+        "burst": 1
+      }
+    },
+    "Boss_Default": {
+      "hp": 2400,
+      "atk": 25,
+      "shoots": {
+        "projectile": "Enemy_Arrow",
+        "interval_ms": 700,
+        "burst": 2
+      }
+    }
+  },
+  "feedback": {
+    "on_melee_hit": {
+      "hitstop_ms": 65,
+      "shake": 0.12
+    },
+    "on_crit": {
+      "shake": 0.22
+    },
+    "on_player_hurt": {
+      "flash_ms": 90
+    }
+  }
+}

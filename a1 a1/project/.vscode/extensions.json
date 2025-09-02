@@ -1,0 +1,6 @@
+{
+	"recommendations": [
+		"ritwickdey.LiveServer",    // Live preview for HTML/CSS/JS (helpful for HTML games)
+		"github.copilot"            // GitHub Copilot (AI coding assistant to help build game logic)
+	]
+}
