@@ -1,7 +1,9 @@
 """Flipbook generator for pixel-art VFX assets.
+
 Generates 1xN PNG strips and GIF previews per user spec.
 - Uses Pillow for image drawing and basic compositing.
-- Outputs PNG strip and looping GIF preview (non-loop effects will have looping GIF too for preview).
+- Outputs PNG strip and looping GIF preview (non-loop effects will have looping
+  GIF too for preview).
 
 Defaults: 128x128, 12 frames, 14 fps, pivot=center
 
@@ -36,10 +38,12 @@ DEFAULT = {"size": (128, 128), "frames": 12, "fps": 14, "pivot": "center"}
 
 
 def make_canvas(size):
+    """Create a transparent canvas of given size."""
     return Image.new("RGBA", size, (0, 0, 0, 0))
 
 
 def draw_sword_slash_diag(frame_index, frames, size):
+    """Draw diagonal sword slash animation frame."""
     # Diagonal from bottom-left to top-right
     w, h = size
     img = make_canvas(size)
@@ -59,6 +63,7 @@ def draw_sword_slash_diag(frame_index, frames, size):
 
 
 def draw_slash_cross(frame_index, frames, size):
+    """Draw cross slash animation frame."""
     # Two arcs crossing
     img = make_canvas(size)
     draw = ImageDraw.Draw(img)
@@ -83,6 +88,7 @@ def draw_slash_cross(frame_index, frames, size):
 
 
 def draw_spin(frame_index, frames, size):
+    """Draw spinning slash animation frame."""
     img = make_canvas(size)
     draw = ImageDraw.Draw(img)
     w, h = size
@@ -107,6 +113,7 @@ def draw_spin(frame_index, frames, size):
 
 
 def draw_uplift(frame_index, frames, size):
+    """Draw uplift slash animation frame."""
     img = make_canvas(size)
     draw = ImageDraw.Draw(img)
     w, h = size
@@ -127,6 +134,7 @@ def draw_uplift(frame_index, frames, size):
 
 
 def draw_slam(frame_index, frames, size):
+    """Draw slam attack animation frame."""
     img = make_canvas(size)
     draw = ImageDraw.Draw(img)
     w, h = size
@@ -149,6 +157,7 @@ def draw_slam(frame_index, frames, size):
 
 
 def draw_fx_dark_aura_idle(frame_index, frames, size):
+    """Draw dark aura idle animation frame."""
     # subtle pulsing void core with drifting rune pixels
     img = make_canvas(size)
     draw = ImageDraw.Draw(img)
@@ -179,6 +188,7 @@ def draw_fx_dark_aura_idle(frame_index, frames, size):
 
 
 def draw_fx_rage_surge_burst(frame_index, frames, size):
+    """Draw rage surge burst animation frame."""
     img = make_canvas(size)
     draw = ImageDraw.Draw(img)
     w, h = size
@@ -212,6 +222,7 @@ def draw_fx_rage_surge_burst(frame_index, frames, size):
 
 
 def draw_fx_shockwave_heavy(frame_index, frames, size):
+    """Draw heavy shockwave animation frame."""
     img = make_canvas(size)
     draw = ImageDraw.Draw(img)
     w, h = size
@@ -235,6 +246,7 @@ def draw_fx_shockwave_heavy(frame_index, frames, size):
 
 
 def draw_fx_shadow_portal_spawn(frame_index, frames, size):
+    """Draw shadow portal spawn animation frame."""
     img = make_canvas(size)
     draw = ImageDraw.Draw(img)
     w, h = size
@@ -270,12 +282,14 @@ def draw_fx_shadow_portal_spawn(frame_index, frames, size):
 
 
 def draw_fx_shadow_portal_exit(frame_index, frames, size):
+    """Draw shadow portal exit animation frame."""
     # reverse of spawn
     rev = frames - 1 - frame_index
     return draw_fx_shadow_portal_spawn(rev, frames, size)
 
 
 def draw_fx_boss_entrance(frame_index, frames, size):
+    """Draw boss entrance animation frame."""
     img = make_canvas(size)
     draw = ImageDraw.Draw(img)
     w, h = size
@@ -296,6 +310,7 @@ def draw_fx_boss_entrance(frame_index, frames, size):
 
 
 def save_strip(frames_imgs, filename, size):
+    """Save animation frames as a horizontal strip PNG."""
     w, h = size
     total_w = w * len(frames_imgs)
     strip = Image.new("RGBA", (total_w, h), (0, 0, 0, 0))
@@ -305,6 +320,7 @@ def save_strip(frames_imgs, filename, size):
 
 
 def save_gif(frames_imgs, filename, fps):
+    """Save animation frames as an animated GIF."""
     durations = int(1000 / fps)
     pil_frames = [img.convert("RGBA") for img in frames_imgs]
     pil_frames[0].save(
@@ -318,6 +334,7 @@ def save_gif(frames_imgs, filename, fps):
 
 
 def save_apng(frames_imgs, filename, fps):
+    """Save animation frames as an animated PNG (APNG)."""
     # fallback to GIF if APNG not available
     if not APNG_SUPPORTED:
         return False
@@ -337,7 +354,8 @@ def save_apng(frames_imgs, filename, fps):
         try:
             os.remove(p)
         except OSError as e:
-            # log and continue; specific exception avoids catching KeyboardInterrupt/SystemExit
+            # log and continue; specific exception avoids catching
+            # KeyboardInterrupt/SystemExit
             print(f"Warning: failed to remove temp file {p}: {e}")
     return True
 
@@ -350,6 +368,7 @@ def generate(
     fps=DEFAULT["fps"],
     filename=None,
 ):
+    """Generate flipbook animation for given effect."""
     imgs = []
     for i in range(frames):
         imgs.append(drawer(i, frames, size))
@@ -363,6 +382,7 @@ def generate(
 
 
 def main():
+    """Generate all predefined flipbook animations."""
     presets = [
         ("atk_slash_diag_fwd", draw_sword_slash_diag, (128, 128), 12, 14),
         ("atk_slash_cross", draw_slash_cross, (128, 128), 12, 14),
