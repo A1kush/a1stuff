@@ -1,0 +1,22 @@
+#!/bin/bash
+# Thin wrapper so platforms invoking `environment setup` succeed.
+# It detects and runs the real setup script.
+
+set -e
+
+# Allow being called as either `environment` or `environment setup`
+if [ "$1" = "setup" ] || [ "$1" = "install" ]; then
+  shift || true
+fi
+
+# Prefer dedicated wrapper `setup` if present, then `setup.sh`.
+if [ -x ./setup ]; then
+  exec ./setup "$@"
+elif [ -x ./setup.sh ]; then
+  exec ./setup.sh "$@"
+else
+  echo "ERROR: Neither ./setup nor ./setup.sh found."
+  echo "Contents of current directory:" >&2
+  ls -1a
+  exit 1
+fi

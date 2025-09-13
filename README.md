@@ -7,7 +7,10 @@ A hybrid Node.js/Python game development project with asset generation tools and
 ```
 a1-a1/
 ├── giftbox auto.html          # Main HTML5 game file (4338 lines)
-├── setup.sh                  # Environment setup script
+├── environment               # Wrapper that runs setup or setup.sh (for CI/Jules)
+├── setup                     # Thin wrapper around setup.sh (optional)
+├── setup.sh                  # Environment setup script (bash)
+├── setup.ps1                 # Windows PowerShell setup
 ├── pyproject.toml            # Python development tools configuration
 ├── a1 a1/                    # Game assets and tools directory
 │   ├── __init__.py           # Python package (v1.0.0)
@@ -31,27 +34,30 @@ a1-a1/
 
 ## Environment Setup
 
-### Automated Setup (Recommended)
+### Quick Start (Auto-detected in hosted/Jules environments)
+If the platform runs `environment setup` automatically you do not need to do anything.
+We provide an executable file named `environment` that forwards to `./setup` or `./setup.sh`.
 
-**For Jules Environment:**
+### Automated Setup (Manual Invocation)
+
+**Primary (portable)**
 ```bash
-# If you see "setup: command not found", try:
-chmod +x setup
-./setup
+chmod +x environment
+./environment setup
+```
 
-# Or alternatively:
+**Fallbacks**
+```bash
+chmod +x setup        # thin wrapper
+./setup
+# or direct script
 chmod +x setup.sh
 ./setup.sh
 ```
 
-**For Local Development:**
-```bash
-# Linux/Mac:
-chmod +x setup.sh
-./setup.sh
-
-# Windows:
-.\setup.ps1
+**Windows PowerShell**
+```powershell
+./setup.ps1
 ```
 
 The setup script will:
@@ -72,13 +78,10 @@ npx playwright install
 
 #### 2. Python Environment
 ```bash
-# Create virtual environment
 python3 -m venv .venv
 source .venv/bin/activate  # Linux/Mac
-# or
-.venv\Scripts\activate     # Windows
-
-# Install dependencies
+# or (Windows)
+.venv\Scripts\activate
 pip install -r "a1 a1/requirements.txt"
 pip install -r "a1 a1/requirements-dev.txt"
 ```
@@ -99,29 +102,28 @@ python generate_flipbooks.py  # Generate VFX flipbook animations
 
 ### Code Quality
 ```bash
-ruff check --fix           # Lint and auto-fix Python code
-black .                    # Format Python code
-mypy "a1 a1"              # Type checking
+ruff check --fix
+black .
+mypy "a1 a1"
 ```
 
 ## Dependencies
 
 ### Node.js
-- `@playwright/test ^1.55.0` - End-to-end testing framework
+- `@playwright/test ^1.55.0`
 
 ### Python Core
-- `pillow` - Image processing library
-- `imageio` - Image I/O operations
+- `pillow`
+- `imageio`
 
 ### Python Development
-- `pytest` - Testing framework
-- `ruff` - Fast Python linter
-- `mypy` - Static type checker  
-- `black` - Code formatter
-- `apng` - Animated PNG support
+- `pytest`
+- `ruff`
+- `mypy`
+- `black`
+- `apng`
 
 ## Game Features
-
 The main game file (`giftbox auto.html`) includes:
 - HTML5 canvas-based game engine
 - Character movement and combat
@@ -130,16 +132,15 @@ The main game file (`giftbox auto.html`) includes:
 - Game state management
 
 ## Development Workflow
-
-1. **Environment**: Use the setup script for initial configuration
-2. **Assets**: Generate VFX assets using the Python tools
-3. **Testing**: Run Playwright tests to verify game functionality
-4. **Code Quality**: Use ruff/black for Python code formatting
-5. **Version Control**: Git repository with main branch
+1. Environment setup (wrapper or manual)
+2. Generate / update VFX assets
+3. Run tests (Playwright)
+4. Lint & format Python
+5. Commit changes
 
 ## Troubleshooting
-
-- **Python Path Issues**: Ensure virtual environment is activated
-- **Asset Generation**: Check that PIL/Pillow is properly installed
-- **Test Failures**: Verify Playwright browsers are installed
-- **Linting Warnings**: N999 warnings due to package name with spaces are cosmetic only
+- `environment: command not found`: ensure it has execute permission: `chmod +x environment`
+- `setup: command not found`: run `./environment setup` or `./setup.sh`
+- Playwright missing browsers: `npx playwright install`
+- Pillow / numpy import errors: reinstall: `pip install --force-reinstall pillow numpy`
+- Space in package path causes cosmetic lint warnings (N999) – safe to ignore
