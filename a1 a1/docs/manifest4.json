@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "assets": {
+    "characters": [
+      "a1_spritesheet.png",
+      "unique_spritesheet.png",
+      "missy_spritesheet.png"
+    ],
+    "skills": [
+      "fireball_icon.png",
+      "ice_shard_icon.png",
+      "lightning_strike_icon.png",
+      "dark_blast_icon.png",
+      "healing_light_icon.png",
+      "energy_wave_icon.png",
+      "frost_nova_icon.png",
+      "shadow_strike_icon.png"
+    ],
+    "animations": [
+      "animated_skill.gif"
+    ]
+  },
+  "styles": [
+    "dbz",
+    "solo_leveling"
+  ],
+  "generated_by": "ChibiAssetGenerator"
+}

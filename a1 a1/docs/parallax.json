@@ -1,0 +1,25 @@
+{
+  "layers": [
+    {
+      "name": "BG_mid",
+      "file": "assets/backgrounds/BG_mid.png",
+      "repeatX": true,
+      "speed": 0.4,
+      "size": [
+        640,
+        720
+      ]
+    },
+    {
+      "name": "BG_ground",
+      "file": "assets/backgrounds/BG_ground.png",
+      "repeatX": true,
+      "speed": 1.0,
+      "size": [
+        256,
+        64
+      ]
+    }
+  ],
+  "note": "Use BG_mid at slower scroll (0.3-0.5) and BG_ground at world scroll speed. Both are repeat-X friendly."
+}

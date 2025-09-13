@@ -1,0 +1,19 @@
+{
+  "ranged_idle_aura": {
+    "enabled": true,
+    "trigger_seconds_idle": 3.0,
+    "vfx": "vfx/auras/ranged_idle_aura.png"
+  },
+  "full_rage_blessing": {
+    "enabled": true,
+    "stats_mult": {
+      "damage": 1.2,
+      "skills": 1.2,
+      "defense": 1.2,
+      "luck": 1.2,
+      "crit": 1.2,
+      "hp_max": 1.2
+    },
+    "vfx": "vfx/auras/full_rage_blessing.png"
+  }
+}

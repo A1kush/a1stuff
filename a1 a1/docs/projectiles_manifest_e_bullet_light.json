@@ -1,0 +1,52 @@
+{
+  "assets/custom/projectiles/e_bullet_light_strip8_256x128_cyan.png": {
+    "type": "projectile",
+    "name": "enemy_light_bullet",
+    "frames": 8,
+    "size": "256x128",
+    "pivot": "center",
+    "fps": 18,
+    "loop": true,
+    "variant": "cyan"
+  },
+  "assets/custom/projectiles/e_bullet_light_strip8_256x128_purple.png": {
+    "type": "projectile",
+    "name": "enemy_light_bullet",
+    "frames": 8,
+    "size": "256x128",
+    "pivot": "center",
+    "fps": 18,
+    "loop": true,
+    "variant": "purple"
+  },
+  "assets/custom/projectiles/e_bullet_light_strip8_256x128_red.png": {
+    "type": "projectile",
+    "name": "enemy_light_bullet",
+    "frames": 8,
+    "size": "256x128",
+    "pivot": "center",
+    "fps": 18,
+    "loop": true,
+    "variant": "red"
+  },
+  "assets/custom/projectiles/e_bullet_light_strip8_256x128_gold.png": {
+    "type": "projectile",
+    "name": "enemy_light_bullet",
+    "frames": 8,
+    "size": "256x128",
+    "pivot": "center",
+    "fps": 18,
+    "loop": true,
+    "variant": "gold"
+  },
+  "assets/custom/projectiles/e_bullet_light_strip8_256x128_toxic.png": {
+    "type": "projectile",
+    "name": "enemy_light_bullet",
+    "frames": 8,
+    "size": "256x128",
+    "pivot": "center",
+    "fps": 18,
+    "loop": true,
+    "variant": "toxic"
+  }
+}

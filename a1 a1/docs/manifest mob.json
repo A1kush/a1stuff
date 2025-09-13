@@ -1,0 +1,67 @@
+{
+  "pack_name": "A1K_Enemies_Pack_v1",
+  "notes": "Sheets are copied as generated; engine expects 128x64, 4x1 (32x64 frames). Replace/normalize as needed.",
+  "files": [
+    {
+      "path": "assets/enemies/mob_grunt.png",
+      "sheet_w": 128,
+      "sheet_h": 64,
+      "frames": 4,
+      "layout": "4x1",
+      "frame_w": 32,
+      "frame_h": 64,
+      "order": [
+        "walk1",
+        "walk2",
+        "aim",
+        "hurt"
+      ]
+    },
+    {
+      "path": "assets/enemies/mob_ranged.png",
+      "sheet_w": 128,
+      "sheet_h": 64,
+      "frames": 4,
+      "layout": "4x1",
+      "frame_w": 32,
+      "frame_h": 64,
+      "order": [
+        "walk1",
+        "walk2",
+        "aim",
+        "hurt"
+      ]
+    },
+    {
+      "path": "assets/enemies/mob_shield.png",
+      "sheet_w": 128,
+      "sheet_h": 64,
+      "frames": 4,
+      "layout": "4x1",
+      "frame_w": 32,
+      "frame_h": 64,
+      "order": [
+        "walk1",
+        "walk2",
+        "aim",
+        "hurt"
+      ]
+    },
+    {
+      "path": "assets/enemies/boss_add.png",
+      "sheet_w": 128,
+      "sheet_h": 64,
+      "frames": 4,
+      "layout": "4x1",
+      "frame_w": 32,
+      "frame_h": 64,
+      "order": [
+        "walk1",
+        "walk2",
+        "aim",
+        "hurt"
+      ],
+      "role": "minion"
+    }
+  ]
+}

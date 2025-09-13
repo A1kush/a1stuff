@@ -1,0 +1,125 @@
+{
+  "game_mechanics": {
+    "combat": {
+      "damage_types": {
+        "physical": {
+          "effects": ["knockback", "hitstun"],
+          "particles": "hit_physical",
+          "sound_group": "impact_physical"
+        },
+        "energy": {
+          "effects": ["burn", "glow"],
+          "particles": "hit_energy",
+          "sound_group": "impact_energy"
+        }
+      },
+      "hit_zones": {
+        "body": {"multiplier": 1.0},
+        "head": {"multiplier": 1.5},
+        "limbs": {"multiplier": 0.8}
+      },
+      "combo_system": {
+        "max_chain": 5,
+        "decay_time": 2.0,
+        "multiplier_per_hit": 0.1
+      }
+    },
+    "status_effects": {
+      "rage": {
+        "activation": {
+          "threshold": 100,
+          "duration": 10.0,
+          "cooldown": 15.0
+        },
+        "buffs": {
+          "damage": 1.5,
+          "speed": 1.2,
+          "defense": 0.8
+        },
+        "visual_effects": {
+          "character_glow": "rage_aura",
+          "screen_effect": "rage_vignette",
+          "particle_system": "rage_particles"
+        }
+      },
+      "stun": {
+        "max_duration": 3.0,
+        "recovery_rate": 0.5,
+        "visual_effect": "stun_stars"
+      }
+    },
+    "movement": {
+      "ground": {
+        "walk": {
+          "speed": 200,
+          "animation": "walk_cycle",
+          "footstep_interval": 0.5
+        },
+        "run": {
+          "speed": 400,
+          "animation": "run_cycle",
+          "footstep_interval": 0.3
+        },
+        "dash": {
+          "speed": 800,
+          "duration": 0.3,
+          "cooldown": 1.0,
+          "effect": "dash_trail"
+        }
+      },
+      "air": {
+        "jump": {
+          "height": 400,
+          "control": 0.8,
+          "double_jump": true,
+          "effect": "jump_dust"
+        },
+        "fall": {
+          "max_speed": 600,
+          "fast_fall_multiplier": 1.5
+        }
+      }
+    },
+    "interaction_zones": {
+      "pickup": {
+        "radius": 50,
+        "highlight": "item_glow",
+        "prompt": "pickup_prompt"
+      },
+      "dialogue": {
+        "radius": 80,
+        "indicator": "talk_bubble",
+        "prompt": "talk_prompt"
+      }
+    }
+  },
+  "visual_effects": {
+    "screen_effects": {
+      "hit_shake": {
+        "amplitude": 5,
+        "frequency": 60,
+        "duration": 0.2
+      },
+      "time_slow": {
+        "scale": 0.5,
+        "duration": 0.5,
+        "ease": "quadOut"
+      }
+    },
+    "particle_systems": {
+      "hit_impact": {
+        "emitRate": 20,
+        "lifetime": [0.3, 0.5],
+        "speed": [100, 200],
+        "size": [5, 10],
+        "color": ["#ff0000", "#ff6666"]
+      },
+      "dash_trail": {
+        "emitRate": 30,
+        "lifetime": [0.2, 0.4],
+        "fadeOut": true,
+        "color": ["#ffffff", "#aaaaaa"]
+      }
+    }
+  }
+}

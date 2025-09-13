@@ -1,0 +1,335 @@
+{
+  "projectiles": [
+    {
+      "id": "unique_basic_v2",
+      "owner": "Unique",
+      "sprite": "vfx/projectiles/unique_basic.png",
+      "size_px": {
+        "w": 64,
+        "h": 64
+      },
+      "collider": {
+        "w": 52,
+        "h": 40,
+        "type": "rect",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "speed": 520,
+      "lifetime_ms": 2200,
+      "pierce": 2,
+      "homing": {
+        "enabled": true,
+        "turn_deg_per_s": 280,
+        "reacquire_s": 0.15
+      },
+      "knockback": {
+        "force": 220,
+        "max_targets": 5,
+        "vsBoss": false
+      },
+      "falloff": "A1K_FALLOFF_DEFAULT",
+      "on_hit": [
+        {
+          "type": "damage_rng",
+          "min": 100,
+          "max": 230,
+          "tags": [
+            "projectile",
+            "basic"
+          ],
+          "override_flag": "enable_v13_7_damage_overrides"
+        },
+        {
+          "type": "dot_percent_current_hp",
+          "pct": 0.01,
+          "duration_s": 2.0,
+          "stacks": true
+        },
+        {
+          "type": "debuff_mult",
+          "stat": "atk_mult",
+          "mult": 0.9,
+          "duration_s": 5.0,
+          "status_icon": "atk_down"
+        }
+      ],
+      "vfx": {
+        "trail": "vfx/trails/unique_basic.png",
+        "impact": "vfx/impacts/unique_hit.png"
+      },
+      "audio": {
+        "spawn": "sfx/unique_basic_spawn",
+        "hit": "sfx/unique_basic_hit"
+      }
+    },
+    {
+      "id": "a1_sword_wave_mid",
+      "owner": "A1",
+      "sprite": "vfx/projectiles/a1_sword_wave_mid.png",
+      "size_px": {
+        "w": 96,
+        "h": 64
+      },
+      "collider": {
+        "w": 84,
+        "h": 40,
+        "type": "rect",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "speed": 640,
+      "lifetime_ms": 1600,
+      "pierce": -1,
+      "homing": {
+        "enabled": false,
+        "turn_deg_per_s": 0,
+        "reacquire_s": 0.0
+      },
+      "knockback": {
+        "force": 0,
+        "max_targets": 0,
+        "vsBoss": false
+      },
+      "falloff": "A1K_FALLOFF_DEFAULT",
+      "on_hit": [
+        {
+          "type": "damage_fixed",
+          "amount": 70,
+          "tags": [
+            "projectile",
+            "wave"
+          ]
+        }
+      ],
+      "vfx": {
+        "trail": "vfx/trails/a1_wave.png",
+        "impact": "vfx/impacts/a1_wave_hit.png"
+      },
+      "audio": {
+        "spawn": "sfx/a1_wave_spawn",
+        "hit": "sfx/a1_wave_hit"
+      }
+    },
+    {
+      "id": "missy_pistol_v2",
+      "owner": "Missy",
+      "sprite": "vfx/projectiles/missy_pistol.png",
+      "size_px": {
+        "w": 48,
+        "h": 48
+      },
+      "collider": {
+        "w": 38,
+        "h": 32,
+        "type": "rect",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "speed": 560,
+      "lifetime_ms": 2000,
+      "pierce": 1,
+      "homing": {
+        "enabled": true,
+        "turn_deg_per_s": 220,
+        "reacquire_s": 0.2
+      },
+      "knockback": {
+        "force": 120,
+        "max_targets": 1,
+        "vsBoss": false
+      },
+      "falloff": "A1K_FALLOFF_DEFAULT",
+      "on_hit": [
+        {
+          "type": "damage_rng",
+          "min": 40,
+          "max": 100,
+          "tags": [
+            "projectile",
+            "basic"
+          ],
+          "override_flag": "enable_v13_7_damage_overrides"
+        },
+        {
+          "type": "apply_status",
+          "status": "dizzy",
+          "duration_s": 5.0,
+          "vsBoss": false,
+          "status_icon": "dizzy"
+        }
+      ],
+      "vfx": {
+        "trail": "vfx/trails/missy_pistol.png",
+        "impact": "vfx/impacts/missy_hit.png"
+      },
+      "audio": {
+        "spawn": "sfx/missy_pistol_spawn",
+        "hit": "sfx/missy_pistol_hit"
+      }
+    },
+    {
+      "id": "tank_cannon",
+      "owner": "Tank",
+      "sprite": "vfx/projectiles/tank_cannon.png",
+      "size_px": {
+        "w": 96,
+        "h": 96
+      },
+      "collider": {
+        "w": 80,
+        "h": 80,
+        "type": "rect",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "speed": 520,
+      "lifetime_ms": 1800,
+      "pierce": -1,
+      "homing": {
+        "enabled": false,
+        "turn_deg_per_s": 0,
+        "reacquire_s": 0.0
+      },
+      "knockback": {
+        "force": 180,
+        "max_targets": 10,
+        "vsBoss": true
+      },
+      "falloff": "A1K_FALLOFF_DEFAULT",
+      "on_hit": [
+        {
+          "type": "damage_rng",
+          "min": 200,
+          "max": 1000,
+          "tags": [
+            "projectile",
+            "tank_basic"
+          ]
+        },
+        {
+          "type": "aoe_explosion",
+          "radius_px": 96,
+          "damage": 500,
+          "tags": [
+            "explosion"
+          ]
+        }
+      ],
+      "vfx": {
+        "trail": "vfx/trails/tank_cannon.png",
+        "impact": "vfx/impacts/tank_cannon_hit.png"
+      },
+      "audio": {
+        "spawn": "sfx/tank_cannon_spawn",
+        "hit": "sfx/tank_cannon_hit"
+      }
+    },
+    {
+      "id": "tank_missile",
+      "owner": "Tank",
+      "sprite": "vfx/projectiles/tank_missile.png",
+      "size_px": {
+        "w": 96,
+        "h": 96
+      },
+      "collider": {
+        "w": 70,
+        "h": 70,
+        "type": "rect",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "speed": 500,
+      "lifetime_ms": 2200,
+      "pierce": -1,
+      "homing": {
+        "enabled": true,
+        "turn_deg_per_s": 220,
+        "reacquire_s": 0.15
+      },
+      "knockback": {
+        "force": 220,
+        "max_targets": 10,
+        "vsBoss": true
+      },
+      "falloff": "A1K_FALLOFF_DEFAULT",
+      "on_hit": [
+        {
+          "type": "damage_rng",
+          "min": 500,
+          "max": 2000,
+          "tags": [
+            "projectile",
+            "tank_skill2"
+          ]
+        },
+        {
+          "type": "aoe_explosion",
+          "radius_px": 120,
+          "damage": 1000,
+          "tags": [
+            "explosion"
+          ]
+        }
+      ],
+      "vfx": {
+        "trail": "vfx/trails/tank_missile.png",
+        "impact": "vfx/impacts/tank_missile_hit.png"
+      },
+      "audio": {
+        "spawn": "sfx/tank_missile_spawn",
+        "hit": "sfx/tank_missile_hit"
+      }
+    },
+    {
+      "id": "tank_beam",
+      "owner": "Tank",
+      "sprite": "vfx/projectiles/tank_beam.png",
+      "size_px": {
+        "w": 256,
+        "h": 64
+      },
+      "collider": {
+        "w": 240,
+        "h": 48,
+        "type": "rect",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      "speed": 0,
+      "lifetime_ms": 1500,
+      "pierce": -1,
+      "homing": {
+        "enabled": false,
+        "turn_deg_per_s": 0,
+        "reacquire_s": 0.0
+      },
+      "knockback": {
+        "force": 140,
+        "max_targets": 20,
+        "vsBoss": true
+      },
+      "falloff": "A1K_FALLOFF_DEFAULT",
+      "on_hit": [
+        {
+          "type": "damage_rng",
+          "min": 1000,
+          "max": 4000,
+          "tags": [
+            "beam",
+            "tank_skill3"
+          ]
+        }
+      ],
+      "vfx": {
+        "trail": "vfx/trails/tank_beam.png",
+        "impact": "vfx/impacts/tank_beam_hit.png"
+      },
+      "audio": {
+        "spawn": "sfx/tank_beam_spawn",
+        "hit": "sfx/tank_beam_hit"
+      }
+    }
+  ]
+}

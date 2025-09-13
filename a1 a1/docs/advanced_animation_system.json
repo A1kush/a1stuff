@@ -1,0 +1,94 @@
+{
+  "state_machine": {
+    "idle": {
+      "transitions": {
+        "to_run": {"input": "movement", "duration": 0.1},
+        "to_jump": {"input": "jump", "duration": 0.08},
+        "to_attack": {"input": "attack", "duration": 0.12}
+      },
+      "animation": {
+        "sequence": "idle_loop",
+        "frameRate": 6,
+        "events": {
+          "4": "breath_effect"
+        }
+      }
+    },
+    "run": {
+      "transitions": {
+        "to_idle": {"input": "stop", "duration": 0.1},
+        "to_jump": {"input": "jump", "duration": 0.08},
+        "to_attack": {"input": "attack", "duration": 0.12}
+      },
+      "animation": {
+        "sequence": "run_loop",
+        "frameRate": 12,
+        "events": {
+          "1": "footstep_left",
+          "3": "footstep_right"
+        }
+      }
+    },
+    "attack": {
+      "variations": {
+        "attack1": {
+          "startup": 0.1,
+          "active": 0.2,
+          "recovery": 0.15,
+          "cancelWindow": [0.2, 0.35],
+          "hitboxActive": [0.15, 0.25],
+          "damage": 10
+        },
+        "attack2": {
+          "startup": 0.12,
+          "active": 0.25,
+          "recovery": 0.18,
+          "cancelWindow": [0.25, 0.4],
+          "hitboxActive": [0.18, 0.3],
+          "damage": 15
+        }
+      },
+      "combos": {
+        "basic_combo": {
+          "sequence": ["attack1", "attack2", "attack3"],
+          "timing": {
+            "maxDelay": 0.5,
+            "earlyCancel": 0.2
+          }
+        },
+        "special_combo": {
+          "sequence": ["attack1", "jump_attack", "landing_strike"],
+          "requirements": {
+            "rage": 30,
+            "health": "above_50_percent"
+          }
+        }
+      }
+    }
+  },
+  "movement_physics": {
+    "ground": {
+      "acceleration": 800,
+      "deceleration": 1000,
+      "maxSpeed": 300
+    },
+    "air": {
+      "jumpForce": 600,
+      "gravity": 1200,
+      "maxFallSpeed": 800,
+      "airControl": 0.6
+    }
+  },
+  "hit_reactions": {
+    "light_hit": {
+      "hitstun": 0.2,
+      "knockback": {"x": 200, "y": 100},
+      "shake": {"intensity": 3, "duration": 0.1}
+    },
+    "heavy_hit": {
+      "hitstun": 0.4,
+      "knockback": {"x": 400, "y": 200},
+      "shake": {"intensity": 5, "duration": 0.2}
+    }
+  }
+}

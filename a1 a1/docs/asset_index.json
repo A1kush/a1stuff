@@ -1,0 +1,58 @@
+{
+  "animations": {
+    "characters": {
+      "a1": {
+        "idle": "animations/characters/a1/idle/*.png",
+        "attack": "animations/characters/a1/attack/*.png",
+        "hurt": "animations/characters/a1/hurt/*.png",
+        "special": "animations/characters/a1/special/*.png"
+      },
+      "missy": {
+        "idle": "animations/characters/missy/idle/*.png",
+        "attack": "animations/characters/missy/attack/*.png",
+        "hurt": "animations/characters/missy/hurt/*.png",
+        "special": "animations/characters/missy/special/*.png"
+      }
+    },
+    "effects": {
+      "rage": "animations/effects/rage/*.png",
+      "hit": "animations/effects/hit/*.png",
+      "explosion": "animations/effects/explosion/*.png"
+    },
+    "enemies": {
+      "boss": {
+        "idle": "animations/enemies/boss/idle/*.png",
+        "attack": "animations/enemies/boss/attack/*.png",
+        "death": "animations/enemies/boss/death/*.png"
+      },
+      "miniboss": {
+        "idle": "animations/enemies/miniboss/idle/*.png",
+        "attack": "animations/enemies/miniboss/attack/*.png",
+        "death": "animations/enemies/miniboss/death/*.png"
+      }
+    }
+  },
+  "ui": {
+    "controls": "ui/controls/*.png",
+    "equipment": "ui/equipment/*.png",
+    "bars": {
+      "hp": "ui/bars/hp_*.png",
+      "mp": "ui/bars/mp_*.png",
+      "rage": "ui/bars/rage_*.png"
+    }
+  },
+  "items": {
+    "consumables": "items/consumables/*.png",
+    "equipment": "items/equipment/*.png",
+    "coins": "items/coins/*.png",
+    "chests": "items/chests/*.png"
+  },
+  "projectiles": {
+    "standard": "projectiles/standard/*.png",
+    "effects": "projectiles/effects/*.png"
+  },
+  "backgrounds": {
+    "ground": "backgrounds/background_ground.gif",
+    "middle": "backgrounds/background_middle.gif"
+  }
+}

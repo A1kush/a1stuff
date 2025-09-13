@@ -1,0 +1,19 @@
+{
+  "name": "A1K Patch Assets & Tests",
+  "version": "2.7.0",
+  "description": "Enhanced chibi-themed UI with procedural art generation and Solo Leveling effects",
+  "icons": {
+    "ability_point": "assets/icons/ability_point.png",
+    "pets_point": "assets/icons/pets_point.png",
+    "gear_point": "assets/icons/gear_point.png",
+    "vehicles_point": "assets/icons/vehicles_point.png"
+  },
+  "spritesheets": {
+    "point_glow_strip8_64x64": "assets/spritesheets/point_glow_strip8_64x64.png"
+  },
+  "gifs": {
+    "point_glow": "assets/gifs/point_glow.gif"
+  },
+  "entry": "test.html",
+  "patch_module": "patch_module.js"
+}

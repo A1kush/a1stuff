@@ -1,0 +1,34 @@
+{
+  "loot_sheet": {
+    "filename": "loot_pickups_sheet_512x256.png",
+    "sprite_width": 64,
+    "sprite_height": 64,
+    "grid": {
+      "columns": 8,
+      "rows": 4
+    },
+    "sprites": {
+      "coin_gold": {"x": 0, "y": 0},
+      "coin_silver": {"x": 64, "y": 0},
+      "potion_health": {"x": 128, "y": 0}
+    }
+  },
+  "equipment_sheet": {
+    "filename": "equipment_icons_24.png",
+    "sprite_width": 24,
+    "sprite_height": 24,
+    "grid": {
+      "columns": 10,
+      "rows": 10
+    }
+  },
+  "consumables_sheet": {
+    "filename": "consumables_tokens_sheet_256x128.png",
+    "sprite_width": 32,
+    "sprite_height": 32,
+    "grid": {
+      "columns": 8,
+      "rows": 4
+    }
+  }
+}

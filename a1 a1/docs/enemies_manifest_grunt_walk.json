@@ -1,0 +1,57 @@
+{
+  "assets/custom/enemies/enemy_grunt_walk_strip8_256x128_cyan.png": {
+    "type": "enemy",
+    "name": "grunt",
+    "anim": "walk",
+    "frames": 8,
+    "size": "256x128",
+    "pivot": "bottom_center",
+    "fps": 12,
+    "loop": true,
+    "variant": "cyan"
+  },
+  "assets/custom/enemies/enemy_grunt_walk_strip8_256x128_purple.png": {
+    "type": "enemy",
+    "name": "grunt",
+    "anim": "walk",
+    "frames": 8,
+    "size": "256x128",
+    "pivot": "bottom_center",
+    "fps": 12,
+    "loop": true,
+    "variant": "purple"
+  },
+  "assets/custom/enemies/enemy_grunt_walk_strip8_256x128_red.png": {
+    "type": "enemy",
+    "name": "grunt",
+    "anim": "walk",
+    "frames": 8,
+    "size": "256x128",
+    "pivot": "bottom_center",
+    "fps": 12,
+    "loop": true,
+    "variant": "red"
+  },
+  "assets/custom/enemies/enemy_grunt_walk_strip8_256x128_gold.png": {
+    "type": "enemy",
+    "name": "grunt",
+    "anim": "walk",
+    "frames": 8,
+    "size": "256x128",
+    "pivot": "bottom_center",
+    "fps": 12,
+    "loop": true,
+    "variant": "gold"
+  },
+  "assets/custom/enemies/enemy_grunt_walk_strip8_256x128_toxic.png": {
+    "type": "enemy",
+    "name": "grunt",
+    "anim": "walk",
+    "frames": 8,
+    "size": "256x128",
+    "pivot": "bottom_center",
+    "fps": 12,
+    "loop": true,
+    "variant": "toxic"
+  }
+}

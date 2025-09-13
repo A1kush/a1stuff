@@ -1,0 +1,30 @@
+{
+  "bundle": "A1K_Game_Assets_Bundle_v3",
+  "copied": [
+    "assets/vfx/ki_aura_gold.png",
+    "assets/vfx/shadow_aura_teal.png",
+    "assets/projectiles/bullet_small.png"
+  ],
+  "generated": [
+    "assets/vfx/afterimage_gold.png",
+    "assets/vfx/afterimage_cyan.png",
+    "assets/vfx/afterimage_violet.png",
+    "assets/vfx/beam_segment.png",
+    "assets/vfx/beam_clash_burst.png",
+    "assets/vfx/slash_red.png",
+    "assets/vfx/reflect_ping.png",
+    "assets/characters/A1_overlimit.png",
+    "assets/characters/Unique.png",
+    "assets/characters/Missy.png",
+    "assets/enemies/boss_time_regent.png",
+    "assets/enemies/boss_arc_warden.png",
+    "assets/enemies/shadow_minion.png",
+    "assets/projectiles/orb_shadow.png",
+    "assets/projectiles/muzzle_flash.png",
+    "assets/bg/BG_mid.gif",
+    "assets/bg/BG_ground.gif",
+    "assets/ui/skills/skill_rage.png",
+    "assets/ui/hud/cutin_boss.png",
+    "assets/ui/hud/rage_ready.png"
+  ]
+}

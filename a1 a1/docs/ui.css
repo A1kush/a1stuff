@@ -1,0 +1,9 @@
+
+:root {
+  --void:#0b0f1a; --cyan:#00E5FF; --purple:#A78BFA; --danger:#FF3B3B;
+}
+body { background:#0b0f1a; color:#d8e4ff; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial;}
+#topbar { position:fixed; left:8px; right:8px; top:8px; height:56px; display:flex; gap:8px; align-items:center; z-index:900; }
+.btn { width:40px; height:40px; border-radius:12px; background:#121a2a; border:1px solid #2a334d; display:grid; place-items:center; }
+#squad-stats { position:fixed; z-index:1000; width:260px; height:92px; pointer-events:auto; }
+.hidden { display:none !important; }

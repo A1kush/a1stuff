@@ -1,0 +1,252 @@
+{
+  "name": "A1 Runner - Complete Game Assets",
+  "version": "2.7.0",
+  "description": "Complete A1 Runner game with enhanced chibi-themed UI, Solo Leveling effects, and DBZ-style combat system",
+  "type": "game_bundle",
+  "author": "A1K",
+  "entry_point": "a1_runner_merged.js",
+  "canvas_id": "gameCanvas",
+  
+  "game_info": {
+    "theme": "DBZ/Solo Leveling Chibi",
+    "genre": "Action RPG Runner",
+    "style": ["dbz", "solo_leveling", "chibi"],
+    "generated_by": "A1K Asset System"
+  },
+
+  "core_assets": {
+    "scripts": {
+      "main": "assets/js/a1_runner_merged.js",
+      "fallbacks": [
+        "assets/js/loader.js",
+        "assets/js/a1_effects_core.js",
+        "assets/js/a1_sword_system.js"
+      ]
+    },
+    
+    "characters": {
+      "a1": {
+        "sprite": "assets/img/A1.png",
+        "portrait": "assets/img/A1.png",
+        "swing_animations": [
+          "assets/img/A1_swing_1.png",
+          "assets/img/A1_swing_2.png"
+        ],
+        "spritesheets": "assets/spritesheets/a1_spritesheet.png"
+      },
+      "missy": {
+        "sprite": "assets/img/Missy.png",
+        "portrait": "assets/img/Missy.png",
+        "spritesheet": "assets/img/Missy_seraph_sheet_256x128.png"
+      },
+      "unique": {
+        "sprite": "assets/img/Unique.png",
+        "portrait": "assets/img/Unique.png"
+      }
+    },
+
+    "ui_elements": {
+      "panels": {
+        "inventory_bg": "assets/img/panel_inventory_bg.png",
+        "stats_bg": "assets/img/panel_stats_bg.png",
+        "squad_small": "assets/img/panel_squad_small.png",
+        "pill_small": "assets/img/panel_pill_small.png"
+      },
+      "buttons": {
+        "vehicles": "assets/img/btn_vehicles.png"
+      },
+      "slots": {
+        "empty": "assets/img/slot_empty.png",
+        "equipped": "assets/img/slot_equipped.png"
+      },
+      "bars": {
+        "hp_small": "assets/img/bar_hp_small.png",
+        "rage_small": "assets/img/bar_rage_small.png",
+        "xp_small": "assets/img/bar_xp_small.png"
+      },
+      "points": {
+        "ability": "assets/img/ability_point_8x.png",
+        "pet": "assets/img/pet_point_8x.png",
+        "talent": "assets/img/talent_point_8x.png",
+        "vehicle": "assets/img/vehicle_point_8x.png"
+      }
+    },
+
+    "backgrounds": {
+      "ground": "assets/img/BG_ground.gif",
+      "mid": "assets/img/BG_mid.gif"
+    },
+
+    "auras": {
+      "a1_effects": [
+        "assets/img/auras/a1_aura_animated.gif",
+        "assets/img/auras/A1_Hero_divine_aura.gif",
+        "assets/img/auras/A1_Hero_power_aura.gif",
+        "assets/img/auras/A1_Hero_shadow_aura.gif",
+        "assets/img/auras/a1_hunter_aura.png",
+        "assets/img/auras/a1_lightning_aura.png",
+        "assets/img/auras/a1_rage_aura.png",
+        "assets/img/auras/a1_saiyan_aura.png",
+        "assets/img/auras/a1_shadow_aura.png"
+      ],
+      "missy_effects": [
+        "assets/img/auras/missy_aura_animated.gif",
+        "assets/img/auras/Missy_Mage_divine_aura.gif",
+        "assets/img/auras/Missy_Mage_power_aura.gif",
+        "assets/img/auras/Missy_Mage_shadow_aura.gif",
+        "assets/img/auras/missy_hunter_aura.png",
+        "assets/img/auras/missy_lightning_aura.png",
+        "assets/img/auras/missy_saiyan_aura.png",
+        "assets/img/auras/missy_shadow_aura.png"
+      ],
+      "generic": [
+        "assets/img/auras/aura_animation.gif",
+        "assets/img/auras/aura_pulse_64.gif",
+        "assets/img/auras/hunter_aura.gif",
+        "assets/img/auras/lightning_aura.gif",
+        "assets/img/auras/saiyan_aura.gif",
+        "assets/img/auras/shadow_aura.gif"
+      ]
+    }
+  },
+
+  "game_systems": {
+    "sword_skills": {
+      "s1_slash_wave": {
+        "name": "Slash Wave",
+        "type": "ranged",
+        "damage": 150,
+        "cooldown": 3000,
+        "icon": "assets/img/A1_swing_1.png",
+        "effects": ["slash_trail", "energy_wave"]
+      },
+      "s2_dark_aura_combo": {
+        "name": "Dark Aura Combo",
+        "type": "combo",
+        "damage": 200,
+        "cooldown": 5000,
+        "icon": "assets/img/A1_swing_2.png",
+        "effects": ["dark_aura", "combo_hits"]
+      },
+      "s3_steal_breaker": {
+        "name": "Steal Breaker",
+        "type": "counter",
+        "damage": 250,
+        "cooldown": 8000,
+        "effects": ["counter_flash", "steal_effect"]
+      },
+      "s4_big_aura_slash": {
+        "name": "Big Aura Slash",
+        "type": "ultimate",
+        "damage": 400,
+        "cooldown": 12000,
+        "effects": ["big_aura", "ultimate_slash"]
+      },
+      "s5_omega_slasher": {
+        "name": "Omega Slasher",
+        "type": "rage",
+        "damage": 600,
+        "cooldown": 20000,
+        "effects": ["omega_aura", "screen_shake"]
+      }
+    },
+
+    "attack_effects": {
+      "ki_blast_fire": {
+        "element": "fire",
+        "style": "dbz",
+        "rarity": "common",
+        "assets": {
+          "gif": "assets/effects/ki_blast_fire_dbz.gif",
+          "icon": "assets/effects/ki_blast_fire_icon.png"
+        }
+      },
+      "ki_blast_ice": {
+        "element": "ice",
+        "style": "dbz",
+        "rarity": "rare",
+        "assets": {
+          "gif": "assets/effects/ki_blast_ice_dbz.gif",
+          "icon": "assets/effects/ki_blast_ice_icon.png"
+        }
+      },
+      "shadow_strike": {
+        "element": "dark",
+        "style": "solo",
+        "rarity": "epic",
+        "assets": {
+          "gif": "assets/effects/shadow_strike_dark_solo.gif",
+          "icon": "assets/effects/shadow_strike_dark_icon.png"
+        }
+      }
+    },
+
+    "inventory": {
+      "max_slots": 20,
+      "equipment_slots": ["weapon", "armor", "accessory"],
+      "categories": ["consumable", "equipment", "material", "quest"]
+    },
+
+    "stats": {
+      "base_stats": {
+        "level": 1,
+        "hp": 100,
+        "maxHp": 100,
+        "mp": 50,
+        "maxMp": 50,
+        "attack": 10,
+        "defense": 5,
+        "speed": 10
+      },
+      "point_types": ["ability_point", "pet_point", "talent_point", "vehicle_point"]
+    }
+  },
+
+  "controls": {
+    "keyboard": {
+      "skills": {
+        "1": "s1_slash_wave",
+        "2": "s2_dark_aura_combo", 
+        "3": "s3_steal_breaker",
+        "4": "s4_big_aura_slash",
+        "5": "s5_omega_slasher"
+      },
+      "ui": {
+        "i": "inventory",
+        "c": "character",
+        "s": "skills",
+        "F3": "debug_toggle"
+      }
+    },
+    "mouse": {
+      "left_click": "create_effect_at_cursor",
+      "right_click": "context_menu"
+    }
+  },
+
+  "development": {
+    "debug_mode": true,
+    "test_assets": true,
+    "console_logging": true,
+    "performance_monitoring": true
+  },
+
+  "dependencies": {
+    "playwright": "^1.45.0"
+  },
+
+  "file_structure": {
+    "assets/": "Main assets directory",
+    "assets/js/": "JavaScript files",
+    "assets/img/": "Image assets",
+    "assets/img/auras/": "Aura effect images",
+    "stuff/": "Unused/duplicate files"
+  },
+
+  "build_info": {
+    "created": "2025-09-07",
+    "last_modified": "2025-09-07",
+    "build_version": "2.7.0-merged",
+    "optimization": "single_file_bundle"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "characters": {
+    "a1": {
+      "sprites": {
+        "idle": {
+          "dimensions": {"width": 128, "height": 128},
+          "pivot": {"x": 64, "y": 128},
+          "collisionBox": {"x": 40, "y": 80, "width": 48, "height": 96},
+          "hitBoxes": {
+            "attack1": {"x": 80, "y": 40, "width": 60, "height": 40}
+          }
+        },
+        "attack": {
+          "dimensions": {"width": 128, "height": 128},
+          "pivot": {"x": 64, "y": 128},
+          "timings": {
+            "startup": 0.1,
+            "active": 0.2,
+            "recovery": 0.15
+          }
+        }
+      },
+      "stats": {
+        "moveSpeed": 300,
+        "jumpForce": 600,
+        "attackRange": 65
+      }
+    },
+    "missy": {
+      "sprites": {
+        "idle": {
+          "dimensions": {"width": 128, "height": 128},
+          "pivot": {"x": 64, "y": 128},
+          "collisionBox": {"x": 40, "y": 80, "width": 48, "height": 96}
+        }
+      },
+      "stats": {
+        "moveSpeed": 280,
+        "jumpForce": 550,
+        "attackRange": 70
+      }
+    }
+  },
+  "projectiles": {
+    "slash_wave": {
+      "dimensions": {"width": 64, "height": 32},
+      "pivot": {"x": 32, "y": 16},
+      "speed": 400,
+      "lifetime": 0.8,
+      "damage": 25,
+      "effects": ["knockback"]
+    }
+  },
+  "effects": {
+    "hit_spark": {
+      "dimensions": {"width": 32, "height": 32},
+      "pivot": {"x": 16, "y": 16},
+      "blendMode": "screen",
+      "particleCount": 8
+    },
+    "rage_aura": {
+      "dimensions": {"width": 128, "height": 128},
+      "pivot": {"x": 64, "y": 64},
+      "blendMode": "add",
+      "pulseRate": 1.2
+    }
+  }
+}

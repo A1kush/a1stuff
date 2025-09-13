@@ -1,0 +1,38 @@
+{
+  "name": "katana_neon_pack",
+  "version": 3,
+  "assets": {
+    "icon": "Downloads/Icon/icon_katana_neon_96.png",
+    "sprite_idle_2x4": "Downloads/Sprite/sprite_katana_idle_2x4.png",
+    "sprite_action_strip_8x1": "Downloads/Sprite/action_behavior_strip_8x1.png",
+    "sprite_action_2x4": "Downloads/Sprite/sprite_katana_action_2x4.png",
+    "gif_idle_64": "Downloads/GIF/katana_idle_64.gif",
+    "gif_idle_256": "Downloads/GIF/katana_idle_256.gif",
+    "previews_64": "Previews/GIF_64x64/katana_idle_preview_64.gif",
+    "previews_256": "Previews/GIF_256x256/katana_idle_preview_256.gif",
+    "variant_scan_ping_frames_glob": "Downloads/Sprite/variants/scan_ping/katana_idle_scanping_*.png"
+  },
+  "meta": {
+    "frame_size": [
+      64,
+      64
+    ],
+    "idle_grid": [
+      2,
+      4
+    ],
+    "action_strip": [
+      8,
+      1
+    ],
+    "transparent": true,
+    "tags": [
+      "weapon",
+      "katana",
+      "neon",
+      "DBZ",
+      "solo-leveling",
+      "scan-ping"
+    ]
+  }
+}

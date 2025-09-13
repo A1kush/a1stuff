@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "generated_at": "8413549",
+  "assets": {
+    "bars": [
+      "health_bar.png",
+      "mana_bar.png",
+      "exp_bar.png",
+      "talent_ap_bar.png",
+      "pet_ap_bar.png",
+      "vehicle_ap_bar.png"
+    ],
+    "weapon_icons": [
+      "sword_common.png",
+      "sword_rare.png",
+      "sword_epic.png",
+      "sword_legendary.png",
+      "bow_common.png",
+      "bow_rare.png",
+      "bow_epic.png",
+      "bow_legendary.png",
+      "staff_common.png",
+      "staff_rare.png",
+      "staff_epic.png",
+      "staff_legendary.png"
+    ],
+    "item_icons": [
+      "armor_common.png",
+      "armor_rare.png",
+      "armor_epic.png",
+      "armor_legendary.png",
+      "accessory_common_fire.png",
+      "accessory_common_water.png",
+      "accessory_common_earth.png",
+      "accessory_common_air.png",
+      "accessory_common_dark.png",
+      "accessory_common_light.png",
+      "accessory_rare_fire.png",
+      "accessory_rare_water.png",
+      "accessory_rare_earth.png",
+      "accessory_rare_air.png",
+      "accessory_rare_dark.png",
+      "accessory_rare_light.png",
+      "accessory_epic_fire.png",
+      "accessory_epic_water.png",
+      "accessory_epic_earth.png",
+      "accessory_epic_air.png",
+      "accessory_epic_dark.png",
+      "accessory_epic_light.png",
+      "accessory_legendary_fire.png",
+      "accessory_legendary_water.png",
+      "accessory_legendary_earth.png",
+      "accessory_legendary_air.png",
+      "accessory_legendary_dark.png",
+      "accessory_legendary_light.png",
+      "gift_common.png",
+      "gift_rare.png",
+      "gift_epic.png",
+      "gift_legendary.png"
+    ],
+    "sprites": [
+      "a1_chibi.png",
+      "unique_chibi.png",
+      "missy_chibi.png"
+    ]
+  }
+}

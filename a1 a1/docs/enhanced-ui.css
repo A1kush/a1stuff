@@ -1,0 +1,114 @@
+/* Enhanced UI Styles for A1 Runner */
+:root {
+    /* Updated color scheme */
+    --panel-bg: rgba(25, 30, 45, 0.85);
+    --panel-border: rgba(80, 120, 160, 0.6);
+    --button-bg: rgba(40, 50, 70, 0.9);
+    --button-hover: rgba(60, 80, 110, 0.95);
+    --button-active: rgba(80, 120, 160, 1);
+    --text-primary: rgb(220, 230, 240);
+    --text-secondary: rgb(180, 190, 210);
+    --accent: rgb(100, 200, 255);
+    
+    /* Updated sizes */
+    --panel-padding: 8px;
+    --button-size: 32px;
+    --icon-size: 24px;
+    --border-radius: 4px;
+}
+
+/* Compact panels */
+.game-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--border-radius);
+    padding: var(--panel-padding);
+    margin: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Smaller buttons */
+.game-button {
+    width: var(--button-size);
+    height: var(--button-size);
+    background: var(--button-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--border-radius);
+    padding: 4px;
+    margin: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.game-button:hover {
+    background: var(--button-hover);
+    transform: translateY(-1px);
+}
+
+.game-button:active {
+    background: var(--button-active);
+    transform: translateY(0);
+}
+
+.game-button img {
+    width: var(--icon-size);
+    height: var(--icon-size);
+}
+
+/* Stats display */
+.stats-display {
+    position: fixed;
+    left: 8px;
+    top: 120px; /* Position under speed/inventory buttons */
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--border-radius);
+    padding: var(--panel-padding);
+    font-size: 12px;
+    color: var(--text-primary);
+    z-index: 100;
+}
+
+.stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.hide-button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 10px;
+}
+
+.hide-button:hover {
+    color: var(--text-primary);
+}
+
+/* Hide all button */
+.hide-all-button {
+    position: fixed;
+    right: 8px;
+    top: 8px;
+    background: var(--button-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--border-radius);
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.hide-all-button:hover {
+    background: var(--button-hover);
+}
+
+/* Hidden state */
+.hidden {
+    display: none !important;
+}

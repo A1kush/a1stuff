@@ -1,0 +1,38 @@
+{
+  "explosion": {
+    "size": 128,
+    "frames": 12,
+    "strip": "/mnt/data/a1k_vfx_autogen/explosion_strip_128x128_12.png",
+    "gif": "/mnt/data/a1k_vfx_autogen/explosion_loop.gif"
+  },
+  "smoke_puff": {
+    "size": 64,
+    "frames": 8,
+    "strip": "/mnt/data/a1k_vfx_autogen/smoke_puff_strip_64x64_8.png",
+    "gif": "/mnt/data/a1k_vfx_autogen/smoke_puff_loop.gif"
+  },
+  "fire_loop": {
+    "size": 64,
+    "frames": 13,
+    "strip": "/mnt/data/a1k_vfx_autogen/fire_loop_strip_64x64_13.png",
+    "gif": "/mnt/data/a1k_vfx_autogen/fire_loop_loop.gif"
+  },
+  "sparkles_loop": {
+    "size": 64,
+    "frames": 8,
+    "strip": "/mnt/data/a1k_vfx_autogen/sparkles_loop_strip_64x64_8.png",
+    "gif": "/mnt/data/a1k_vfx_autogen/sparkles_loop_loop.gif"
+  },
+  "portal_spawn": {
+    "size": 128,
+    "frames": 12,
+    "strip": "/mnt/data/a1k_vfx_autogen/portal_spawn_strip_128x128_12.png",
+    "gif": "/mnt/data/a1k_vfx_autogen/portal_spawn_loop.gif"
+  },
+  "shield_idle": {
+    "size": 128,
+    "frames": 12,
+    "strip": "/mnt/data/a1k_vfx_autogen/shield_idle_strip_128x128_12.png",
+    "gif": "/mnt/data/a1k_vfx_autogen/shield_idle_loop.gif"
+  }
+}

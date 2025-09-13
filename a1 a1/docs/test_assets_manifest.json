@@ -1,0 +1,29 @@
+{
+  "character_name": "./test_assets",
+  "generated_assets": {
+    "icon": "assets/chibi_generated\\./test_assets_icon.png",
+    "spritesheet": "assets/chibi_generated\\./test_assets_spritesheet.png",
+    "power_aura": "assets/chibi_generated\\./test_assets_power_aura.gif",
+    "power_aura_static": "assets/chibi_generated\\./test_assets_power_aura.png",
+    "shadow_aura": "assets/chibi_generated\\./test_assets_shadow_aura.gif",
+    "shadow_aura_static": "assets/chibi_generated\\./test_assets_shadow_aura.png",
+    "divine_aura": "assets/chibi_generated\\./test_assets_divine_aura.gif",
+    "divine_aura_static": "assets/chibi_generated\\./test_assets_divine_aura.png",
+    "sword_icon": "assets/chibi_generated\\sword_icon.png",
+    "bow_icon": "assets/chibi_generated\\bow_icon.png",
+    "staff_icon": "assets/chibi_generated\\staff_icon.png",
+    "level_up_effect": "assets/chibi_generated\\./test_assets_level_up.gif"
+  },
+  "asset_info": {
+    "base_size": 128,
+    "style": "chibi_solo_leveling",
+    "version": "1.0"
+  },
+  "usage": {
+    "icon": "Character profile and UI display",
+    "spritesheet": "Character animation frames",
+    "aura_effects": "Power-up and special ability effects",
+    "weapon_icons": "Equipment and inventory display",
+    "level_up_effect": "Level progression animation"
+  }
+}

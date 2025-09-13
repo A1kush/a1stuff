@@ -1,0 +1,121 @@
+{
+  "version": "1.0",
+  "characters": {
+    "A1": {
+      "static": "chibi/a1_chibi.png",
+      "large": "chibi/a1_chibi_large.png",
+      "animated_gif": "chibi/a1_aura_animated.gif",
+      "aura_frames": [
+        "chibi/a1_aura_frame_00.png",
+        "chibi/a1_aura_frame_01.png",
+        "chibi/a1_aura_frame_02.png",
+        "chibi/a1_aura_frame_03.png",
+        "chibi/a1_aura_frame_04.png",
+        "chibi/a1_aura_frame_05.png",
+        "chibi/a1_aura_frame_06.png",
+        "chibi/a1_aura_frame_07.png"
+      ],
+      "colors": {
+        "base": [
+          255,
+          140,
+          0
+        ],
+        "aura": [
+          255,
+          215,
+          0
+        ],
+        "hair": [
+          255,
+          165,
+          0
+        ],
+        "outfit": [
+          0,
+          100,
+          200
+        ]
+      }
+    },
+    "Unique": {
+      "static": "chibi/unique_chibi.png",
+      "large": "chibi/unique_chibi_large.png",
+      "animated_gif": "chibi/unique_aura_animated.gif",
+      "aura_frames": [
+        "chibi/unique_aura_frame_00.png",
+        "chibi/unique_aura_frame_01.png",
+        "chibi/unique_aura_frame_02.png",
+        "chibi/unique_aura_frame_03.png",
+        "chibi/unique_aura_frame_04.png",
+        "chibi/unique_aura_frame_05.png",
+        "chibi/unique_aura_frame_06.png",
+        "chibi/unique_aura_frame_07.png"
+      ],
+      "colors": {
+        "base": [
+          138,
+          43,
+          226
+        ],
+        "aura": [
+          147,
+          112,
+          219
+        ],
+        "hair": [
+          75,
+          0,
+          130
+        ],
+        "outfit": [
+          25,
+          25,
+          112
+        ]
+      }
+    },
+    "Missy": {
+      "static": "chibi/missy_chibi.png",
+      "large": "chibi/missy_chibi_large.png",
+      "animated_gif": "chibi/missy_aura_animated.gif",
+      "aura_frames": [
+        "chibi/missy_aura_frame_00.png",
+        "chibi/missy_aura_frame_01.png",
+        "chibi/missy_aura_frame_02.png",
+        "chibi/missy_aura_frame_03.png",
+        "chibi/missy_aura_frame_04.png",
+        "chibi/missy_aura_frame_05.png",
+        "chibi/missy_aura_frame_06.png",
+        "chibi/missy_aura_frame_07.png"
+      ],
+      "colors": {
+        "base": [
+          255,
+          20,
+          147
+        ],
+        "aura": [
+          255,
+          192,
+          203
+        ],
+        "hair": [
+          139,
+          69,
+          19
+        ],
+        "outfit": [
+          220,
+          20,
+          60
+        ]
+      }
+    }
+  },
+  "generated_at": "2025-09-06",
+  "style": "DBZ_Solo_Leveling_Chibi",
+  "level_up_effect": "chibi/level_up.png",
+  "skill_unlock_effect": "chibi/skill_unlock.png",
+  "rage_mode_effect": "chibi/rage_mode.png"
+}

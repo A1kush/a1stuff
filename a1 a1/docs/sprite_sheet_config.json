@@ -1,0 +1,60 @@
+{
+  "sprite_sheets": {
+    "character_sheets": {
+      "a1_main": {
+        "source": "A1_sheet.png",
+        "frameSize": {"width": 128, "height": 128},
+        "padding": 0,
+        "frames": {
+          "idle": {"x": 0, "y": 0, "count": 2},
+          "run": {"x": 0, "y": 128, "count": 4},
+          "attack": {"x": 0, "y": 256, "count": 3}
+        }
+      },
+      "missy_main": {
+        "source": "Missy_sheet_256x128.png",
+        "frameSize": {"width": 128, "height": 128},
+        "padding": 0,
+        "frames": {
+          "idle": {"x": 0, "y": 0, "count": 2}
+        }
+      }
+    },
+    "effect_sheets": {
+      "combat_effects": {
+        "source": "Effects_atlas.png",
+        "frameSize": {"width": 64, "height": 64},
+        "padding": 0,
+        "frames": {
+          "hit_light": {"x": 0, "y": 0, "count": 3},
+          "hit_heavy": {"x": 0, "y": 64, "count": 4}
+        }
+      },
+      "rage_effects": {
+        "source": "rage_aura_sheet_256x128.png",
+        "frameSize": {"width": 128, "height": 128},
+        "padding": 0,
+        "frames": {
+          "rage_loop": {"x": 0, "y": 0, "count": 2}
+        }
+      }
+    },
+    "item_sheets": {
+      "consumables": {
+        "source": "consumables_tokens_sheet_256x128.png",
+        "frameSize": {"width": 32, "height": 32},
+        "padding": 0,
+        "frames": {
+          "potions": {"x": 0, "y": 0, "count": 4},
+          "scrolls": {"x": 0, "y": 32, "count": 4}
+        }
+      }
+    }
+  },
+  "export_settings": {
+    "format": "png",
+    "quality": 100,
+    "trim": false,
+    "padding": 1
+  }
+}

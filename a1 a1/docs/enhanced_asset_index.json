@@ -1,0 +1,137 @@
+{
+  "version": "1.0.0",
+  "baseUrl": "assets/img/",
+  "animations": {
+    "characters": {
+      "a1": {
+        "idle": {
+          "path": "animations/characters/a1/idle",
+          "frameRate": 12,
+          "loop": true,
+          "frames": ["idle_0.png", "idle_1.png"]
+        },
+        "attack": {
+          "path": "animations/characters/a1/attack",
+          "frameRate": 24,
+          "loop": false,
+          "frames": ["attack_0.png", "attack_1.png", "attack_2.png"]
+        },
+        "hurt": {
+          "path": "animations/characters/a1/hurt",
+          "frameRate": 15,
+          "loop": false
+        },
+        "special": {
+          "path": "animations/characters/a1/special",
+          "frameRate": 30,
+          "loop": false
+        }
+      },
+      "missy": {
+        "idle": {
+          "path": "animations/characters/missy/idle",
+          "frameRate": 12,
+          "loop": true
+        },
+        "attack": {
+          "path": "animations/characters/missy/attack",
+          "frameRate": 24,
+          "loop": false
+        }
+      }
+    },
+    "effects": {
+      "rage": {
+        "path": "animations/effects/rage",
+        "frameRate": 15,
+        "loop": true,
+        "blendMode": "screen"
+      },
+      "hit": {
+        "path": "animations/effects/hit",
+        "frameRate": 30,
+        "loop": false,
+        "blendMode": "screen"
+      },
+      "explosion": {
+        "path": "animations/effects/explosion",
+        "frameRate": 30,
+        "loop": false,
+        "blendMode": "screen"
+      }
+    }
+  },
+  "particles": {
+    "combat": {
+      "hit": {
+        "path": "particles/combat/hit",
+        "emitRate": 10,
+        "lifetime": 0.5
+      },
+      "slash": {
+        "path": "particles/combat/slash",
+        "emitRate": 15,
+        "lifetime": 0.3
+      }
+    },
+    "environment": {
+      "dust": {
+        "path": "particles/environment/dust",
+        "emitRate": 5,
+        "lifetime": 1.0
+      }
+    }
+  },
+  "ui": {
+    "bars": {
+      "hp": {
+        "fill": "ui/bars/hp_fill.png",
+        "background": "ui/bars/hp_bg.png",
+        "frame": "ui/bars/frame.png"
+      },
+      "mp": {
+        "fill": "ui/bars/mp_fill.png",
+        "background": "ui/bars/mp_bg.png",
+        "frame": "ui/bars/frame.png"
+      },
+      "rage": {
+        "fill": "ui/bars/rage_fill.png",
+        "background": "ui/bars/rage_bg.png",
+        "frame": "ui/bars/frame.png"
+      }
+    },
+    "panels": {
+      "inventory": "ui/panels/inventory_panel.png",
+      "equipment": "ui/panels/equipment_panel.png",
+      "character": "ui/panels/character_panel.png"
+    }
+  },
+  "items": {
+    "consumables": {
+      "path": "items/consumables",
+      "types": {
+        "potion": ["health_potion.png", "mana_potion.png"],
+        "scroll": ["scroll_fire.png", "scroll_ice.png"]
+      }
+    },
+    "equipment": {
+      "path": "items/equipment",
+      "types": {
+        "weapon": ["sword.png", "axe.png"],
+        "armor": ["chest.png", "helmet.png"]
+      }
+    }
+  },
+  "backgrounds": {
+    "layers": {
+      "ground": {
+        "path": "backgrounds/layers/ground.gif",
+        "scrollSpeed": 1.0
+      },
+      "middle": {
+        "path": "backgrounds/layers/middle.gif",
+        "scrollSpeed": 0.6
+      }
+    }
+  }
+}

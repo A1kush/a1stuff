@@ -1,0 +1,57 @@
+{
+  "version": "2.1.0",
+  "type": "a1_sword_effects",
+  "character": "A1",
+  "effects": [
+    {
+      "type": "basic_swing",
+      "name": "Basic Sword Swing",
+      "category": "melee",
+      "gif": "a1_basic_swing.gif",
+      "icon": "a1_basic_swing_icon.png",
+      "preview": "a1_basic_swing_preview.png"
+    },
+    {
+      "type": "slash_wave",
+      "name": "Slash Wave (S1)",
+      "category": "ranged",
+      "gif": "a1_slash_wave.gif",
+      "icon": "a1_slash_wave_icon.png",
+      "preview": "a1_slash_wave_preview.png"
+    },
+    {
+      "type": "dark_aura_combo",
+      "name": "Dark Aura Combo (S2)",
+      "category": "combo",
+      "gif": "a1_dark_aura_combo.gif",
+      "icon": "a1_dark_aura_combo_icon.png",
+      "preview": "a1_dark_aura_combo_preview.png"
+    },
+    {
+      "type": "steal_breaker",
+      "name": "Steal Breaker (S3)",
+      "category": "counter",
+      "gif": "a1_steal_breaker.gif",
+      "icon": "a1_steal_breaker_icon.png",
+      "preview": "a1_steal_breaker_preview.png"
+    },
+    {
+      "type": "big_aura_slash",
+      "name": "Big Aura Slash (S4)",
+      "category": "ultimate",
+      "gif": "a1_big_aura_slash.gif",
+      "icon": "a1_big_aura_slash_icon.png",
+      "preview": "a1_big_aura_slash_preview.png"
+    },
+    {
+      "type": "omega_slasher",
+      "name": "Omega Slasher (S5)",
+      "category": "rage",
+      "gif": "a1_omega_slasher.gif",
+      "icon": "a1_omega_slasher_icon.png",
+      "preview": "a1_omega_slasher_preview.png"
+    }
+  ],
+  "total_effects": 6,
+  "generated_by": "A1SwordEffectsGenerator"
+}

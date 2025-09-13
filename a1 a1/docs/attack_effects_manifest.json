@@ -1,0 +1,116 @@
+{
+  "version": "2.1.0",
+  "type": "attack_effects",
+  "effects": [
+    {
+      "type": "ki_blast",
+      "element": "fire",
+      "style": "dbz",
+      "rarity": "common",
+      "gif": "ki_blast_fire_dbz.gif",
+      "icon": "ki_blast_fire_icon.png",
+      "preview": "ki_blast_fire_preview.png"
+    },
+    {
+      "type": "ki_blast",
+      "element": "ice",
+      "style": "dbz",
+      "rarity": "rare",
+      "gif": "ki_blast_ice_dbz.gif",
+      "icon": "ki_blast_ice_icon.png",
+      "preview": "ki_blast_ice_preview.png"
+    },
+    {
+      "type": "ki_blast",
+      "element": "lightning",
+      "style": "dbz",
+      "rarity": "epic",
+      "gif": "ki_blast_lightning_dbz.gif",
+      "icon": "ki_blast_lightning_icon.png",
+      "preview": "ki_blast_lightning_preview.png"
+    },
+    {
+      "type": "energy_wave",
+      "element": "fire",
+      "style": "dbz",
+      "rarity": "common",
+      "gif": "energy_wave_fire_dbz.gif",
+      "icon": "energy_wave_fire_icon.png",
+      "preview": "energy_wave_fire_preview.png"
+    },
+    {
+      "type": "energy_wave",
+      "element": "ice",
+      "style": "dbz",
+      "rarity": "rare",
+      "gif": "energy_wave_ice_dbz.gif",
+      "icon": "energy_wave_ice_icon.png",
+      "preview": "energy_wave_ice_preview.png"
+    },
+    {
+      "type": "shadow_strike",
+      "element": "dark",
+      "style": "solo",
+      "rarity": "epic",
+      "gif": "shadow_strike_dark_solo.gif",
+      "icon": "shadow_strike_dark_icon.png",
+      "preview": "shadow_strike_dark_preview.png"
+    },
+    {
+      "type": "elemental_blast",
+      "element": "fire",
+      "style": "mixed",
+      "rarity": "rare",
+      "gif": "elemental_blast_fire_mixed.gif",
+      "icon": "elemental_blast_fire_icon.png",
+      "preview": "elemental_blast_fire_preview.png"
+    },
+    {
+      "type": "elemental_blast",
+      "element": "ice",
+      "style": "mixed",
+      "rarity": "rare",
+      "gif": "elemental_blast_ice_mixed.gif",
+      "icon": "elemental_blast_ice_icon.png",
+      "preview": "elemental_blast_ice_preview.png"
+    },
+    {
+      "type": "elemental_blast",
+      "element": "lightning",
+      "style": "mixed",
+      "rarity": "epic",
+      "gif": "elemental_blast_lightning_mixed.gif",
+      "icon": "elemental_blast_lightning_icon.png",
+      "preview": "elemental_blast_lightning_preview.png"
+    },
+    {
+      "type": "ultimate_attack",
+      "element": "fire",
+      "style": "dbz",
+      "rarity": "legendary",
+      "gif": "ultimate_attack_fire_dbz.gif",
+      "icon": "ultimate_attack_fire_icon.png",
+      "preview": "ultimate_attack_fire_preview.png"
+    },
+    {
+      "type": "ultimate_attack",
+      "element": "dark",
+      "style": "solo",
+      "rarity": "legendary",
+      "gif": "ultimate_attack_dark_solo.gif",
+      "icon": "ultimate_attack_dark_icon.png",
+      "preview": "ultimate_attack_dark_preview.png"
+    },
+    {
+      "type": "combo_finisher",
+      "element": "lightning",
+      "style": "solo",
+      "rarity": "epic",
+      "gif": "combo_finisher_lightning_solo.gif",
+      "icon": "combo_finisher_lightning_icon.png",
+      "preview": "combo_finisher_lightning_preview.png"
+    }
+  ],
+  "total_effects": 12,
+  "generated_by": "EnhancedAttackEffectsGenerator"
+}

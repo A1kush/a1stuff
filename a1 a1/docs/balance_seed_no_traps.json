@@ -1,0 +1,8 @@
+{
+  "version": "0.1-final",
+  "globals": {"tick_hz": 60},
+  "floors": [
+    {"id":1,"waves":[{"spawns":[{"type":"enemy","count":4}]},{"spawns":[{"type":"enemy","count":6}]},{"spawns":[{"type":"enemy","count":8}]}]},
+    {"id":2,"waves":[{"spawns":[{"type":"enemy","count":5}]},{"spawns":[{"type":"enemy","count":7}]},{"spawns":[{"type":"enemy","count":9}]}]}
+  ]
+}

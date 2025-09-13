@@ -1,0 +1,61 @@
+{
+  "name": "a1k-runner-enhanced",
+  "version": "2.7.0",
+  "description": "Enhanced A1 Runner game with merged assets and optimized structure",
+  "main": "index.html",
+  "type": "module",
+  "private": true,
+  "keywords": ["game", "runner", "dbz", "solo-leveling", "chibi", "action-rpg"],
+  "author": "A1K",
+  "license": "MIT",
+  
+  "scripts": {
+    "start": "echo 'Open index.html in your browser to start the game'",
+    "serve": "python -m http.server 8000 || python3 -m http.server 8000",
+    "test:smoke": "playwright test -c playwright.smoke.config.ts",
+    "test:headed": "PWDEBUG=1 playwright test -c playwright.smoke.config.ts",
+    "clean": "echo 'Cleaning temporary files...' && rm -rf .cache temp/",
+    "organize": "echo 'Assets already organized in current structure'"
+  },
+  
+  "files": [
+    "assets/",
+    "index.html",
+    "master_manifest.json",
+    "README.md"
+  ],
+  
+  "gameInfo": {
+    "title": "A1 Runner Enhanced",
+    "genre": "Action RPG Runner", 
+    "theme": "DBZ/Solo Leveling Chibi",
+    "version": "2.7.0",
+    "engine": "HTML5 Canvas + JavaScript",
+    "features": [
+      "Merged JavaScript files",
+      "Consolidated manifests", 
+      "Enhanced UI system",
+      "Visual effects engine",
+      "Debug console",
+      "Organized asset structure"
+    ]
+  },
+  
+  "structure": {
+    "assets/": "Organized game assets",
+    "assets/js/": "Merged JavaScript files",
+    "stuff/": "Deprecated/duplicate files",
+    "master_manifest.json": "Consolidated game configuration",
+    "index.html": "Main game entry point"
+  },
+  
+  "devDependencies": {
+    "@playwright/test": "^1.45.0"
+  },
+  
+  "browserslist": [
+    "last 2 versions",
+    "not dead",
+    "> 1%"
+  ]
+}

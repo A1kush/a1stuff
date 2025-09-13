@@ -1,0 +1,73 @@
+{
+  "version": "2.0.0",
+  "generated": true,
+  "assets": {
+    "characters": {
+      "a1k_icon": "assets/generated/icons/a1k_icon.png",
+      "unique_icon": "assets/generated/icons/unique_icon.png",
+      "missy_icon": "assets/generated/icons/missy_icon.png"
+    },
+    "weapons": {
+      "a1k_sword": {
+        "spritesheet": "assets/generated/sprites/a1k_sword_sheet.png",
+        "frames": 8,
+        "frame_size": [
+          128,
+          128
+        ]
+      },
+      "unique_beam": {
+        "spritesheet": "assets/generated/sprites/unique_beam_sheet.png",
+        "frames": 8,
+        "frame_size": [
+          128,
+          128
+        ]
+      },
+      "missy_charm": {
+        "spritesheet": "assets/generated/sprites/missy_charm_sheet.png",
+        "frames": 8,
+        "frame_size": [
+          128,
+          128
+        ]
+      }
+    },
+    "effects": {
+      "slash_wave_a1k": {
+        "spritesheet": "assets/generated/effects/slash_wave_a1k_sheet.png",
+        "frames": 8,
+        "frame_size": [
+          128,
+          128
+        ]
+      },
+      "explosion_unique": {
+        "spritesheet": "assets/generated/effects/explosion_unique_sheet.png",
+        "frames": 8,
+        "frame_size": [
+          128,
+          128
+        ]
+      },
+      "sparkle_missy": {
+        "spritesheet": "assets/generated/effects/sparkle_missy_sheet.png",
+        "frames": 8,
+        "frame_size": [
+          128,
+          128
+        ]
+      }
+    },
+    "ui": {
+      "inventory_panel": "assets/generated/ui/inventory_panel.png",
+      "button_normal": "assets/generated/ui/button_normal.png",
+      "button_hover": "assets/generated/ui/button_hover.png",
+      "button_active": "assets/generated/ui/button_active.png",
+      "item_slot_common": "assets/generated/ui/item_slot_common.png",
+      "item_slot_rare": "assets/generated/ui/item_slot_rare.png",
+      "item_slot_epic": "assets/generated/ui/item_slot_epic.png",
+      "item_slot_legendary": "assets/generated/ui/item_slot_legendary.png"
+    }
+  }
+}

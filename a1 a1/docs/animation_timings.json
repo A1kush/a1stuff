@@ -1,0 +1,75 @@
+{
+  "combos": {
+    "a1_basic_combo": {
+      "sequence": ["attack1", "attack2", "attack3"],
+      "timing": {
+        "attack1": {
+          "duration": 0.4,
+          "cancelWindow": [0.2, 0.35],
+          "hitFrame": 0.15
+        },
+        "attack2": {
+          "duration": 0.45,
+          "cancelWindow": [0.25, 0.4],
+          "hitFrame": 0.2
+        },
+        "attack3": {
+          "duration": 0.6,
+          "cancelWindow": [0.4, 0.55],
+          "hitFrame": 0.3
+        }
+      }
+    },
+    "a1_special_moves": {
+      "rage_burst": {
+        "startup": ["rage_start", "rage_charge"],
+        "active": ["rage_burst", "rage_effect"],
+        "recovery": ["rage_end"],
+        "timing": {
+          "startup": 0.3,
+          "active": 0.4,
+          "recovery": 0.2
+        }
+      }
+    }
+  },
+  "movement": {
+    "a1_movement": {
+      "run": {
+        "frames": ["run1", "run2", "run3", "run4"],
+        "frameDuration": 0.1,
+        "footsteps": [0, 2]
+      },
+      "jump": {
+        "rise": ["jump_start", "jump_rise"],
+        "fall": ["jump_fall", "jump_land"],
+        "timing": {
+          "jumpStartup": 0.1,
+          "minimumAirTime": 0.2
+        }
+      }
+    }
+  },
+  "effects": {
+    "hit_impacts": {
+      "light": {
+        "frames": ["hit_light1", "hit_light2"],
+        "duration": 0.2,
+        "shake": {"intensity": 2, "duration": 0.1}
+      },
+      "heavy": {
+        "frames": ["hit_heavy1", "hit_heavy2", "hit_heavy3"],
+        "duration": 0.3,
+        "shake": {"intensity": 4, "duration": 0.15}
+      }
+    },
+    "status": {
+      "rage_active": {
+        "overlay": ["rage_pulse1", "rage_pulse2"],
+        "duration": 0.8,
+        "loop": true,
+        "colorOverlay": {"r": 255, "g": 50, "b": 50, "a": 0.3}
+      }
+    }
+  }
+}

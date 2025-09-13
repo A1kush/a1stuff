@@ -1,0 +1,38 @@
+{
+  "dark_aura_idle": {
+    "size": 128,
+    "frames": 16,
+    "strip": "/mnt/data/a1k_vfx_dark_aura/dark_aura_idle_strip_128x128_16.png",
+    "gif": "/mnt/data/a1k_vfx_dark_aura/dark_aura_idle_loop.gif"
+  },
+  "dark_aura_rage": {
+    "size": 128,
+    "frames": 16,
+    "strip": "/mnt/data/a1k_vfx_dark_aura/dark_aura_rage_strip_128x128_16.png",
+    "gif": "/mnt/data/a1k_vfx_dark_aura/dark_aura_rage_loop.gif"
+  },
+  "shadow_portal_monarch": {
+    "size": 128,
+    "frames": 12,
+    "strip": "/mnt/data/a1k_vfx_dark_aura/shadow_portal_monarch_strip_128x128_12.png",
+    "gif": "/mnt/data/a1k_vfx_dark_aura/shadow_portal_monarch_loop.gif"
+  },
+  "shadow_puddle_spawn": {
+    "size": 128,
+    "frames": 12,
+    "strip": "/mnt/data/a1k_vfx_dark_aura/shadow_puddle_spawn_strip_128x128_12.png",
+    "gif": "/mnt/data/a1k_vfx_dark_aura/shadow_puddle_spawn_loop.gif"
+  },
+  "dark_shockwave_ring": {
+    "size": 128,
+    "frames": 10,
+    "strip": "/mnt/data/a1k_vfx_dark_aura/dark_shockwave_ring_strip_128x128_10.png",
+    "gif": "/mnt/data/a1k_vfx_dark_aura/dark_shockwave_ring_loop.gif"
+  },
+  "warp_speedlines": {
+    "size": 128,
+    "frames": 8,
+    "strip": "/mnt/data/a1k_vfx_dark_aura/warp_speedlines_strip_128x128_8.png",
+    "gif": "/mnt/data/a1k_vfx_dark_aura/warp_speedlines_loop.gif"
+  }
+}

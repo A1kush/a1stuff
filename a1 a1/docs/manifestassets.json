@@ -1,0 +1,39 @@
+{
+  "version": "2.0",
+  "generator": "ChibiAssetGenerator",
+  "theme": "DBZ/Solo Leveling Chibi",
+  "assets": {
+    "characters": [
+      "character_a1_portrait.png",
+      "character_unique_portrait.png",
+      "character_missy_portrait.png"
+    ],
+    "ui_buttons": [
+      "btn_inventory.png",
+      "btn_character.png",
+      "btn_settings.png"
+    ],
+    "panels": [
+      "panel_inventory_bg.png",
+      "panel_stats_bg.png"
+    ],
+    "effects": [
+      "effect_power_up.png",
+      "effect_shadow_step.png",
+      "effect_cyber_dash.png",
+      "effect_energy_blast.png"
+    ],
+    "slots": [
+      "slot_empty.png",
+      "slot_equipped.png"
+    ]
+  },
+  "sizes": {
+    "icon": 24,
+    "button": 32,
+    "panel": [
+      240,
+      160
+    ]
+  }
+}

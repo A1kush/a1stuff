@@ -1,0 +1,109 @@
+{
+  "sprite_sheets": {
+    "character_sheets": {
+      "a1_base": {
+        "source": "A1_sheet.png",
+        "frameSize": {"width": 128, "height": 128},
+        "padding": 0,
+        "frames": {
+          "idle": {"x": 0, "y": 0, "count": 2, "anchor": {"x": 0.5, "y": 1.0}},
+          "run": {"x": 0, "y": 128, "count": 4, "anchor": {"x": 0.5, "y": 1.0}},
+          "jump": {"x": 0, "y": 256, "count": 2, "anchor": {"x": 0.5, "y": 1.0}},
+          "fall": {"x": 256, "y": 256, "count": 2, "anchor": {"x": 0.5, "y": 1.0}}
+        },
+        "animations": {
+          "idle_loop": {
+            "frames": ["idle_0", "idle_1"],
+            "frameRate": 6,
+            "loop": true
+          },
+          "run_loop": {
+            "frames": ["run_0", "run_1", "run_2", "run_3"],
+            "frameRate": 12,
+            "loop": true
+          }
+        }
+      },
+      "a1_combat": {
+        "source": "A1_combat_sheet.png",
+        "frameSize": {"width": 128, "height": 128},
+        "padding": 0,
+        "frames": {
+          "attack1": {"x": 0, "y": 0, "count": 3, "anchor": {"x": 0.5, "y": 1.0}},
+          "attack2": {"x": 0, "y": 128, "count": 3, "anchor": {"x": 0.5, "y": 1.0}},
+          "special": {"x": 0, "y": 256, "count": 4, "anchor": {"x": 0.5, "y": 1.0}}
+        }
+      }
+    },
+    "effect_sheets": {
+      "combat_effects": {
+        "source": "Effects_atlas.png",
+        "frameSize": {"width": 64, "height": 64},
+        "padding": 0,
+        "frames": {
+          "hit_light": {"x": 0, "y": 0, "count": 4, "anchor": {"x": 0.5, "y": 0.5}},
+          "hit_heavy": {"x": 0, "y": 64, "count": 5, "anchor": {"x": 0.5, "y": 0.5}},
+          "slash": {"x": 0, "y": 128, "count": 3, "anchor": {"x": 0.5, "y": 0.5}}
+        },
+        "blendModes": {
+          "hit_light": "screen",
+          "hit_heavy": "screen",
+          "slash": "add"
+        }
+      }
+    },
+    "projectile_sheets": {
+      "projectiles": {
+        "source": "projectiles.png",
+        "frameSize": {"width": 32, "height": 32},
+        "padding": 0,
+        "frames": {
+          "bullet": {"x": 0, "y": 0, "count": 4, "anchor": {"x": 0.5, "y": 0.5}},
+          "energy": {"x": 0, "y": 32, "count": 4, "anchor": {"x": 0.5, "y": 0.5}}
+        },
+        "rotations": {
+          "bullet": true,
+          "energy": false
+        }
+      }
+    },
+    "ui_sheets": {
+      "icons": {
+        "source": "icons_sheet_32x32.png",
+        "frameSize": {"width": 32, "height": 32},
+        "padding": 0,
+        "frames": {
+          "items": {"x": 0, "y": 0, "count": 8},
+          "status": {"x": 0, "y": 32, "count": 8}
+        },
+        "ninePatch": {
+          "panel": {
+            "x": 0, "y": 64,
+            "width": 32, "height": 32,
+            "borders": {"left": 8, "right": 8, "top": 8, "bottom": 8}
+          }
+        }
+      }
+    }
+  },
+  "atlas_optimization": {
+    "powerOfTwo": true,
+    "padding": 2,
+    "maxSize": 2048,
+    "pot": true,
+    "allowRotation": false
+  },
+  "export_settings": {
+    "format": "png",
+    "quality": 100,
+    "optimization": {
+      "compression": "default",
+      "dithering": false
+    },
+    "metadata": {
+      "generateJSON": true,
+      "includeSize": true,
+      "includeFrameData": true
+    }
+  }
+}

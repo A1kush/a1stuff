@@ -1,0 +1,101 @@
+{
+  "version": "1.0.0",
+  "generated": "2025-09-06",
+  "theme": "Chibi Solo Leveling Style",
+  "assets": {
+    "characters": {
+      "icons": [
+        "a1_icon.png",
+        "unique_icon.png",
+        "missy_icon.png"
+      ],
+      "spritesheet": "characters_spritesheet.png"
+    },
+    "weapons": {
+      "icons": [
+        "sword_common_icon.png",
+        "sword_rare_icon.png",
+        "sword_epic_icon.png",
+        "sword_legendary_icon.png",
+        "bow_common_icon.png",
+        "bow_rare_icon.png",
+        "bow_epic_icon.png",
+        "bow_legendary_icon.png",
+        "staff_common_icon.png",
+        "staff_rare_icon.png",
+        "staff_epic_icon.png",
+        "staff_legendary_icon.png"
+      ],
+      "spritesheet": "weapons_spritesheet.png"
+    },
+    "effects": {
+      "aura_frames": [
+        "aura_frame_00.png",
+        "aura_frame_01.png",
+        "aura_frame_02.png",
+        "aura_frame_03.png",
+        "aura_frame_04.png",
+        "aura_frame_05.png",
+        "aura_frame_06.png",
+        "aura_frame_07.png"
+      ],
+      "aura_spritesheet": "aura_animation_spritesheet.png",
+      "aura_gif": "aura_animation.gif",
+      "level_up_frames": [
+        "level_up_frame_00.png",
+        "level_up_frame_01.png",
+        "level_up_frame_02.png",
+        "level_up_frame_03.png",
+        "level_up_frame_04.png",
+        "level_up_frame_05.png",
+        "level_up_frame_06.png",
+        "level_up_frame_07.png",
+        "level_up_frame_08.png",
+        "level_up_frame_09.png",
+        "level_up_frame_10.png",
+        "level_up_frame_11.png"
+      ],
+      "level_up_gif": "level_up_effect.gif",
+      "skill_unlock_frames": [
+        "skill_unlock_frame_00.png",
+        "skill_unlock_frame_01.png",
+        "skill_unlock_frame_02.png",
+        "skill_unlock_frame_03.png",
+        "skill_unlock_frame_04.png",
+        "skill_unlock_frame_05.png",
+        "skill_unlock_frame_06.png",
+        "skill_unlock_frame_07.png",
+        "skill_unlock_frame_08.png",
+        "skill_unlock_frame_09.png",
+        "skill_unlock_frame_10.png",
+        "skill_unlock_frame_11.png"
+      ],
+      "skill_unlock_gif": "skill_unlock_effect.gif"
+    }
+  },
+  "config": {
+    "icon_size": [
+      64,
+      64
+    ],
+    "sprite_size": [
+      32,
+      32
+    ],
+    "animation_frames": 8,
+    "colors": {
+      "chibi_skin": "#FFDBAC",
+      "chibi_hair": "#8B4513",
+      "chibi_eyes": "#4169E1",
+      "solo_leveling_blue": "#00D4FF",
+      "solo_leveling_purple": "#7B61FF",
+      "solo_leveling_gold": "#FFD700",
+      "aura_shadow": "#1a1a2e",
+      "weapon_steel": "#C0C0C0",
+      "armor_bronze": "#CD7F32",
+      "rare_green": "#00FF00",
+      "epic_purple": "#8A2BE2",
+      "legendary_orange": "#FF8C00"
+    }
+  }
+}

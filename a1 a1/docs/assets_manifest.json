@@ -1,0 +1,94 @@
+{
+  "note": "A1K Runner asset pack \u2014 placeholders + normalized character sprites",
+  "characters": {
+    "A1": {
+      "single": "assets/characters/A1.png",
+      "sheet": "assets/characters/A1_sheet_256x128.png"
+    },
+    "Unique": {
+      "single": "assets/characters/Unique.png",
+      "sheet": "assets/characters/Unique_sheet_256x128.png"
+    },
+    "Missy": {
+      "single": "assets/characters/Missy.png",
+      "sheet": "assets/characters/Missy_sheet_256x128.png"
+    }
+  },
+  "vfx": [
+    "assets/vfx/a1/a1_rage_aura.png",
+    "assets/vfx/a1/a1_slash_red_arc.png",
+    "assets/vfx/unique/muzzle_cyan_small.png",
+    "assets/vfx/missy/pistol_flash_warm.png",
+    "assets/vfx/missy/wing_shield.png",
+    "assets/vfx/hit_spark.png",
+    "assets/vfx/explosion_small.png",
+    "assets/vfx/crit_flash.png"
+  ],
+  "projectiles": [
+    "assets/projectiles/a1_slash_wave.png",
+    "assets/projectiles/unique_tracer.png",
+    "assets/projectiles/missy_pistol_bullet.png"
+  ],
+  "loot": [
+    "assets/loot/coin_gold.png",
+    "assets/loot/gift_chest.png",
+    "assets/loot/boss_chest.png"
+  ],
+  "ui": [
+    "assets/ui/skills/icon_rage.png",
+    "assets/ui/skills/icon_skill_unique.png",
+    "assets/ui/skills/icon_skill_missy.png",
+    "assets/ui/skills/icon_shield.png",
+    "assets/ui/skills/icon_jump.png",
+    "assets/ui/skills/icon_s1.png",
+    "assets/ui/skills/icon_s2.png",
+    "assets/ui/skills/icon_s3.png",
+    "assets/ui/inventory/slot_empty.png",
+    "assets/ui/inventory/slot_equip.png",
+    "assets/ui/inventory/icon_weapon.png",
+    "assets/ui/inventory/icon_armor.png",
+    "assets/ui/inventory/icon_accessory.png",
+    "assets/ui/inventory/icon_pet.png",
+    "assets/ui/currencies/icon_gold.png",
+    "assets/ui/currencies/icon_silver.png",
+    "assets/ui/currencies/icon_ticket.png",
+    "assets/ui/currencies/icon_gem.png",
+    "assets/ui/controls/joystick_base.png",
+    "assets/ui/controls/joystick_nub.png",
+    "assets/ui/controls/btn_round.png"
+  ],
+  "enemies": [
+    "assets/enemies/mob_grunt_1.png",
+    "assets/enemies/mob_grunt_2.png",
+    "assets/enemies/mob_grunt_3.png",
+    "assets/enemies/miniboss_blade_dancer_sheet_256x128.png",
+    "assets/enemies/boss1_sheet_256x128.png",
+    "assets/enemies/boss2_sheet_256x128.png",
+    "assets/enemies/boss3_sheet_256x128.png",
+    "assets/enemies/boss4_sheet_256x128.png"
+  ],
+  "pets": [
+    "assets/pets/cat_ally.png"
+  ],
+  "bg": [
+    "BG_mid.png",
+    "BG_ground.png",
+    "assets/bg/BG_mid.png",
+    "assets/bg/BG_ground.png"
+  ],
+  "technical": {
+    "tile_size": [
+      64,
+      64
+    ],
+    "sheet_size": [
+      256,
+      128
+    ],
+    "baseline_y": 56,
+    "pivot": [
+      32,
+      56
+    ]
+  }
+}

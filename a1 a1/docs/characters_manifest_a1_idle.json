@@ -1,0 +1,150 @@
+{
+  "asset": {
+    "id": "a1_idle_v01",
+    "subject": {
+      "character": "A1",
+      "animation": "Idle (8f)",
+      "pose": "lethal-calm swordsman; sword in low guard; cape corners breathing",
+      "micro_motion_beats": [
+        "settle",
+        "micro torso sway",
+        "cape tip breathe",
+        "fist flex",
+        "settle"
+      ],
+      "aura": {
+        "present": true,
+        "notes": "faint, contained inside safe-box (no UI spill). No extra VFX on-sheet"
+      }
+    },
+    "style": {
+      "tag": "A1K_STYLE",
+      "art_style": "pixel-inspired; void-black base; neon cyan #00E5FF + purple #A78BFA rim-light; red #FF3B3B danger pops; crisp 1-px outlines; high contrast; no blur/AA.",
+      "view": "strict side-view, right-facing. Full body visible; no cut-offs.",
+      "render_scale_px": [1024, 2048],
+      "background": "removed -> transparent",
+      "downscale": {
+        "method": "nearest-neighbor",
+        "reason": "lock crisp edges"
+      }
+    },
+    "sheet": {
+      "frame_w": 64,
+      "frame_h": 64,
+      "cols": 4,
+      "rows": 2,
+      "total_frames": 8,
+      "order": "row-major (left->right, top row then bottom row)",
+      "sheet_w": 256,
+      "sheet_h": 128,
+      "safe_box": {
+        "w": 224,
+        "h": 112,
+        "x": 16,
+        "y": 8,
+        "notes": "keep motion inside ≈224×112 on the 256×128 sheet"
+      },
+      "pivot": "bottom-center",
+      "ground_line": {
+        "y": "H-16",
+        "lock": true
+      }
+    },
+    "timing": {
+      "fps": 12,
+      "loop": true,
+      "first_frame": "calm stance",
+      "loop_seam": "last returns cleanly for a perfect loop"
+    },
+    "quality_locks": {
+      "no_clipping": true,
+      "identical_bottom_center_pivot": true,
+      "silhouette_jitter_px_max": 2,
+      "crisp_1px_outlines": true,
+      "no_blur_or_aa": true
+    },
+    "variants": ["cyan", "purple", "red", "gold", "toxic"],
+    "aura_colors": {
+      "cyan": "#00E5FF",
+      "purple": "#A78BFA",
+      "red": "#FF3B3B",
+      "gold": "#F7D047",
+      "toxic": "#7CFF7A"
+    },
+    "export_paths": {
+      "sprite": "assets/custom/characters/a1/a1_idle_strip8_256x128_<aura>.png",
+      "icon": "assets/custom/characters/a1/a1_idle_icon_256_<aura>.png",
+      "gif_loop": "Downloads/a1_idle_<aura>.gif",
+      "sprite_copy_for_downloads": "Downloads/a1_idle_sprite_256x128_<aura>.png",
+      "previews": {
+        "gif_64": "Previews/a1_idle_64_<aura>.gif",
+        "gif_256": "Previews/a1_idle_256_<aura>.gif"
+      }
+    },
+    "packaging": {
+      "zip_name": "a1k_characters_A1_idle_v01.zip",
+      "zip_tree": [
+        {
+          "path": "assets/custom/characters/a1/",
+          "files": [
+            "a1_idle_strip8_256x128_cyan.png",
+            "a1_idle_strip8_256x128_purple.png",
+            "a1_idle_strip8_256x128_red.png",
+            "a1_idle_strip8_256x128_gold.png",
+            "a1_idle_strip8_256x128_toxic.png"
+          ]
+        },
+        {
+          "path": "Downloads/",
+          "files": [
+            "a1_idle_cyan.gif",
+            "a1_idle_purple.gif",
+            "a1_idle_red.gif",
+            "a1_idle_gold.gif",
+            "a1_idle_toxic.gif",
+            "a1_idle_sprite_256x128_cyan.png",
+            "a1_idle_sprite_256x128_purple.png",
+            "a1_idle_sprite_256x128_red.png",
+            "a1_idle_sprite_256x128_gold.png",
+            "a1_idle_sprite_256x128_toxic.png"
+          ]
+        },
+        {
+          "path": "Previews/",
+          "files": [
+            "a1_idle_64_cyan.gif",
+            "a1_idle_64_purple.gif",
+            "a1_idle_64_red.gif",
+            "a1_idle_64_gold.gif",
+            "a1_idle_64_toxic.gif",
+            "a1_idle_256_cyan.gif",
+            "a1_idle_256_purple.gif",
+            "a1_idle_256_red.gif",
+            "a1_idle_256_gold.gif",
+            "a1_idle_256_toxic.gif"
+          ]
+        },
+        {
+          "path": ".",
+          "files": [
+            "characters_manifest_a1_idle.json"
+          ]
+        }
+      ]
+    },
+    "render_pipeline": {
+      "steps": [
+        "Render at 1024–2048 px with transparent background",
+        "Apply rim-lights and danger pops per A1K_STYLE",
+        "Assemble 8 frames into 2×4 256×128 sheet (64×64 frames)",
+        "Ensure bottom-center pivot alignment and ground line at H−16",
+        "Downscale to targets using nearest-neighbor",
+        "Export per variant (cyan|purple|red|gold|toxic)",
+        "Generate GIF loops at native timing (12 fps)",
+        "Generate 64×64 and 256×256 preview GIFs",
+        "Package zip with required tree"
+      ]
+    }
+  }
+}
+

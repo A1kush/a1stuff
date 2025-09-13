@@ -1,0 +1,162 @@
+[
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/dark_aura/aura_levelup_burst_strip_128x128.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/dark_aura/aura_levelup_burst_strip_128x128_loop.gif",
+    "w": 128,
+    "h": 128,
+    "frames": 12,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/trails/shadow_dash_afterimage_strip_96x96.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/trails/shadow_dash_afterimage_strip_96x96_loop.gif",
+    "w": 96,
+    "h": 96,
+    "frames": 10,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/shockwaves/dark_shockwave_heavy_strip_128x128.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/shockwaves/dark_shockwave_heavy_strip_128x128_loop.gif",
+    "w": 128,
+    "h": 128,
+    "frames": 12,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/portals/shadow_portal_exit_strip_128x128.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/portals/shadow_portal_exit_strip_128x128_loop.gif",
+    "w": 128,
+    "h": 128,
+    "frames": 12,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/hitsparks/parry_reflect_hex_strip_64x64.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/hitsparks/parry_reflect_hex_strip_64x64_loop.gif",
+    "w": 64,
+    "h": 64,
+    "frames": 8,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/dissolves/death_to_shadows_strip_96x96.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/dissolves/death_to_shadows_strip_96x96_loop.gif",
+    "w": 96,
+    "h": 96,
+    "frames": 12,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/decals/burn_scorch_ground_strip_96x32.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/vfx/decals/burn_scorch_ground_strip_96x32_loop.gif",
+    "w": 96,
+    "h": 32,
+    "frames": 8,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/a1/a1_shadow_claw_strip_128x128.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/a1/a1_shadow_claw_strip_128x128_loop.gif",
+    "w": 128,
+    "h": 128,
+    "frames": 12,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/a1/a1_dark_ascent_strip_128x128.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/a1/a1_dark_ascent_strip_128x128_loop.gif",
+    "w": 128,
+    "h": 128,
+    "frames": 12,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/unique/uniq_soulsiphon_beam_strip_128x128.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/unique/uniq_soulsiphon_beam_strip_128x128_loop.gif",
+    "w": 128,
+    "h": 128,
+    "frames": 12,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/unique/uniq_prism_rail_finish_strip_128x128.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/unique/uniq_prism_rail_finish_strip_128x128_loop.gif",
+    "w": 128,
+    "h": 128,
+    "frames": 10,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/missy/missy_winged_guard_strip_128x128.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/missy/missy_winged_guard_strip_128x128_loop.gif",
+    "w": 128,
+    "h": 128,
+    "frames": 14,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/missy/missy_shadow_bubble_pop_strip_96x96.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/skills/missy/missy_shadow_bubble_pop_strip_96x96_loop.gif",
+    "w": 96,
+    "h": 96,
+    "frames": 10,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/projectiles/slashwave_dark_pierce_strip_96x96.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/projectiles/slashwave_dark_pierce_strip_96x96_loop.gif",
+    "w": 96,
+    "h": 96,
+    "frames": 8,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/projectiles/bullet_curse_strip_32x32.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/projectiles/bullet_curse_strip_32x32_loop.gif",
+    "w": 32,
+    "h": 32,
+    "frames": 6,
+    "loop": true
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/ui/icons/ui_rage_ready_dark_strip_64x64.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/ui/icons/ui_rage_ready_dark_strip_64x64_loop.gif",
+    "w": 64,
+    "h": 64,
+    "frames": 8,
+    "loop": true
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/loot/magnet_aura_dark_strip_96x96.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/loot/magnet_aura_dark_strip_96x96_loop.gif",
+    "w": 96,
+    "h": 96,
+    "frames": 10,
+    "loop": true
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/loot/chest_sparkle_dark_strip_64x64.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/loot/chest_sparkle_dark_strip_64x64_loop.gif",
+    "w": 64,
+    "h": 64,
+    "frames": 8,
+    "loop": true
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/boss/boss_entrance_glitch_strip_128x128.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/boss/boss_entrance_glitch_strip_128x128_loop.gif",
+    "w": 128,
+    "h": 128,
+    "frames": 12,
+    "loop": false
+  },
+  {
+    "path_png_strip": "/mnt/data/a1k_dark_aura_Tier1/assets/boss/boss_deflect_hex_strip_96x96.png",
+    "path_gif": "/mnt/data/a1k_dark_aura_Tier1/assets/boss/boss_deflect_hex_strip_96x96_loop.gif",
+    "w": 96,
+    "h": 96,
+    "frames": 8,
+    "loop": false
+  }
+]

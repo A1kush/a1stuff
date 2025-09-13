@@ -1,0 +1,51 @@
+{
+  "players": {
+    "a1": [
+      "assets/players/player_a1.png"
+    ],
+    "unique": [
+      "assets/players/player_unique.png"
+    ],
+    "missy": [
+      "assets/players/player_missy.png"
+    ]
+  },
+  "backgrounds": [
+    "assets/backgrounds/parallax_1.png",
+    "assets/backgrounds/parallax_2.png",
+    "assets/backgrounds/parallax_3.png"
+  ],
+  "fx": {
+    "reflect": [
+      "assets/fx/reflect_spark.png"
+    ],
+    "shield": [
+      "assets/fx/shield_bubble.png"
+    ],
+    "beam": [
+      "assets/fx/beam_segment.png"
+    ]
+  },
+  "bullets": {
+    "player": [
+      "assets/bullets/bullet_player.png"
+    ],
+    "enemy": [
+      "assets/bullets/bullet_enemy.png"
+    ]
+  },
+  "enemies": {
+    "mob_basic": [
+      "assets/enemies/mob_basic.png"
+    ],
+    "miniboss_1": [
+      "assets/enemies/miniboss_1.png"
+    ],
+    "boss_1": [
+      "assets/enemies/boss_1.png"
+    ],
+    "chest_boss": [
+      "assets/enemies/chest_boss.png"
+    ]
+  }
+}
