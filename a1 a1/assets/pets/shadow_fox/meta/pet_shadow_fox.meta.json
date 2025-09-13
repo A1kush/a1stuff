@@ -1,0 +1,86 @@
+{
+  "name": "Shadow Fox",
+  "type": "pet",
+  "style_token": "[A1K_STYLE]",
+  "icon": {
+    "file": "assets/pets/shadow_fox/icon/pet_shadow_fox_icon_256.png",
+    "size": [
+      256,
+      256
+    ],
+    "fallback_64": "assets/pets/shadow_fox/icon/pet_shadow_fox_icon_64.png"
+  },
+  "sprite": {
+    "file": "assets/pets/shadow_fox/sprites/pet_shadow_fox_idle_2x4_256x128.png",
+    "canvas_size": [
+      256,
+      128
+    ],
+    "grid": {
+      "rows": 2,
+      "cols": 4,
+      "frame_w": 64,
+      "frame_h": 64,
+      "frames": 8
+    },
+    "animation": {
+      "name": "idle_hover",
+      "loop": true,
+      "fps": 8
+    },
+    "orientation": "side-view right-facing",
+    "pivot": {
+      "bottom_center_px": [
+        32,
+        56
+      ]
+    },
+    "safe_box": {
+      "w": 224,
+      "h": 112,
+      "origin_px": [
+        16,
+        8
+      ]
+    },
+    "ground_line_y": 112
+  },
+  "animations": {
+    "idle": {
+      "file": "assets/pets/shadow_fox/sprites/pet_shadow_fox_idle_2x4_256x128.png",
+      "grid": {
+        "rows": 2,
+        "cols": 4,
+        "frame_w": 64,
+        "frame_h": 64,
+        "frames": 8
+      },
+      "fps": 8,
+      "loop": true
+    },
+    "dash": {
+      "file": "assets/pets/shadow_fox/sprites/pet_shadow_fox_dash_2x4_256x128.png",
+      "grid": {
+        "rows": 2,
+        "cols": 4,
+        "frame_w": 64,
+        "frame_h": 64,
+        "frames": 8
+      },
+      "fps": 12,
+      "loop": true
+    },
+    "attack": {
+      "file": "assets/pets/shadow_fox/sprites/pet_shadow_fox_attack_2x4_256x128.png",
+      "grid": {
+        "rows": 2,
+        "cols": 4,
+        "frame_w": 64,
+        "frame_h": 64,
+        "frames": 8
+      },
+      "fps": 10,
+      "loop": false
+    }
+  }
+}

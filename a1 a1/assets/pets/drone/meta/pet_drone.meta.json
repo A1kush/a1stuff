@@ -1,0 +1,78 @@
+{
+  "name": "Drone",
+  "type": "pet",
+  "style_token": "[A1K_STYLE]",
+  "icon": {
+    "file": "assets/pets/drone/icon/pet_drone.png",
+    "size": [
+      256,
+      256
+    ]
+  },
+  "animations": {
+    "hover": {
+      "file": "assets/pets/drone/sprites/pet_drone_sprite.png",
+      "grid": {
+        "rows": 2,
+        "cols": 4,
+        "frame_w": 64,
+        "frame_h": 64,
+        "frames": 8
+      },
+      "fps": 8,
+      "loop": true
+    },
+    "attack": {
+      "file": "assets/pets/drone/sprites/pet_drone_attack_2x4_256x128.png",
+      "grid": {
+        "rows": 2,
+        "cols": 4,
+        "frame_w": 64,
+        "frame_h": 64,
+        "frames": 8
+      },
+      "fps": 10,
+      "loop": false
+    },
+    "walk": {
+      "file": "assets/pets/drone/sprites/pet_drone_walk_2x4_256x128.png",
+      "grid": {
+        "rows": 2,
+        "cols": 4,
+        "frame_w": 64,
+        "frame_h": 64,
+        "frames": 8
+      },
+      "fps": 11,
+      "loop": true
+    },
+    "attack_beam": {
+      "file": "assets/pets/drone/sprites/pet_drone_attack_beam_2x4_256x128.png",
+      "grid": {
+        "rows": 2,
+        "cols": 4,
+        "frame_w": 64,
+        "frame_h": 64,
+        "frames": 8
+      },
+      "fps": 10,
+      "loop": false
+    }
+  },
+  "orientation": "side-view right-facing",
+  "pivot": {
+    "bottom_center_px": [
+      32,
+      56
+    ]
+  },
+  "safe_box": {
+    "w": 224,
+    "h": 112,
+    "origin_px": [
+      16,
+      8
+    ]
+  },
+  "ground_line_y": 112
+}

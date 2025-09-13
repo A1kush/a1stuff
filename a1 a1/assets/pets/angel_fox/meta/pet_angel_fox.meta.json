@@ -1,0 +1,40 @@
+{
+  "name": "Angel Fox",
+  "type": "pet",
+  "style_token": "[A1K_STYLE]",
+  "sprite": {
+    "file": "assets/pets/angel_fox/sprites/pet_angel_fox_hover_2x4_256x128.png",
+    "canvas_size": [
+      256,
+      128
+    ],
+    "grid": {
+      "rows": 2,
+      "cols": 4,
+      "frame_w": 64,
+      "frame_h": 64,
+      "frames": 8
+    },
+    "animation": {
+      "name": "hover",
+      "fps": 8,
+      "loop": true
+    },
+    "orientation": "side-view right-facing",
+    "pivot": {
+      "bottom_center_px": [
+        32,
+        56
+      ]
+    },
+    "safe_box": {
+      "w": 224,
+      "h": 112,
+      "origin_px": [
+        16,
+        8
+      ]
+    },
+    "ground_line_y": 112
+  }
+}
