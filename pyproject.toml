@@ -1,0 +1,18 @@
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C", "N", "B", "D"]
+
+[tool.mypy]
+files = ["a1 a1"]
+exclude = "a1 a1/assets/flipbooks"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-q"
+testpaths = ["tests"]
