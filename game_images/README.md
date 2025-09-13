@@ -5,13 +5,23 @@ Place all new game image assets (PNG, GIF, JPEG, WebP) in this folder.
 ## Recommended Subfolders
 
 - `backgrounds/` – Level and parallax backgrounds
-- `characters/` – Player and NPC sprite sheets
-- `enemies/` – Enemy sprite sheets
-- `vfx/` – Visual effects, particles, explosions
+- `characters/` – Player and NPC sprite sheets / animations
+- `enemies/` – Enemy sprite sheets / boss phases
+- `vfx/` – Core visual effect strips (explosions, auras)
 - `ui/` – Interface elements (icons, buttons, HUD pieces)
-- `items/` – Collectibles, loot, inventory icons
-- `projectiles/` – Bullets, missiles, beams
+- `items/` – Collectibles, inventory icons, powerups
+- `projectiles/` – Bullets, missiles, beams, trails
 - `tiles/` – Environment tiles or modular pieces
+- `loot/` – Drop art separate from inventory icons
+- `skills/` – Skill-specific icons or effect overlays
+- `pets/` – Companion / follower sprites
+- `hud/` – HUD overlays (frames, bars, meters) distinct from generic UI
+- `effects/` – High-level composed effects (may reference `particles/` and `vfx/` sources)
+- `particles/` – Tiny particle elements used to build larger effects
+- `spritesheets/` – Raw packed sheets prior to slicing or tooling
+- `temp/` – Temporary work-in-progress art (clean regularly)
+- `raw/` – Source originals before optimization/compression
+- `icons/` – General-purpose small UI icons not tied to items/skills
 
 ## Naming Conventions
 
