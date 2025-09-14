@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "description": "Custom sprite & sheet manifest. Each entry can be a single image (frameCount = 1) or a spritesheet sliced horizontally.",
+  "basePath": "assets/custom/",
+  "sprites": [
+    {
+      "key": "mob_grunt_3",
+      "file": "mob_grunt_3.png",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 1,
+      "origin": { "x": 64, "y": 96 },
+      "usage": "Enemy – static placeholder"
+    },
+    {
+      "key": "shadow_grunts",
+      "file": "shadow_grunts.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "frameCount": 4,
+      "fps": 8,
+      "origin": { "x": 48, "y": 72 },
+      "usage": "Shadow enemy idle cycle"
+    },
+    {
+      "key": "angel_sheet",
+      "file": "angel_sheet.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "frameCount": 6,
+      "fps": 10,
+      "origin": { "x": 128, "y": 200 },
+      "usage": "Large summon / ultimate"
+    },
+    {
+      "key": "explosion_big",
+      "file": "explosion_sheet.png",
+      "frameWidth": 192,
+      "frameHeight": 192,
+      "frameCount": 8,
+      "fps": 14,
+      "origin": { "x": 96, "y": 140 },
+      "usage": "Big explosion VFX"
+    },
+    {
+      "key": "drone_anim",
+      "file": "drone_sheet.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "frameCount": 6,
+      "fps": 12,
+      "origin": { "x": 48, "y": 64 },
+      "usage": "Support drone idle/fly"
+    },
+    {
+      "key": "chest_mimic",
+      "file": "chest_sheet.png",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frameCount": 10,
+      "fps": 10,
+      "origin": { "x": 64, "y": 100 },
+      "usage": "Animated chest / mimic"
+    }
+  ]
+}

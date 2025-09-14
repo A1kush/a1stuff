@@ -1,128 +1,123 @@
-# A1K Runner Game - Windows PowerShell Setup Script
-# This script sets up both Node.js and Python environments for the game development
+<#!
+.SYNOPSIS
+  A1K Runner Game - Windows PowerShell Environment Setup Script
+.DESCRIPTION
+  Mirrors functionality of ./setup (Bash) to prepare Node.js, Playwright, and Python tooling.
+  Safe to re-run; idempotent installs. Adds optional skipping of tests/assets.
+.PARAMETER SkipTests
+  Skip running Playwright test suite.
+.PARAMETER SkipAssets
+  Skip generating flipbook assets.
+.PARAMETER Python
+  Python executable to use (default 'python').
+.EXAMPLE
+  ./setup.ps1 -SkipTests
+.EXAMPLE
+  pwsh -File setup.ps1 -Python python3
+#>
 
-Write-Host "🎮 Setting up A1K Runner Game Development Environment..." -ForegroundColor Green
+[CmdletBinding()] param(
+    [switch]$SkipTests,
+    [switch]$SkipAssets,
+    [string]$Python = 'python'
+)
 
-# Check if we're in the right directory
-if (-not (Test-Path "giftbox auto.html")) {
-    Write-Host "❌ Error: Not in the correct project directory" -ForegroundColor Red
-    Write-Host "Expected to find 'giftbox auto.html' in current directory" -ForegroundColor Red
-    exit 1
+$ErrorActionPreference = 'Stop'
+
+function Write-Section($msg) { Write-Host "`n=== $msg ===" -ForegroundColor Cyan }
+function Write-Step($msg)    { Write-Host "[*] $msg" -ForegroundColor Yellow }
+function Write-OK($msg)      { Write-Host "[OK] $msg" -ForegroundColor Green }
+function Write-Warn2($msg)   { Write-Host "[WARN] $msg" -ForegroundColor DarkYellow }
+function Write-Fail($msg)    { Write-Host "[FAIL] $msg" -ForegroundColor Red }
+
+Write-Host "🎮 Setting up A1K Runner Game Development Environment..." -ForegroundColor Magenta
+
+# 0. Validate location
+if (-not (Test-Path 'giftbox auto.html')) { Write-Fail "Not in repo root (giftbox auto.html missing)"; exit 1 }
+
+$RepoRoot = Get-Location
+$NodeDir  = Join-Path $RepoRoot 'a1 a1'
+$VenvPath = Join-Path $RepoRoot '.venv'
+$ToolsDir = Join-Path $NodeDir 'tools'
+if (-not (Test-Path $NodeDir)) { Write-Fail "Directory 'a1 a1' missing"; exit 1 }
+
+Write-Section 'Node.js Environment'
+Set-Location $NodeDir
+if (-not (Test-Path package.json)) { Write-Fail 'package.json missing in a1 a1'; exit 1 }
+
+Write-Step 'Installing npm dependencies (npm install)'
+try { npm install | Out-Null; Write-OK 'npm dependencies installed' } catch { Write-Fail "npm install failed: $_"; exit 1 }
+
+Write-Step 'Installing Playwright browsers'
+try { npx playwright install | Out-Null; Write-OK 'Playwright browsers installed' } catch { Write-Warn2 "Playwright install had issues: $_" }
+
+Write-Section 'Python Virtual Environment'
+if (-not (Test-Path $VenvPath)) {
+    Write-Step 'Creating virtual environment (.venv)'
+    & $Python -m venv $VenvPath
+    Write-OK 'Virtual environment created'
+} else { Write-Step 'Virtual environment already exists (.venv)' }
+
+# Activate venv
+$Activate = Join-Path $VenvPath 'Scripts' 'Activate.ps1'
+if (-not (Test-Path $Activate)) { Write-Fail 'Activate script missing (venv not created properly)'; exit 1 }
+. $Activate
+
+Write-Step 'Upgrading pip'
+& $Python -m pip install --upgrade pip | Out-Null
+
+# Install Python requirements
+if (Test-Path (Join-Path $NodeDir 'requirements.txt')) {
+    Write-Step 'Installing core Python dependencies'
+    pip install -r requirements.txt | Out-Null
+    Write-OK 'Core Python deps installed'
+}
+if (Test-Path (Join-Path $NodeDir 'requirements-dev.txt')) {
+    Write-Step 'Installing development Python dependencies'
+    pip install -r requirements-dev.txt | Out-Null
+    Write-OK 'Dev Python deps installed'
 }
 
-# 1. Node.js Setup
-Write-Host "📦 Setting up Node.js environment..." -ForegroundColor Yellow
-Set-Location "a1 a1"
-
-if (-not (Test-Path "package.json")) {
-    Write-Host "❌ Error: package.json not found in 'a1 a1' directory" -ForegroundColor Red
-    exit 1
+Write-Section 'Verification'
+Write-Step 'Checking Python libraries'
+foreach ($lib in 'PIL','imageio') {
+    try { & $Python - <<"PY"
+import $lib
+print('$lib OK')
+PY
+    } catch { Write-Warn2 "$lib import failed" }
 }
 
-# Install Node.js dependencies
-Write-Host "Installing npm dependencies..." -ForegroundColor Cyan
-npm install
-
-# Install Playwright browsers
-Write-Host "🎭 Installing Playwright browsers..." -ForegroundColor Cyan
-npx playwright install
-
-# 2. Python Setup
-Write-Host "🐍 Setting up Python environment..." -ForegroundColor Yellow
-
-# Create virtual environment if it doesn't exist
-if (-not (Test-Path "../.venv")) {
-    Write-Host "Creating Python virtual environment..." -ForegroundColor Cyan
-    python -m venv ../.venv
+Write-Step 'Checking dev tooling versions'
+foreach ($tool in 'ruff','black','mypy') {
+    try { & $tool --version | Select-Object -First 1 } catch { Write-Warn2 "$tool not found (maybe not installed yet)" }
 }
 
-# Activate virtual environment (Windows)
-Write-Host "Activating virtual environment..." -ForegroundColor Cyan
-& "../.venv/Scripts/Activate.ps1"
+if (-not $SkipTests) {
+    Write-Step 'Running Playwright test suite (non-fatal)'
+    try { npm test } catch { Write-Warn2 'Playwright tests experienced errors' }
+} else { Write-Step 'Skipping tests (--SkipTests supplied)' }
 
-# Upgrade pip
-Write-Host "Upgrading pip..." -ForegroundColor Cyan
-python -m pip install --upgrade pip
+Write-Section 'Asset Generation'
+if (-not $SkipAssets -and (Test-Path (Join-Path $ToolsDir 'generate_flipbooks.py'))) {
+    Write-Step 'Generating flipbook assets'
+    Push-Location $ToolsDir
+    try { & $Python generate_flipbooks.py } catch { Write-Warn2 'Asset generation had issues' }
+    Pop-Location
+} else { Write-Step 'Skipping asset generation (missing script or --SkipAssets specified)' }
 
-# Install core requirements
-if (Test-Path "requirements.txt") {
-    Write-Host "Installing core Python dependencies..." -ForegroundColor Cyan
-    pip install -r requirements.txt
-}
+Set-Location $RepoRoot
 
-# Install development requirements
-if (Test-Path "requirements-dev.txt") {
-    Write-Host "Installing development Python dependencies..." -ForegroundColor Cyan
-    pip install -r requirements-dev.txt
-}
+Write-Section 'Summary'
+Write-OK 'Node.js dependencies installed'
+Write-OK 'Playwright browsers installed (or attempted)'
+Write-OK 'Python virtual environment ready (.venv)'
+Write-OK 'Python dependencies installed'
+Write-Host ''
+Write-Host 'Next steps:' -ForegroundColor Cyan
+Write-Host '  Activate environment (new session):  .\.venv\Scripts\Activate.ps1'
+Write-Host '  Run tests:                           cd "a1 a1"; npm test'
+Write-Host '  Generate assets later:               cd "a1 a1\tools"; python generate_flipbooks.py'
+Write-Host '  Edit game file:                      giftbox auto.html'
 
-# 3. Verify installations
-Write-Host "✅ Verifying installations..." -ForegroundColor Green
-
-# Test Node.js setup
-Write-Host "Testing Node.js/Playwright setup..." -ForegroundColor Cyan
-try {
-    npm test
-    Write-Host "✅ All tests passed!" -ForegroundColor Green
-} catch {
-    Write-Host "⚠️  Some tests failed, but setup is complete" -ForegroundColor Yellow
-}
-
-# Test Python tools
-Write-Host "Testing Python tools..." -ForegroundColor Cyan
-try {
-    python -c "import PIL; print('✅ PIL/Pillow working')"
-    python -c "import imageio; print('✅ imageio working')"
-} catch {
-    Write-Host "⚠️  Python dependencies may need attention" -ForegroundColor Yellow
-}
-
-# Test linting tools
-Write-Host "Testing development tools..." -ForegroundColor Cyan
-try {
-    ruff --version | Out-Host
-    Write-Host "✅ ruff working" -ForegroundColor Green
-    black --version | Out-Host  
-    Write-Host "✅ black working" -ForegroundColor Green
-    mypy --version | Out-Host
-    Write-Host "✅ mypy working" -ForegroundColor Green
-} catch {
-    Write-Host "⚠️  Some development tools may need attention" -ForegroundColor Yellow
-}
-
-# 4. Generate some sample assets to verify tools work
-Write-Host "🎨 Testing asset generation..." -ForegroundColor Yellow
-if (Test-Path "tools/generate_flipbooks.py") {
-    Set-Location tools
-    try {
-        python generate_flipbooks.py
-        Write-Host "✅ Asset generation successful!" -ForegroundColor Green
-    } catch {
-        Write-Host "⚠️  Asset generation had issues, but tools are installed" -ForegroundColor Yellow
-    }
-    Set-Location ..
-}
-
-Set-Location ..
-
-Write-Host ""
-Write-Host "🎉 Setup complete!" -ForegroundColor Green
-Write-Host ""
-Write-Host "📋 Summary:" -ForegroundColor Cyan
-Write-Host "  - Node.js dependencies installed"
-Write-Host "  - Playwright browsers installed"
-Write-Host "  - Python virtual environment created at .venv"
-Write-Host "  - Python dependencies installed"
-Write-Host "  - Development tools (ruff, black, mypy) ready"
-Write-Host ""
-Write-Host "🚀 Next steps:" -ForegroundColor Cyan
-Write-Host "  1. Activate Python environment: .venv/Scripts/Activate.ps1"
-Write-Host "  2. Run tests: cd 'a1 a1'; npm test"
-Write-Host "  3. Generate assets: cd 'a1 a1/tools'; python generate_flipbooks.py"
-Write-Host "  4. Edit HTML game: open giftbox auto.html"
-Write-Host ""
-Write-Host "📁 Key files:" -ForegroundColor Cyan
-Write-Host "  - giftbox auto.html: Main game file"
-Write-Host "  - a1 a1/: Game assets and tools"
-Write-Host "  - a1 a1/tools/generate_flipbooks.py: VFX asset generator"
-Write-Host "  - a1 a1/tests/: Playwright test suite"
+Write-Host "\n🎉 Setup complete!" -ForegroundColor Magenta

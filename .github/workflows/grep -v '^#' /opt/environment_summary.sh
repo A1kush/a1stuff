@@ -1,0 +1,1 @@
+grep -v '^#' /opt/environment_summary.sh | less
