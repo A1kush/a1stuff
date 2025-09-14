@@ -2231,35 +2231,215 @@
           if (heal > 0) addFloater(a.x, a.y - 28, '+' + heal, '#6aa8ff');
           // Aura ring on sword contact
           addCast(a.x + 20, a.y - 40, '#ff7a6a');
-        } catch { }
       }
     }
 
-    // Attempt to reflect enemy bullets during a melee strike.  Only heroes whose id is listed
-    // in PATCH.combat.reflect.playerMelee.enabledFor will cause reflection.  For each overlapping
-    // enemy projectile within a rectangular melee zone ahead of the attacker, convert it into a
-    // friendly shot with mirrored horizontal velocity and reduced vertical velocity.  Reflected
-    // shots gain piercing and scaled damage.
+    // Enhanced melee function for A1's refined 5-hit combo system
+    function enhancedMelee(a, reach, height, dmg, comboIndex, swingAngle) {
+      // Attempt to reflect enemy bullets during melee (refined timing)
+      tryReflectDuringMelee(a);
+      
+      let hit = false;
+      let hitCount = 0;
+      const baseX = a.x;
+      const baseY = a.y;
+      
+      // Calculate swing-specific hit area based on angle and reach
+      for (const e of st.enemies) {
+        if (e.hp <= 0) continue;
+        
+        // Distance and angle calculations
+        const dx = e.x - baseX;
+        const dy = e.y - baseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const angleToEnemy = Math.atan2(dy, dx) * (180 / Math.PI);
+        
+        // Check if enemy is within reach and swing arc
+        if (distance <= reach && Math.abs(dy) <= height / 2) {
+          // For frontal attacks, ensure enemy is mostly in front
+          if (dx > -10) {
+            let dealt = dmg;
+            
+            // Apply combo multipliers and crit chance for finisher
+            if (comboIndex === 5) {
+              // 5th swing has crit chance
+              if (Math.random() < 0.25) dealt = Math.round(dealt * 1.5);
+            }
+            
+            // Apply enemy defenses
+            if (e.defFlat) dealt = Math.max(1, dealt - e.defFlat);
+            if (e.defPct) dealt = Math.max(1, Math.round(dealt * (1 - e.defPct)));
+            
+            e.hp -= dealt;
+            hitCount++;
+            
+            // Enhanced hitstop and flinch effects per spec
+            const hitstopDuration = 40 + Math.random() * 30; // 40-70ms
+            setTimeout(() => {
+              // Enemy flinch unless elite/boss
+              if (!e.isBoss && !e.isElite && !e.noFlinch) {
+                e._flinchT = (e._flinchT || 0) + 200;
+                e.vx *= 0.3; // Reduce movement during flinch
+              }
+              
+              // Higher stagger for swing 3 (thrust)
+              if (comboIndex === 3) {
+                e._staggerT = (e._staggerT || 0) + 400;
+              }
+              
+              // Wider CC for swing 4 (sweep)
+              if (comboIndex === 4) {
+                e._knockbackT = (e._knockbackT || 0) + 300;
+                e.vx -= 50; // Knockback effect
+              }
+            }, hitstopDuration);
+            
+            hit = true;
+          }
+        }
+      }
+      
+      // Enhanced lifesteal and defensive bonuses
+      if (hit) {
+        const totalHeal = Math.max(0, Math.round(dmg * 0.12 * hitCount)); // 12% per hit
+        a.hp = Math.min(a.hpMax, a.hp + totalHeal);
+        
+        // +15% DEF for 6s (improved from original)
+        st._defBuffT = Math.max(st._defBuffT || 0, 6000);
+      }
+      
+      // Enhanced parry/reflect window - refined timing per spec (6-10 frames at 60fps)
+      if (a && a.id === 'A1') {
+        const parryFrames = 6 + Math.floor(Math.random() * 5); // 6-10 frames
+        const parryMs = Math.round((parryFrames / 60) * 1000); // Convert to milliseconds
+        st.parryT = Math.max(st.parryT, parryMs);
+        
+        // Reflect bullets back toward nearest enemy within 900 units with +25% speed
+        st._reflectOwnerId = a.id;
+        st._reflectLeft = 2 + Math.floor(Math.random() * 4); // 2-5 reflects per swing
+        st._reflectRange = 900; // 900 unit range per spec
+        st._reflectSpeedMul = 1.25; // +25% speed per spec
+      }
+      
+      // Camera micro-shake on hit per spec
+      if (hit) {
+        const shakeIntensity = Math.min(5, hitCount * 1.5);
+        st._cameraShake = (st._cameraShake || 0) + shakeIntensity;
+      }
+    }
+
+    // Add distinct swing VFX for each combo hit
+    function addDistinctSwingFX(player, comboIndex, color, swingAngle) {
+      const x = player.x + 24;
+      const y = player.y - 36;
+      
+      // Trail VFX for each swing type
+      switch (comboIndex) {
+        case 1: // Frontal slash - horizontal arc
+          addArcSlash(x, y, 1.0, color);
+          addSlash(x + 8, y, 1);
+          break;
+        case 2: // Wide slash - broader arc  
+          addArcSlash(x, y, 1.2, color);
+          addCrescent(x + 12, y, 1, color);
+          break;
+        case 3: // Thrust - linear trail
+          addSlash(x + 16, y, 1.5);
+          addAfterImage(x, y, color);
+          break;
+        case 4: // Sweep - wide horizontal
+          addArcSlash(x - 8, y, 1.4, color);
+          addArcSlash(x + 8, y, 1.4, color);
+          addCrescent(x, y, 1.2, color);
+          break;
+        case 5: // Finisher - explosive effect
+          addArcSlash(x, y, 1.6, color);
+          addCrescent(x + 16, y, 1.4, color);
+          addSlash(x + 12, y, 2.0);
+          addAfterImage(x, y, color);
+          // Additional finisher effects
+          addCast(x, y, color);
+          break;
+      }
+      
+      // Impact sparks for all swings
+      addCrescent(x + 20, y, 0.8, '#ffffff');
+    }
+
+    // Enhanced bullet reflection system for A1 combat spec
     function tryReflectDuringMelee(attacker) {
       if (!PATCH.combat.reflect.playerMelee.enabledFor.includes(attacker.id)) return;
       if (st.parryT <= 0) return;
+      
       const reachX = 54;
       const reachY = 36;
+      const reflectRange = st._reflectRange || 900; // 900 units per spec
+      const speedMultiplier = st._reflectSpeedMul || 1.25; // +25% speed per spec
+      
       for (const b of st.eShots) {
         if (!b || b.life <= 0) continue;
+        
+        // Check if bullet is in parry zone
         if (Math.abs(b.x - attacker.x) < reachX && Math.abs(b.y - (attacker.y - 20)) < reachY) {
           if (st._reflectLeft != null && st._reflectLeft <= 0) break;
-          // flip projectile to player
-          const nvx = Math.abs(b.vx); // ensure it travels rightward (toward enemies)
-          const nvy = b.vy * 0.5;
-          b.vx = nvx;
-          b.vy = nvy;
-          b.speed = Math.hypot(nvx, nvy);
-          b.owner = 'player';
-          b.team = 'player';
-          b.pierce = (b.pierce || 0) + 1;
-          const mul = PATCH.combat.reflect.playerMelee.dmgMul || 1.2;
-          b.dmg = Math.round((b.dmg || 10) * ((st._reflectPingpong && st._reflectPingpong > 0) ? (mul * 2) : mul));
+          
+          // Find nearest enemy within 900 units for reflect targeting
+          let nearestEnemy = null;
+          let nearestDist = reflectRange;
+          
+          for (const e of st.enemies) {
+            if (e.hp <= 0) continue;
+            const dist = Math.sqrt((e.x - attacker.x) ** 2 + (e.y - attacker.y) ** 2);
+            if (dist < nearestDist) {
+              nearestEnemy = e;
+              nearestDist = dist;
+            }
+          }
+          
+          if (nearestEnemy) {
+            // REFLECT: Send bullet back toward nearest enemy with +25% speed
+            const dx = nearestEnemy.x - b.x;
+            const dy = nearestEnemy.y - b.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist > 0) {
+              const speed = Math.hypot(b.vx, b.vy) * speedMultiplier;
+              b.vx = (dx / dist) * speed;
+              b.vy = (dy / dist) * speed;
+              b.speed = speed;
+            }
+            
+            // Convert to player-owned projectile
+            b.owner = 'player';
+            b.team = 'player';
+            b.pierce = (b.pierce || 0) + 1;
+            
+            // Apply damage multiplier
+            const mul = PATCH.combat.reflect.playerMelee.dmgMul || 1.25;
+            b.dmg = Math.round((b.dmg || 10) * mul);
+            
+            // VFX for successful reflect
+            addCrescent(b.x, b.y, 1, '#00ff88');
+            addSlash(b.x, b.y, 0.8);
+            
+          } else {
+            // REPEL: Push bullet off-course with radial force, remove damage
+            const dx = b.x - attacker.x;
+            const dy = b.y - (attacker.y - 20);
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist > 0) {
+              const repelForce = 300;
+              b.vx = (dx / dist) * repelForce;
+              b.vy = (dy / dist) * repelForce;
+              b.speed = repelForce;
+              b.dmg = 0; // Remove damage per spec
+            }
+            
+            // VFX for repel
+            addCrescent(b.x, b.y, 1, '#ff6666');
+          }
+          
           if (st._reflectLeft != null) st._reflectLeft--;
         }
       }
@@ -2718,14 +2898,66 @@
               fireVehicleWeapon(leader(), vehicle);
           }
         } else {
-          // A1 short melee cadence only; 3–5 hit combo with heavy swings; 4th/5th emits mid-size wave (70 dmg)
-          if ((st.time % 0.28) < 0.02) {
-            st._a1Combo = (st._a1Combo || 0) + 1; if (st._a1Combo > 5) st._a1Combo = 1;
-            const l = leader();
-            const base = enable_v13_7_damage_overrides ? (50 + Math.floor(Math.random() * 71)) : (l.dmg || 50);
-            melee(l, 32, 42, base);
-            addCrescent(l.x + 24, l.y - 36, 1, '#ff4d4f');
-            if (st._a1Combo >= 4) { wave(l, 1.0, '#ff7a6a', enable_v13_7_damage_overrides ? 70 : Math.round(l.dmg * 0.9)); }
+          // A1 Enhanced Five-Hit Combo System with 0.35s buffer and distinct swing patterns
+          const l = leader();
+          if (l.id === 'A1') {
+            // Initialize combo state
+            if (!st._a1ComboState) {
+              st._a1ComboState = { 
+                count: 0, 
+                lastSwingTime: 0, 
+                inputBuffer: 350, // 0.35s buffer between swings
+                isActive: false 
+              };
+            }
+            
+            const comboState = st._a1ComboState;
+            const currentTime = performance.now();
+            const timeSinceLastSwing = currentTime - comboState.lastSwingTime;
+            
+            // Check if combo has timed out (beyond input buffer)
+            if (comboState.isActive && timeSinceLastSwing > comboState.inputBuffer) {
+              comboState.count = 0;
+              comboState.isActive = false;
+            }
+            
+            // Execute swing with proper timing (reduced from 0.28s to allow manual control)
+            if ((st.time % 0.22) < 0.02) {
+              comboState.count = (comboState.count % 5) + 1; // 1-5 cycle
+              comboState.lastSwingTime = currentTime;
+              comboState.isActive = true;
+              
+              // Swing-specific parameters based on spec
+              let reach, height, angle, damage, effectColor;
+              switch (comboState.count) {
+                case 1: // Frontal 120°, reach 2.5m
+                  reach = 40; height = 48; angle = 120; damage = 100;
+                  effectColor = '#ff4d4f'; break;
+                case 2: // 150°, reach 2.7m  
+                  reach = 43; height = 52; angle = 150; damage = 120;
+                  effectColor = '#ff6b6b'; break;
+                case 3: // Thrust 60°, reach 3.2m (higher stagger)
+                  reach = 51; height = 32; angle = 60; damage = 140;
+                  effectColor = '#ff8787'; break;
+                case 4: // 180° sweep, reach 3.0m (wider CC)
+                  reach = 48; height = 60; angle = 180; damage = 170;
+                  effectColor = '#ffa8a8'; break;
+                case 5: // Finisher 140°, reach 3.4m (+crit mod)
+                  reach = 54; height = 56; angle = 140; damage = 220;
+                  effectColor = '#ffcccc'; break;
+              }
+              
+              // Apply enhanced melee with swing-specific parameters
+              enhancedMelee(l, reach, height, damage, comboState.count, angle);
+              
+              // Enhanced VFX for each swing type
+              addDistinctSwingFX(l, comboState.count, effectColor, angle);
+              
+              // Wave attacks for later swings (4th/5th)
+              if (comboState.count >= 4) { 
+                wave(l, 1.2, '#ff7a6a', damage * 0.6); 
+              }
+            }
           }
           // Unique & Missy patterned fire with cooldowns
           st._autoState = st._autoState || {};
