@@ -392,7 +392,7 @@ const st={
   time:0, dt:0, running:true, speed:1, started:false,
   stage:1, wave:1, wavesPerStage: PATCH.meta.wavesPerStage, kills:0,
   gold:0, silver:0, tickets:0, gems:0,
-  hp:100, hpMax:100, mp:100, mpMax:100, mpRegen:8,
+  hp:400, hpMax:400, mp:100, mpMax:100, mpRegen:8, // A1 gets 400 HP as specified
   // rage and rageMax derive from PATCH.systems.rage.max
   // Global rage fields (legacy). Per-hero rage fields below are used instead.
   rage:0, rageMax: PATCH.systems.rage.max, rageOn:false, rageDur:0, rageICD:0,
@@ -400,9 +400,9 @@ const st={
   allowAutoRage:false,
   waveClearDelay:800, waveClearT:0,
   players:[
-    {id:'A1',x:220,y:DESIGN_H-160,vx:0,vy:0,grounded:true, dmg:20, alive:true, lane:0, overT:0, overCD:0, rage:0, rageMax:100, rageOn:false, rageDur:0, rageICD:0},
-    {id:'Unique',x:260,y:DESIGN_H-130,vx:0,vy:0,grounded:true,dmg:18, alive:true, lane:1, overT:0, overCD:0, rage:0, rageMax:100, rageOn:false, rageDur:0, rageICD:0},
-    {id:'Missy',x:240,y:DESIGN_H-100,vx:0,vy:0,grounded:true,dmg:18, alive:true, lane:2, overT:0, overCD:0, rage:0, rageMax:100, rageOn:false, rageDur:0, rageICD:0}
+    {id:'A1',x:220,y:DESIGN_H-160,vx:0,vy:0,grounded:true, dmg:80, alive:true, lane:0, overT:0, overCD:0, rage:0, rageMax:100, rageOn:false, rageDur:0, rageICD:0, def:40}, // High def for A1
+    {id:'Unique',x:260,y:DESIGN_H-130,vx:0,vy:0,grounded:true,dmg:220, alive:true, lane:1, overT:0, overCD:0, rage:0, rageMax:100, rageOn:false, rageDur:0, rageICD:0, def:15}, // Unique shots 200-300dmg
+    {id:'Missy',x:240,y:DESIGN_H-100,vx:0,vy:0,grounded:true,dmg:200, alive:true, lane:2, overT:0, overCD:0, rage:0, rageMax:100, rageOn:false, rageDur:0, rageICD:0, def:15} // Missy 200 damage
   ],
   leader:0, lastSwap:0,
   shots:[], eShots:[], enemies:[], pickups:[], effects:[],
@@ -1331,12 +1331,29 @@ function tryReflectDuringMelee(attacker){
   if(st.parryT<=0) return;
   const reachX = 54;
   const reachY = 36;
+  let reflectedCount = 0;
+  
   for(const b of st.eShots){
     if(!b || b.life <= 0) continue;
     if(Math.abs(b.x - attacker.x) < reachX && Math.abs(b.y - (attacker.y - 20)) < reachY){
       if(st._reflectLeft!=null && st._reflectLeft<=0) break;
+      
+      // Enhanced A1 deflect system: 2-4x damage multiplier and 5-6x bullet size
+      let damageMult = PATCH.combat.reflect.playerMelee.dmgMul || 1.2;
+      let sizeMult = 1;
+      
+      if(attacker.id === 'A1'){
+        // A1 gets enhanced deflect: 2-4x damage and 5-6x size
+        damageMult = 2 + Math.random() * 2; // 2-4x damage
+        sizeMult = 5 + Math.random(); // 5-6x size
+        
+        // Visual effects for enhanced deflect
+        addFloater(b.x, b.y, 'DEFLECT!', '#ffd56a');
+        addCrescent(attacker.x+24, attacker.y-36, 1, '#ff4d4f');
+      }
+      
       // flip projectile to player
-      const nvx = Math.abs(b.vx); // ensure it travels rightward (toward enemies)
+      const nvx = Math.abs(b.vx) * 1.5; // Make reflected bullets faster
       const nvy = b.vy * 0.5;
       b.vx = nvx;
       b.vy = nvy;
@@ -1344,10 +1361,23 @@ function tryReflectDuringMelee(attacker){
       b.owner = 'player';
       b.team = 'player';
       b.pierce = (b.pierce || 0) + 1;
-      const mul = PATCH.combat.reflect.playerMelee.dmgMul || 1.2;
-      b.dmg = Math.round((b.dmg || 10) * ( (st._reflectPingpong && st._reflectPingpong>0) ? (mul*2) : mul));
+      
+      // Apply enhanced damage and size
+      b.dmg = Math.round((b.dmg || 10) * damageMult);
+      if(sizeMult > 1){
+        b.w = (b.w || 6) * sizeMult;
+        b.h = (b.h || 4) * sizeMult;
+        b._enhanced = true; // Mark for special rendering
+      }
+      
       if(st._reflectLeft!=null) st._reflectLeft--;
+      reflectedCount++;
     }
+  }
+  
+  // A1 can reflect 3-7 bullets per parry window as specified
+  if(attacker.id === 'A1' && reflectedCount > 0){
+    st.parryT = Math.max(st.parryT, 350); // Extend parry window slightly
   }
 }
 
@@ -1421,15 +1451,16 @@ function spawnWave(){
     // Determine number of enemies by stage using PATCH.waves.sizes.  Use enemiesPerWave() helper.
     const n = enemiesPerWave(st.stage);
     for(let i=0; i<n; i++){
-      const hpBase = 80 + (st.stage - 1) * 40 + st.wave * 8;
+      const hpBase = 50; // Mobs are easy to kill with 50 HP as specified
       const e = {
         kind: 'mob',
-        x: DESIGN_W + 120 + i * 60,
+        x: DESIGN_W/2 + 60 + Math.random() * 100, // Teleport halfway onto screen, not from edge
         y: laneY([0,1,2][i % 3]),
         hp: hpBase,
         max: hpBase,
-        vx: -0.30 - 0.02 * st.stage,
-        fireCD: 1200 + Math.random() * 800
+        vx: (-0.30 - 0.02 * st.stage) * PATCH.systems.enemyMoveScale, // Apply movement scaling
+        fireCD: (1200 + Math.random() * 800) / PATCH.systems.enemyFireRateScale, // Apply fire rate scaling
+        _justTeleported: true // Mark as teleported for visual effect
       };
       if(st._giantMode){
         // Giant Mode: power up mobs and add a simple dash skill
@@ -1480,13 +1511,14 @@ function spawnWave(){
     const hp = Math.round((900 + (st.stage - 1) * 220) * 1.30);
     const b = {
       kind: bossKind,
-      x: DESIGN_W - 260,
+      x: DESIGN_W/2 + 100 + Math.random() * 100, // Teleport halfway onto screen instead of edge
       y: laneY(1),
       hp: hp,
       max: hp,
       vx: 0,
       phase2: false,
-      fireCD: 600
+      fireCD: 600,
+      _justTeleported: true // Mark as teleported for visual effect
     };
     if(st._giantMode){ b.hp = Math.round(b.hp * 2.0); b.max = b.hp; }
     b.shieldT = 5000;
@@ -1688,15 +1720,41 @@ function loop(t){
       }
     }
   }
-  // manual/auto primary cadence
+  // manual/auto primary cadence - ALL CHARACTERS ATTACK TOGETHER
   if(hold.shoot){
     // A1 short melee cadence only; 3–5 hit combo with heavy swings; 4th/5th emits mid-size wave (70 dmg)
     if((st.time%0.28)<0.02){
       st._a1Combo = (st._a1Combo||0) + 1; if(st._a1Combo>5) st._a1Combo=1;
+      
+      // A1 attacks
       const base = enable_v13_7_damage_overrides ? (50 + Math.floor(Math.random()*71)) : (l.dmg||50);
       melee(l,32,42,base);
       addCrescent(l.x+24, l.y-36, 1, '#ff4d4f');
       if(st._a1Combo>=4){ wave(l,1.0,'#ff7a6a', enable_v13_7_damage_overrides?70:Math.round(l.dmg*0.9)); }
+      
+      // ALL OTHER CHARACTERS ATTACK SIMULTANEOUSLY
+      for(const p of st.players){
+        if(p.id === 'A1' || !p.alive) continue; // Skip A1 and dead players
+        
+        if(p.id === 'Unique'){
+          // Unique fires her giant piercing shots
+          const t=nearestEnemy(p)||{x:p.x+300,y:p.y}; 
+          const ang=Math.atan2(t.y-(p.y-40), t.x-(p.x+10));
+          const w=120, h=48; const sp=340;
+          const dmg = 200 + Math.floor(Math.random()*101); // 200-300 damage
+          st.shots.push({kind:'unique_big', x:p.x+10,y:p.y-40,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,speed:sp,dmg,life:3200,laneY:p.y,homing:true, spawnAir: !p.grounded, w, h, ownerId:p.id, pierce:5, isGiant:true});
+        }
+        else if(p.id === 'Missy'){
+          // Missy fires her piercing pistol shots
+          const t=nearestEnemy(p)||{x:p.x+260,y:p.y}; 
+          const ang=Math.atan2(t.y-(p.y-40), t.x-(p.x+10));
+          const sp=500; const shots = 2;
+          for(let k=0;k<shots;k++){
+            const pdmg = 200; // 200 damage
+            st.shots.push({kind:'missy_pistol', x:p.x+10,y:p.y-40,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,speed:sp,dmg:pdmg,life:2200,laneY:p.y,homing:true, spawnAir: !p.grounded, ownerId:p.id, pierce:3, pierceHits:0, maxPierceHits:3});
+          }
+        }
+      }
     }
     // Unique & Missy patterned fire with cooldowns
     st._autoState = st._autoState || {};
@@ -1704,11 +1762,12 @@ function loop(t){
       state.cd = Math.max(0, state.cd - st.dt*1000);
       if(state.cd>0) continue;
       if(id==='Unique'){
-        // Big slow piercer: 1.0–2.0s cooldown, high damage 100–230, knockback on hit
+        // Big slow piercer: Enhanced damage 200-300, giant bullets, pierce effect
         const t=nearestEnemy(p)||{x:p.x+300,y:p.y}; const ang=Math.atan2(t.y-(p.y-40), t.x-(p.x+10));
-        const w=84, h=32; const sp=340; const dmg = enable_v13_7_damage_overrides ? (100 + Math.floor(Math.random()*131)) : Math.max(20, Math.round((p.dmg||20) * 2));
-        st.shots.push({kind:'unique_big', x:p.x+10,y:p.y-40,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,speed:sp,dmg,life:3200,laneY:p.y,homing:true, spawnAir: !p.grounded, w, h, ownerId:p.id});
-        state.cd = 1000 + Math.random()*1000;
+        const w=120, h=48; const sp=340; // Giant bullets - much bigger size
+        const dmg = 200 + Math.floor(Math.random()*101); // 200-300 damage as specified
+        st.shots.push({kind:'unique_big', x:p.x+10,y:p.y-40,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,speed:sp,dmg,life:3200,laneY:p.y,homing:true, spawnAir: !p.grounded, w, h, ownerId:p.id, pierce:5, isGiant:true});
+        state.cd = 800 + Math.random()*400; // Faster fire rate for responsiveness
       } else if(id==='Missy'){
         // Missy: sword, sword, pistol, pistol pattern
         const pat = ['S','S','P','P']; const step = pat[state.seqIdx % pat.length]; state.seqIdx++;
@@ -1723,10 +1782,10 @@ function loop(t){
           const t=nearestEnemy(p)||{x:p.x+260,y:p.y}; const ang=Math.atan2(t.y-(p.y-40), t.x-(p.x+10));
           const sp=500; const shots = 2 + Math.floor(Math.random()*2);
           for(let k=0;k<shots;k++) setTimeout(()=>{
-            const pdmg = enable_v13_7_damage_overrides ? (40+Math.floor(Math.random()*61)) : Math.max(8, Math.round(p.dmg*0.9));
-            st.shots.push({kind:'missy_pistol', x:p.x+10,y:p.y-40,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,speed:sp,dmg:pdmg,life:2200,laneY:p.y,homing:true, spawnAir: !p.grounded, ownerId:p.id});
+            const pdmg = 200; // 200 damage as specified
+            st.shots.push({kind:'missy_pistol', x:p.x+10,y:p.y-40,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,speed:sp,dmg:pdmg,life:2200,laneY:p.y,homing:true, spawnAir: !p.grounded, ownerId:p.id, pierce:3, pierceHits:0, maxPierceHits:3}); // Pierce hits 2-3 enemies
           }, k*80);
-          state.cd = 520; // slower cadence
+          state.cd = 450; // Increased fire rate
         }
       }
     }
@@ -1806,9 +1865,14 @@ function loop(t){
     if(e.dizzyT && e.dizzyT>0){ e.dizzyT-=st.dt*1000; if(e.dizzyT<0) e.dizzyT=0; }
     // Apply slow and clamp approach to center screen
     if(e.slowT && e.slowT>0){ e.slowT -= st.dt*1000; e.vx *= 0.9; }
-    e.x += (e.vx||0)*DESIGN_W*st.dt;
-    // prevent passing center of field
-    e.x = Math.max(DESIGN_W/2, e.x);
+    e.x += (e.vx||0)*DESIGN_W*st.dt * PATCH.systems.enemyMoveScale; // Apply enemy move scaling (25% slower)
+    // prevent passing center of field unless they do close combat (melee enemies)
+    if(e.kind === 'mob' || e.kind === 'chestBoss' || (e.kind && e.kind.startsWith('boss'))){
+      // Only allow close combat enemies to pass center, others stay at center or further
+      if(!e.isMelee){
+        e.x = Math.max(DESIGN_W/2, e.x);
+      }
+    }
     // Missy wall barrier: stop enemies at wall and let them chip it
     if(st._wall && st._wall.hp>0){ const wx = st._wall.x; if(e.x < wx){ e.x = wx; if(Math.random()<0.02){ st._wall.hp -= 10; if(st._wall.hp<=0){ addFloater(wx, laneY(1)-60, 'Wall Broken', '#ff7a6a'); st._wall=null; } } } }
     // light jitter and dodge to avoid sync walls for mobs
@@ -2574,7 +2638,24 @@ function draw(){
       }
     }
   }
-  ctx.fillStyle='#ffb18b'; for(const b of st.eShots){ ctx.fillRect(b.x-3,b.y-2,6,4); }
+  // Render enemy shots with enhanced reflected bullets
+  for(const b of st.eShots){ 
+    if(b._enhanced){
+      // Enhanced reflected bullets are much bigger and more visible
+      const w = b.w || 30; // Much bigger than default 6
+      const h = b.h || 20; // Much bigger than default 4
+      ctx.fillStyle='#ffd56a'; // Golden color for enhanced bullets
+      ctx.globalAlpha = 0.9;
+      ctx.fillRect(b.x-w/2,b.y-h/2,w,h);
+      // Add glow effect
+      ctx.strokeStyle='#ff7a31'; ctx.lineWidth = 2;
+      ctx.strokeRect(b.x-w/2,b.y-h/2,w,h);
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.fillStyle='#ffb18b'; 
+      ctx.fillRect(b.x-3,b.y-2,6,4); 
+    }
+  }
   // Debug: Leader Scaler (dev only)
   try {
     if (/(^|[?&])dev=1(&|$)/.test(location.search)){
