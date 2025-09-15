@@ -2870,48 +2870,302 @@
       if (st.dropBoostT > 0) { st.dropBoostT -= st.dt * 1000; if (st.dropBoostT <= 0) { st.dropBoostT = 0; st.dropBoost = 0; } }
       if (st.magnetAuraT > 0) { st.magnetAuraT -= st.dt * 1000; if (st.magnetAuraT <= 0) { st.magnetAuraT = 0; } }
 
-      // formation + movement (followers orbit, dodge, retreat)
+      // Enhanced Party AI system per A1 Combat Spec
+      // formation + movement (followers with intelligent AI states)
       const l = leader();
       const speedBoost = (st._vehicleSpeedBoostT > 0) ? 1.5 : 1;
       const moveSpeedMultiplier = (st.equippedVehicle ? st.equippedVehicle.vehicleData.moveSpeed : 1) * speedBoost;
       l.vx = (joyX || 0) * 0.45 * (st._anyRageOn ? 1.2 : 1) * moveSpeedMultiplier;
       l.vy += 0.002; // slightly stronger gravity
+      
       // Auto center bias
       if (st.auto) { const cx = DESIGN_W * 0.5; l.x += Math.sign(cx - l.x) * 40 * st.dt; }
+      
       // Decrement AI aggro window
       st._aiAggroT = Math.max(0, (st._aiAggroT || 0) - st.dt * 1000);
+      
+      // Initialize party AI state system
+      if (!st._partyAI) {
+        st._partyAI = {
+          stateTimers: { Unique: 0, Missy: 0 },
+          skillCooldowns: { Unique: { defensive: 0, last: 0 }, Missy: { defensive: 0, last: 0 } },
+          lastManualAttack: 0
+        };
+      }
+      
+      // Update party AI timers
+      for (const key in st._partyAI.stateTimers) {
+        st._partyAI.stateTimers[key] = Math.max(0, st._partyAI.stateTimers[key] - st.dt * 1000);
+      }
+      for (const ally in st._partyAI.skillCooldowns) {
+        for (const type in st._partyAI.skillCooldowns[ally]) {
+          st._partyAI.skillCooldowns[ally][type] = Math.max(0, st._partyAI.skillCooldowns[ally][type] - st.dt * 1000);
+        }
+      }
+      
+      // Follow-the-leader mechanics - track manual attacks
+      if (hold.shoot && !st.auto) {
+        st._partyAI.lastManualAttack = performance.now();
+      }
+      
       for (const p of st.players) {
         p._orbitT = (p._orbitT || 0) + st.dt; // idle orbit timer
-        const baseBehind = (st._aiAggroT > 0 ? 60 : 90);
-        const orbit = (p === l ? 0 : (Math.sin(p._orbitT * 2 + (p.id === 'Missy' ? 1.6 : 0)) * 10));
-        let targetX = (p === l ? l.x : l.x - baseBehind - (p === st.players[2] ? 20 : 0) + orbit);
-        const targetY = laneY(p.lane);
-        // Defensive retreat if many enemies or low HP
-        const threat = (st.enemies.length >= 6) || (l.hp < l.hpMax * 0.35);
-        if (p !== l && threat) targetX -= 20;
-        // Hide behind ally: ensure follower X never exceeds leader X-30
-        if (p !== l) targetX = Math.min(targetX, l.x - 30);
-        if (p === l) { p.x += l.vx * DESIGN_W * st.dt; p.y += l.vy * DESIGN_H * st.dt; }
-        else { p.x += (targetX - p.x) * 0.09; p.y += (targetY - p.y) * 0.12; }
-        // Missy short flight window (<=10s, with cooldown)
+        
+        if (p === l) {
+          // Leader movement
+          p.x += l.vx * DESIGN_W * st.dt; 
+          p.y += l.vy * DESIGN_H * st.dt;
+        } else {
+          // Enhanced Party AI for non-leader teammates
+          const aiState = determinePartyAIState(p, l, st);
+          executePartyAIBehavior(p, l, aiState, st);
+        }
+        
+        // Missy flight and universal jump-dodge mechanics
         if (p.id === 'Missy') {
-          p.flightCD = Math.max(0, (p.flightCD || 0) - st.dt * 1000); p.flightT = Math.max(0, (p.flightT || 0) - st.dt * 1000);
-          if (p.flightCD <= 0 && st.enemies.length >= 5) { p.flightT = 6000 + Math.floor(Math.random() * 4000); p.flightCD = 18000; }
+          p.flightCD = Math.max(0, (p.flightCD || 0) - st.dt * 1000); 
+          p.flightT = Math.max(0, (p.flightT || 0) - st.dt * 1000);
+          if (p.flightCD <= 0 && st.enemies.length >= 5) { 
+            p.flightT = 6000 + Math.floor(Math.random() * 4000); 
+            p.flightCD = 18000; 
+          }
           if (p.flightT > 0) { p.vy += 0.001; /* lighter gravity */ }
         }
-        // Jump-dodge enemy bullets
+        
         // Jump-dodge with per-ally cooldown and larger radius
         p._dodgeCD = Math.max(0, (p._dodgeCD || 0) - st.dt * 1000);
-        const nearShot = st.eShots.find(b => { const dx = b.x - p.x, dy = b.y - p.y; return (dx * dx + dy * dy) < (120 * 120); });
-        if (p._dodgeCD <= 0 && nearShot && p.grounded) { p.vy = PATCH.systems.jump.v0; p.grounded = false; p._dodgeCD = 800 + Math.floor(Math.random() * 400); }
-        // ground clamp
-        if (p.y > laneY(p.lane)) { p.y = laneY(p.lane); p.vy = 0; p.grounded = true; } else p.grounded = false;
-        // widen playable range so leader can approach bosses on the right; clamp to screen
+        const nearShot = st.eShots.find(b => { 
+          const dx = b.x - p.x, dy = b.y - p.y; 
+          return (dx * dx + dy * dy) < (120 * 120); 
+        });
+        if (p._dodgeCD <= 0 && nearShot && p.grounded) { 
+          p.vy = PATCH.systems.jump.v0; 
+          p.grounded = false; 
+          p._dodgeCD = 800 + Math.floor(Math.random() * 400); 
+        }
+        
+        // Ground clamp
+        if (p.y > laneY(p.lane)) { 
+          p.y = laneY(p.lane); 
+          p.vy = 0; 
+          p.grounded = true; 
+        } else p.grounded = false;
+        
+        // Widen playable range so leader can approach bosses on the right; clamp to screen
         p.x = Math.max(40, Math.min(DESIGN_W - 40, p.x));
         p.y = Math.max(60, Math.min(DESIGN_H - 60, p.y));
         // Unique beam ticks (bug fix: timer-based)
         if (p.overT > 0) { p.overT -= st.dt * 1000; p.overCD -= st.dt * 1000; if (p.overCD <= 0) { p.overCD = 120; const t = nearestEnemy(p); if (t) { const ang = Math.atan2(t.y - (p.y - 40), t.x - (p.x + 10)); st.shots.push({ x: p.x + 10, y: p.y - 40, vx: Math.cos(ang) * 740, vy: Math.sin(ang) * 740, speed: 740, dmg: applySkillDmg(10), life: 180, laneY: p.y, homing: true, pierce: 3, spawnAir: !p.grounded, ownerId: p.id }); addBeam(p.x + 10, p.y - 40, t.x, t.y, '#63e6ff'); } } }
       }
+
+    // Enhanced Party AI state determination per A1 Combat Spec
+    function determinePartyAIState(ally, leader, gameState) {
+      const leaderHP = leader.hp / leader.hpMax;
+      const allyHP = ally.hp / ally.hpMax;
+      const nearbyEnemies = gameState.enemies.filter(e => {
+        const dist = Math.sqrt((e.x - leader.x) ** 2 + (e.y - leader.y) ** 2);
+        return dist <= 96 && e.hp > 0; // 6m in pixels
+      });
+      const incomingDPS = estimateIncomingDPS(gameState);
+      
+      // Priority 1: Leader HP low (≤35%) → Support
+      if (leaderHP <= 0.35) {
+        return 'Support';
+      }
+      
+      // Priority 2: Ally HP critical (≤20%) and heal available → Support self
+      if (allyHP <= 0.20 && ally.id === 'Missy' && cdReady('Missy', 'S2')) {
+        return 'SelfSupport';
+      }
+      
+      // Priority 3: Clustered enemies within 6m of leader → Protect
+      if (nearbyEnemies.length >= 3) {
+        return 'Protect';
+      }
+      
+      // Priority 4: Priority target exposed (sniper, summoner, elite <50% HP) → Aggressive
+      const priorityTarget = findPriorityTarget(gameState);
+      if (priorityTarget) {
+        return 'Aggressive';
+      }
+      
+      // Priority 5: Overwhelmed (high incoming DPS, no defensive cooldowns) → Retreat
+      if (incomingDPS > 200 && !hasDefensiveCooldowns(ally)) {
+        return 'Retreat';
+      }
+      
+      // Default: Protect (maintain formation)
+      return 'Protect';
+    }
+
+    // Execute AI behavior based on determined state
+    function executePartyAIBehavior(ally, leader, state, gameState) {
+      const dt = gameState.dt;
+      const baseBehind = 80; // 3-6m orbit distance
+      const orbit = Math.sin(ally._orbitT * 2 + (ally.id === 'Missy' ? 1.6 : 0)) * 15;
+      
+      switch (state) {
+        case 'Support':
+          executeSupport(ally, leader, gameState);
+          break;
+        case 'SelfSupport':
+          executeSelfSupport(ally, gameState);
+          break;
+        case 'Protect':
+          executeProtect(ally, leader, gameState, baseBehind, orbit);
+          break;
+        case 'Aggressive':
+          executeAggressive(ally, leader, gameState);
+          break;
+        case 'Retreat':
+          executeRetreat(ally, leader, gameState);
+          break;
+        default:
+          executeProtect(ally, leader, gameState, baseBehind, orbit);
+      }
+      
+      // Follow-the-leader mechanics: mirror leader intent within 0.15-0.35s
+      if (!gameState.auto && gameState._partyAI.lastManualAttack > 0) {
+        const timeSinceManual = performance.now() - gameState._partyAI.lastManualAttack;
+        const delay = 150 + Math.random() * 200; // 0.15-0.35s
+        
+        if (timeSinceManual >= delay && timeSinceManual <= delay + 500) {
+          // Enter Combat posture and target same threat cluster
+          const leaderTarget = nearestEnemy(leader);
+          if (leaderTarget) {
+            // Stagger skill usage by 0.5-1.0s offset
+            const skillOffset = (ally.id === 'Unique' ? 500 : 1000);
+            if (!ally._followLeaderSkillCD || ally._followLeaderSkillCD <= 0) {
+              useSkill(ally, 'S1');
+              ally._followLeaderSkillCD = skillOffset;
+            }
+          }
+        }
+      }
+      
+      // Update follow-leader skill cooldown
+      if (ally._followLeaderSkillCD > 0) {
+        ally._followLeaderSkillCD -= dt * 1000;
+      }
+    }
+
+    // Support state: heals, shields, cleanse, damage-mitigation skills
+    function executeSupport(ally, leader, gameState) {
+      const targetX = leader.x - 60; // Stay close for healing
+      const targetY = laneY(ally.lane);
+      
+      ally.x += (targetX - ally.x) * 0.15; // Faster positioning for support
+      ally.y += (targetY - ally.y) * 0.15;
+      
+      // Reserve defensive skills for leader
+      if (ally.id === 'Missy' && cdReady('Missy', 'S2')) {
+        // Winged Aegis - team heal + shields
+        useSkill(ally, 'S2');
+        gameState._partyAI.skillCooldowns.Missy.defensive = 3000; // Reserve timer
+      } else if (ally.id === 'Unique' && cdReady('Unique', 'S2')) {
+        // Defensive boost/taunt
+        useSkill(ally, 'S2');
+        gameState._partyAI.skillCooldowns.Unique.defensive = 3000;
+      }
+    }
+
+    // Self-support for critical HP allies
+    function executeSelfSupport(ally, gameState) {
+      // Move to safer position
+      const safeX = Math.max(60, gameState.players[gameState.leader].x - 120);
+      const targetY = laneY(ally.lane);
+      
+      ally.x += (safeX - ally.x) * 0.12;
+      ally.y += (targetY - ally.y) * 0.12;
+      
+      // Use self-heal if available
+      if (ally.id === 'Missy' && cdReady('Missy', 'S2')) {
+        useSkill(ally, 'S2');
+      }
+    }
+
+    // Protect state: stay near leader, intercept threats, body-block
+    function executeProtect(ally, leader, gameState, baseBehind, orbit) {
+      let targetX = leader.x - baseBehind + orbit;
+      const targetY = laneY(ally.lane);
+      
+      // Body-block positioning - get between leader and nearest threat
+      const nearestThreat = nearestEnemy(leader);
+      if (nearestThreat && nearestThreat.x > leader.x) {
+        const interceptX = leader.x + (nearestThreat.x - leader.x) * 0.6;
+        targetX = Math.max(targetX, interceptX);
+      }
+      
+      // Stay within 3-6m orbit unless urgent intercept needed
+      targetX = Math.max(leader.x - 96, Math.min(leader.x - 48, targetX));
+      
+      ally.x += (targetX - ally.x) * 0.09;
+      ally.y += (targetY - ally.y) * 0.12;
+      
+      // Use CC and bullet control skills
+      if (gameState.eShots.length > 3 && cdReady(ally.id, 'S1')) {
+        useSkill(ally, 'S1'); // Use reflecting/CC skills
+      }
+    }
+
+    // Aggressive state: push to eliminate high-threat enemies
+    function executeAggressive(ally, leader, gameState) {
+      const priorityTarget = findPriorityTarget(gameState);
+      
+      if (priorityTarget) {
+        // Move towards priority target for 3-5s
+        const chaseX = Math.min(priorityTarget.x - 80, leader.x + 100); // Don't overextend
+        const targetY = priorityTarget.y;
+        
+        ally.x += (chaseX - ally.x) * 0.14; // Faster aggressive movement
+        ally.y += (targetY - ally.y) * 0.16;
+        
+        // Focus fire on priority target
+        if (cdReady(ally.id, 'S1')) {
+          useSkill(ally, 'S1');
+        }
+        
+        // Set timer to return to formation
+        gameState._partyAI.stateTimers[ally.id] = 3000 + Math.random() * 2000; // 3-5s
+      }
+    }
+
+    // Retreat state: fall back behind cover for 2-3s
+    function executeRetreat(ally, leader, gameState) {
+      const retreatX = Math.max(40, leader.x - 140); // Fall back behind leader
+      const targetY = laneY(ally.lane);
+      
+      ally.x += (retreatX - ally.x) * 0.16; // Fast retreat
+      ally.y += (targetY - ally.y) * 0.16;
+      
+      // Set retreat timer
+      if (gameState._partyAI.stateTimers[ally.id] <= 0) {
+        gameState._partyAI.stateTimers[ally.id] = 2000 + Math.random() * 1000; // 2-3s
+      }
+    }
+
+    // Helper functions for Party AI
+    function findPriorityTarget(gameState) {
+      return gameState.enemies.find(e => {
+        if (e.hp <= 0) return false;
+        // Snipers, summoners, elites under 50% HP
+        if (e.role === 'shooter') return true;
+        if (e.kind === 'wave_leader' && e.hp < e.max * 0.5) return true;
+        if ((e.kind === 'miniboss' || e._isElite) && e.hp < e.max * 0.5) return true;
+        return false;
+      });
+    }
+
+    function estimateIncomingDPS(gameState) {
+      let dps = 0;
+      dps += gameState.eShots.length * 15; // Rough estimate based on bullet count
+      dps += gameState.enemies.filter(e => e.role === 'shooter').length * 25;
+      return dps;
+    }
+
+    function hasDefensiveCooldowns(ally) {
+      return cdReady(ally.id, 'S2') || cdReady(ally.id, 'S3');
+    }
 
       // auto & manual fire / skills
       if (st.auto) {
