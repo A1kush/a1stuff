@@ -2567,6 +2567,11 @@
       return best;
     }
     function spawnWave() {
+      // Enhanced spawning with position restrictions per A1 Combat Spec
+      const centerX = DESIGN_W / 2; // Center line of arena
+      const leaderPlayer = leader();
+      const minBossDistance = 96; // 6m converted to pixels (assuming ~16px per meter)
+      
       // spawn mobs for normal waves or a stage boss on the final wave.  The boss type scales
       // with the current stage (capped at BOSS_COUNT) and may randomly be replaced by a chest boss.
       if (st.wave < st.wavesPerStage) {
@@ -2595,6 +2600,8 @@
           applyEnemyScalars(e);
           st.enemies.push(e);
         }
+        
+        // Enhanced ranged enemy spawning with center line restrictions
         const numShooters = Math.floor(n / 3); // Spawn 1 shooter for every 3 melee mobs
         for (let i = 0; i < numShooters; i++) {
             const hpBase = 60 + (st.stage - 1) * 30 + st.wave * 6; // Shooters are weaker
@@ -2606,57 +2613,115 @@
                 hp: hpBase,
                 max: hpBase,
                 vx: -0.20 - 0.015 * st.stage, // Slower than melee
-                fireCD: 800 + Math.random() * 500 // Fires faster
+                fireCD: 800 + Math.random() * 500, // Fires faster
+                // Enhanced positioning restrictions per spec
+                _maxX: centerX + 20, // Cannot cross past center line + small buffer
+                _isRanged: true,
+                _originalVx: -0.20 - 0.015 * st.stage // Store original speed for clamping
             };
             applyEnemyScalars(e);
             st.enemies.push(e);
         }
-        // chance to spawn a miniboss between waves 5–7
+        
+        // chance to spawn a miniboss between waves 5–7 with enhanced positioning
         if (st.wave >= PATCH.waves.miniboss.waveMin && st.wave <= PATCH.waves.miniboss.waveMax && Math.random() < PATCH.waves.miniboss.chance) {
           const hp = Math.round((350 + st.stage * 120) * 1.30);
-          const m = { kind: 'miniboss', x: DESIGN_W - 140, y: laneY(1), hp: hp, max: hp, vx: -0.12, fireCD: 1000, shieldT: 5000 };
+          // Ensure miniboss spawns at least 6m from leader
+          let spawnX = DESIGN_W - 140;
+          if (leaderPlayer && Math.abs(spawnX - leaderPlayer.x) < minBossDistance) {
+            spawnX = leaderPlayer.x + minBossDistance + 20; // Add buffer
+          }
+          const m = { 
+            kind: 'miniboss', 
+            x: Math.min(spawnX, DESIGN_W - 60), // Don't spawn off-screen
+            y: laneY(1), 
+            hp: hp, 
+            max: hp, 
+            vx: -0.12, 
+            fireCD: 1000, 
+            shieldT: 5000,
+            _isElite: true // Mark as elite for flinch resistance
+          };
           if (st._giantMode) { m.hp = Math.round(m.hp * 1.7); m.max = m.hp; }
           applyEnemyScalars(m);
           st.enemies.push(m);
         }
-        // chance to spawn a gift-box boss (piñata) between waves 2–9
+        
+        // chance to spawn a gift-box boss (piñata) between waves 2–9 with enhanced positioning
         if (st.wave >= PATCH.waves.giftBoxBoss.waveMin && st.wave <= PATCH.waves.giftBoxBoss.waveMax && Math.random() < PATCH.waves.giftBoxBoss.chance) {
           const hp = Math.round((420 + st.stage * 80) * 1.30);
-          const gb = { kind: 'chestBoss', x: DESIGN_W - 220, y: laneY(1), hp: hp, max: hp, vx: -0.10, canHurt: false, shieldT: 5000 };
+          // Ensure chest boss spawns at least 6m from leader  
+          let spawnX = DESIGN_W - 220;
+          if (leaderPlayer && Math.abs(spawnX - leaderPlayer.x) < minBossDistance) {
+            spawnX = leaderPlayer.x + minBossDistance + 20;
+          }
+          const gb = { 
+            kind: 'chestBoss', 
+            x: Math.min(spawnX, DESIGN_W - 60),
+            y: laneY(1), 
+            hp: hp, 
+            max: hp, 
+            vx: -0.10, 
+            canHurt: false, 
+            shieldT: 5000,
+            _isBoss: true // Mark as boss for flinch resistance
+          };
           if (st._giantMode) { gb.hp = Math.round(gb.hp * 2.0); gb.max = gb.hp; }
           applyEnemyScalars(gb);
           st.enemies.push(gb);
         }
-        // Wave Leader on even waves: spawn behind frontline
+        
+        // Wave Leader on even waves: spawn behind frontline with positioning rules
         if ((st.wave % 2) === 0) {
           const LHP = 1000;
+          // Ensure wave leader spawns at least 6m from player leader
+          let spawnX = DESIGN_W - 260;
+          if (leaderPlayer && Math.abs(spawnX - leaderPlayer.x) < minBossDistance) {
+            spawnX = leaderPlayer.x + minBossDistance + 20;
+          }
           const leader = {
-            kind: 'wave_leader', x: DESIGN_W - 260, y: laneY(1), hp: LHP, max: LHP, vx: -0.06, fireCD: 1600,
+            kind: 'wave_leader', 
+            x: Math.min(spawnX, DESIGN_W - 60), 
+            y: laneY(1), 
+            hp: LHP, 
+            max: LHP, 
+            vx: -0.06, 
+            fireCD: 1600,
             reflectCD: 0, reflectOn: false, reflectT: 0,
             nextSpell: 'heal', spellCD: 1500, spellIdx: 0,
             name: makeLeaderName(), atk: 30 + st.stage * 2, def: 10 + st.stage,
-            secret: (st._leaderSecretScale || 0)
+            secret: (st._leaderSecretScale || 0),
+            _isElite: true // Mark as elite for flinch resistance
           };
           if (st._giantMode) { leader.hp = Math.round(leader.hp * 1.7); leader.max = leader.hp; }
           applyEnemyScalars(leader);
           st.enemies.push(leader);
         }
       } else {
+        // Enhanced boss spawning with minimum distance requirements
         // Determine which boss pattern to use based on stage.  Only BOSS_COUNT unique patterns
         // exist; later stages reuse the final pattern.  Chest boss still has a 50% chance.
         const idx = Math.min(st.stage, BOSS_COUNT);
         const useChest = rng() < 0.5;
         const bossKind = useChest ? 'chestBoss' : 'boss' + idx;
         const hp = Math.round((900 + (st.stage - 1) * 220) * 1.30);
+        
+        // Ensure boss spawns at least 6m from leader player per spec
+        let spawnX = DESIGN_W - 260;
+        if (leaderPlayer && Math.abs(spawnX - leaderPlayer.x) < minBossDistance) {
+          spawnX = leaderPlayer.x + minBossDistance + 30; // Extra buffer for bosses
+        }
+        
         const b = {
           kind: bossKind,
-          x: DESIGN_W - 260,
+          x: Math.min(spawnX, DESIGN_W - 80), // Ensure boss doesn't spawn off-screen
           y: laneY(1),
           hp: hp,
           max: hp,
           vx: 0,
           phase2: false,
-          fireCD: 600
+          fireCD: 600,
+          _isBoss: true // Mark as boss for flinch resistance
         };
         if (st._giantMode) { b.hp = Math.round(b.hp * 2.0); b.max = b.hp; }
         b.shieldT = 5000;
@@ -2966,13 +3031,42 @@
             state.cd = Math.max(0, state.cd - st.dt * 1000);
             if (state.cd > 0) continue;
             if (id === 'Unique') {
-              // Big slow piercer: 1.0–2.0s cooldown, high damage 100–230, knockback on hit
-              const t = nearestEnemy(p) || { x: p.x + 300, y: p.y }; const ang = Math.atan2(t.y - (p.y - 40), t.x - (p.x + 10));
-              const w = 84, h = 32; const sp = 340; const dmg = enable_v13_7_damage_overrides ? (100 + Math.floor(Math.random() * 131)) : Math.max(20, Math.round((p.dmg || 20) * 2));
-              st.shots.push({ kind: 'unique_big', x: p.x + 10, y: p.y - 40, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, speed: sp, dmg, life: 3200, laneY: p.y, homing: true, spawnAir: !p.grounded, w, h, ownerId: p.id });
-              state.cd = 1000 + Math.random() * 1000;
+              // Enhanced Unique weapon feel: higher fire rate, erratic bullet spread with sine jitter
+              const t = nearestEnemy(p) || { x: p.x + 300, y: p.y }; 
+              const baseAng = Math.atan2(t.y - (p.y - 40), t.x - (p.x + 10));
+              
+              // Mildly erratic spread that "breathes" with sine jitter
+              const breathePhase = (st.time * 3.2) % (Math.PI * 2); // 3.2 Hz breathing
+              const breatheIntensity = Math.sin(breathePhase) * 0.15; // ±0.15 radians variation
+              const jitterSpread = (Math.random() - 0.5) * 0.25; // ±0.125 radians random jitter
+              const finalAng = baseAng + breatheIntensity + jitterSpread;
+              
+              const w = 84, h = 32; 
+              const sp = 420; // Increased from 340 for higher fire rate feel
+              const dmg = enable_v13_7_damage_overrides ? (100 + Math.floor(Math.random() * 131)) : Math.max(20, Math.round((p.dmg || 20) * 2));
+              
+              st.shots.push({ 
+                kind: 'unique_big', 
+                x: p.x + 10, 
+                y: p.y - 40, 
+                vx: Math.cos(finalAng) * sp, 
+                vy: Math.sin(finalAng) * sp, 
+                speed: sp, 
+                dmg, 
+                life: 3200, 
+                laneY: p.y, 
+                homing: true, 
+                spawnAir: !p.grounded, 
+                w, h, 
+                ownerId: p.id,
+                _uniqueErratic: true // Mark for additional erratic behavior
+              });
+              
+              // Faster reload - reduced from 1000-2000ms to 600-1200ms
+              state.cd = 600 + Math.random() * 600;
+              
             } else if (id === 'Missy') {
-              // Missy: sword, sword, pistol, pistol pattern
+              // Enhanced Missy weapon feel: quirky/curvy bullet paths with gentle homing
               const pat = ['S', 'S', 'P', 'P']; const step = pat[state.seqIdx % pat.length]; state.seqIdx++;
               if (step === 'S') {
                 const base = enable_v13_7_damage_overrides ? (50 + Math.floor(Math.random() * 71)) : (p.dmg || 50);
@@ -2982,11 +3076,36 @@
                 addAfterImage(p.x, p.y, '#ff8c6a');
                 state.cd = 300; // quick slashes
               } else {
-                const t = nearestEnemy(p) || { x: p.x + 260, y: p.y }; const ang = Math.atan2(t.y - (p.y - 40), t.x - (p.x + 10));
-                const sp = 500; const shots = 2 + Math.floor(Math.random() * 2);
+                const t = nearestEnemy(p) || { x: p.x + 260, y: p.y }; 
+                const baseAng = Math.atan2(t.y - (p.y - 40), t.x - (p.x + 10));
+                const sp = 500; 
+                const shots = 2 + Math.floor(Math.random() * 2);
+                
                 for (let k = 0; k < shots; k++) setTimeout(() => {
-                  const pdmg = enable_v13_7_damage_overrides ? (40 + Math.floor(Math.random() * 61)) : Math.max(8, Math.round(p.dmg * 0.9));
-                  st.shots.push({ kind: 'missy_pistol', x: p.x + 10, y: p.y - 40, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, speed: sp, dmg: pdmg, life: 2200, laneY: p.y, homing: true, spawnAir: !p.grounded, ownerId: p.id });
+                  // Quirky/curvy bullet paths - add initial curve bias
+                  const curveBias = (Math.random() - 0.5) * 0.4; // ±0.2 radians curve
+                  const curveAng = baseAng + curveBias;
+                  
+                  // Slightly lower base damage but high status uptime
+                  const pdmg = enable_v13_7_damage_overrides ? (35 + Math.floor(Math.random() * 51)) : Math.max(8, Math.round(p.dmg * 0.8));
+                  
+                  st.shots.push({ 
+                    kind: 'missy_pistol', 
+                    x: p.x + 10, 
+                    y: p.y - 40, 
+                    vx: Math.cos(curveAng) * sp, 
+                    vy: Math.sin(curveAng) * sp, 
+                    speed: sp, 
+                    dmg: pdmg, 
+                    life: 2200, 
+                    laneY: p.y, 
+                    homing: true, 
+                    spawnAir: !p.grounded, 
+                    ownerId: p.id,
+                    _missyCurvy: true, // Mark for bezier sway behavior
+                    _curvePhase: Math.random() * Math.PI * 2, // Random curve phase
+                    _curveIntensity: 30 + Math.random() * 20 // Curve strength
+                  });
                 }, k * 80);
                 state.cd = 520; // slower cadence
               }
@@ -3042,6 +3161,48 @@
             const t = nearestEnemy({ x: s.x, y: s.laneY }); if (t) { const ax = t.x - s.x, ay = t.y - s.y; const m = Math.hypot(ax, ay) || 1; s.vx = (ax / m) * s.speed; s.vy = (ay / m) * s.speed; }
           }
         }
+        
+        // Enhanced projectile behaviors per A1 Combat Spec
+        
+        // Unique erratic spread with breathing pattern
+        if (s._uniqueErratic) {
+          s._breatheT = (s._breatheT || 0) + st.dt;
+          const breatheFreq = 2.8; // Hz
+          const breathePhase = s._breatheT * breatheFreq * Math.PI * 2;
+          const breatheOffset = Math.sin(breathePhase) * 8; // ±8 pixel offset
+          s.y += breatheOffset * st.dt;
+        }
+        
+        // Missy curvy bullet paths with bezier sway
+        if (s._missyCurvy) {
+          s._curveT = (s._curveT || 0) + st.dt;
+          s._curvePhase = (s._curvePhase || 0) + st.dt * 4; // Sway frequency
+          
+          // Apply gentle homing with curve bias
+          const t = nearestEnemy({ x: s.x, y: s.y });
+          if (t) {
+            const dx = t.x - s.x;
+            const dy = t.y - s.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist > 0) {
+              // Gentle homing force
+              const homingStrength = 0.15; // Reduced for quirky paths
+              const targetAng = Math.atan2(dy, dx);
+              const currentAng = Math.atan2(s.vy, s.vx);
+              
+              // Add curve sway
+              const curveOffset = Math.sin(s._curvePhase) * 0.3; // ±0.3 radians
+              const swayAng = targetAng + curveOffset;
+              
+              // Blend current direction with sway direction
+              const newAng = currentAng + (swayAng - currentAng) * homingStrength * st.dt;
+              s.vx = Math.cos(newAng) * s.speed;
+              s.vy = Math.sin(newAng) * s.speed;
+            }
+          }
+        }
+        
         // update position
         s.x += s.vx * st.dt; s.y += s.vy * st.dt; s.life -= st.dt * 1000;
         // Floor-rider waves: stick to lane y with subtle bob; zero vertical drift
@@ -3086,6 +3247,16 @@
 
         // clamp to screen bounds and small margin; prevent moving offscreen or backwards past spawn edge
         e.x = Math.max(40, Math.min(DESIGN_W - 40, e.x));
+        
+        // Enhanced enemy positioning restrictions per A1 Combat Spec
+        if (e._isRanged && e._maxX) {
+          // Flying and ranged enemies cannot cross past center line toward player start side
+          e.x = Math.max(e.x, e._maxX);
+          // If enemy tries to cross, apply steering force to hold position
+          if (e.x <= e._maxX && e.vx < 0) {
+            e.vx = Math.abs(e._originalVx || e.vx) * 0.3; // Slow reverse movement
+          }
+        }
         
         if (e.role === 'shooter') {
             const desiredX = frontX + 150; // Try to stay 150px behind the front
