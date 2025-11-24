@@ -1,0 +1,279 @@
+{
+  "assetManifest": {
+    "version": 1,
+    "generatedAt": "2025-11-09T00:00:00.000Z",
+    "assets": [
+      { "id": "pet_firecub", "path": "assets/pets/pet_firecub.webp", "type": "image" },
+      { "id": "pet_earthgolem", "path": "assets/pets/pet_earthgolem.webp", "type": "image" },
+      { "id": "pet_lightningbird", "path": "assets/pets/pet_lightningbird.webp", "type": "image" },
+      { "id": "pet_icewolf", "path": "assets/pets/pet_icewolf.webp", "type": "image" },
+      { "id": "pet_magicfrog", "path": "assets/pets/pet_magicfrog.webp", "type": "image" },
+      { "id": "veh_hoverbike", "path": "assets/veh/vehicle_hoverbike_sprite.webp", "type": "image" },
+      { "id": "veh_jetcart", "path": "assets/veh/vehicle_jetcart.webp", "type": "image" },
+      { "id": "veh_dunebuggy", "path": "assets/veh/Monster Truck vehicl.webp", "type": "image" },
+      { "id": "veh_cybercar", "path": "assets/veh/vehicle_car_sports_sprite.webp", "type": "image" },
+      { "id": "veh_mechwalker", "path": "assets/veh/Tank vehicle sprite .webp", "type": "image" }
+    ]
+  },
+  "bagManifest": {
+    "version": "1.1.0",
+    "lastUpdated": "2025-11-11T00:00:00Z",
+    "description": "A1K Ultimate bag manifest aligned with the runner game's production datasets - OFFLINE VERSION",
+    "tabs": [
+      { "id": "items", "label": "Items", "renderer": "renderItemsTab", "order": 1 },
+      { "id": "gear", "label": "Gear", "renderer": "renderGearTab", "order": 2 },
+      { "id": "player", "label": "Player", "renderer": "renderPlayerTab", "order": 3 },
+      { "id": "abilities", "label": "Abilities", "renderer": "renderAbilitiesTab", "order": 4 },
+      { "id": "alchemy", "label": "Alchemy", "renderer": "renderAlchemyTab", "order": 5 },
+      { "id": "quests", "label": "Quest & Collection", "renderer": "renderQuestsTab", "order": 6 },
+      { "id": "map", "label": "Map", "renderer": "renderMapTab", "order": 7 },
+      { "id": "shop", "label": "Shop", "renderer": "renderShopTab", "order": 8 },
+      { "id": "settings", "label": "Settings", "renderer": "renderSettingsTab", "order": 9 }
+    ],
+    "shop": {
+      "totalItems": 22,
+      "categories": ["consumable", "misc", "gear", "scroll", "srank"]
+    },
+    "stateDependencies": {
+      "gameState": [
+        "gold",
+        "gems",
+        "keys",
+        "tickets",
+        "inventory.items",
+        "inventory.gear",
+        "inventory.pets",
+        "inventory.vehicles",
+        "equipped"
+      ]
+    },
+    "characters": {
+      "A1": {
+        "id": "A1",
+        "name": "A1",
+        "title": "Boss Slayer",
+        "color": "#ff4d4f"
+      },
+      "UNIQUE": {
+        "id": "UNIQUE",
+        "name": "UNIQUE",
+        "title": "Tech Support",
+        "color": "#74b9ff"
+      },
+      "MISSY": {
+        "id": "MISSY",
+        "name": "MISSY",
+        "title": "Cat Angel",
+        "color": "#ff69b4"
+      }
+    }
+  },
+  "unifiedManifests": {
+    "version": "2.0.0",
+    "description": "Unified manifest for offline A1K Bag System - combines all configuration files",
+    "lastUpdated": "2025-11-11T00:00:00Z",
+    "offlineVersion": true,
+    "bagSystem": {
+      "version": "1.1.0",
+      "description": "A1K Ultimate bag manifest - OFFLINE BUNDLE",
+      "skillCount": 30,
+      "characterCount": 3,
+      "equippedSkillsPerCharacter": 3
+    },
+    "skills": {
+      "total": 30,
+      "perCharacter": 10,
+      "characters": ["A1", "UNIQUE", "MISSY"],
+      "slotsPerCharacter": ["S1", "S2", "S3", "S4", "S5", "X1"],
+      "enhanced": ["S3", "S4", "S5"],
+      "autoEquipped": ["S1", "S2", "S3"],
+      "includeExtended": true,
+      "extendedPerCharacter": 4
+    },
+    "skillConfig": {
+      "version": "1.0.0",
+      "defaultCooldowns": {
+        "S1": 2500,
+        "S2": 6000,
+        "S3": 10000,
+        "S4": 20000,
+        "S5": 24000,
+        "X1": 28000
+      },
+      "damageMultipliers": {
+        "S1": 1.0,
+        "S2": 1.2,
+        "S3": 1.5,
+        "S4": 1.8,
+        "S5": 2.0,
+        "X1": 2.5
+      }
+    },
+    "characters": {
+      "A1": {
+        "name": "A1",
+        "title": "Boss Slayer",
+        "color": "#ff4d4f",
+        "theme": "crimson",
+        "skills": 10
+      },
+      "UNIQUE": {
+        "name": "UNIQUE",
+        "title": "Tech Support",
+        "color": "#74b9ff",
+        "theme": "tech",
+        "skills": 10
+      },
+      "MISSY": {
+        "name": "MISSY",
+        "title": "Cat Angel",
+        "color": "#ff69b4",
+        "theme": "magical",
+        "skills": 10
+      }
+    },
+    "vfxSettings": {
+      "projectiles": {
+        "xwave": { "color": "#ff6b6b", "lifetime": 2500 },
+        "plasma": { "color": "#00ffff", "lifetime": 2000 },
+        "bullet": { "color": "#ffd700", "lifetime": 2200 }
+      },
+      "enhanced": {
+        "s3": { "effect": "glow", "intensity": 1.2 },
+        "s4": { "effect": "pulse", "intensity": 1.5 },
+        "s5": { "effect": "aura", "intensity": 1.8 }
+      }
+    },
+    "initialization": {
+      "manifestShimming": true,
+      "assetManifestUrl": "asset_manifest.json",
+      "arcadeManifestUrl": "arcade-manifest.json",
+      "skillsSourceUrl": "data/skills-data.json"
+    },
+    "performance": {
+      "offlineOptimizations": true,
+      "inlineCSS": true,
+      "manifestCaching": true,
+      "fetchOverride": true
+    }
+  },
+  "arcadeManifest": {
+    "name": "A1K Arcade System",
+    "version": "1.0.0",
+    "description": "Production-ready arcade betting system with 5 games: Slots, Rock Paper Scissors, Dice Duel, Color Wheel, and High-Low Card",
+    "author": "A1K Game Systems",
+    "license": "MIT",
+    "files": {
+      "core": {
+        "path": "js/arcade-core.js",
+        "type": "javascript",
+        "description": "Core arcade system integration module",
+        "required": true,
+        "dependencies": []
+      },
+      "games": {
+        "path": "js/arcade-games.js",
+        "type": "javascript",
+        "description": "All 5 betting games implementation",
+        "required": true,
+        "dependencies": ["core"]
+      },
+      "styles": {
+        "path": "css/arcade.css",
+        "type": "stylesheet",
+        "description": "Complete styling for arcade games",
+        "required": true,
+        "dependencies": []
+      }
+    },
+    "games": [
+      {
+        "id": "slots",
+        "name": "Slot Machine",
+        "icon": "🎰",
+        "maxBet": 20000,
+        "maxWin": 2000000,
+        "multipliers": {
+          "jackpot": 100,
+          "three_match": [50, 30, 20, 15, 10],
+          "two_match": 2
+        }
+      },
+      {
+        "id": "rps",
+        "name": "Rock Paper Scissors",
+        "icon": "✊✋✌️",
+        "maxBet": 20000,
+        "maxWin": 40000,
+        "multipliers": {
+          "win": 2,
+          "tie": 1
+        }
+      },
+      {
+        "id": "dice",
+        "name": "Dice Duel",
+        "icon": "🎲",
+        "maxBet": 20000,
+        "maxWin": 60000,
+        "multipliers": {
+          "win": 3,
+          "tie": 1
+        }
+      },
+      {
+        "id": "wheel",
+        "name": "Color Wheel",
+        "icon": "🎡",
+        "maxBet": 20000,
+        "maxWin": 100000,
+        "multipliers": {
+          "match": 5
+        }
+      },
+      {
+        "id": "highlow",
+        "name": "High-Low Card",
+        "icon": "🃏",
+        "maxBet": 20000,
+        "maxWin": 160000,
+        "multipliers": {
+          "streak": "2^n",
+          "maxStreak": 4
+        }
+      }
+    ],
+    "integration": {
+      "requires": [
+        "window.BagSystem",
+        "window.gameState"
+      ],
+      "methods": [
+        "window.ArcadeSystem.init(bagSystem)",
+        "bagSystem.renderArcadeSubtab(container)"
+      ],
+      "dependencies": {
+        "BagSystem": "Required for integration",
+        "gameState.gold": "Required for betting system"
+      }
+    },
+    "features": [
+      "5 Complete Betting Games",
+      "Bet amounts: 100 - 20,000 gold",
+      "Win amounts: Up to 2,000,000 gold",
+      "Animated game displays",
+      "Real-time gold updates",
+      "Toast notifications",
+      "Responsive design",
+      "Production-ready code"
+    ],
+    "changelog": {
+      "1.0.0": [
+        "Initial release",
+        "5 betting games implemented",
+        "Complete CSS styling",
+        "Production-ready integration"
+      ]
+    }
+  }
+}
