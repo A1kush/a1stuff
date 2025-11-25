@@ -1,0 +1,6 @@
+{
+  "debugOverlay": true,
+  "missionBoard": true,
+  "missionTelemetry": true,
+  "inlineLoader": true
+}

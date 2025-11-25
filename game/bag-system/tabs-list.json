@@ -1,0 +1,300 @@
+{
+  "summary": {
+    "totalUniqueTabs": 20,
+    "tabsInDefinitions": 20,
+    "tabsInArray": 16,
+    "tabsInManifest": 9,
+    "rendererFunctions": 20
+  },
+  "tabDefinitions": [
+    {
+      "id": "items",
+      "label": "Items",
+      "icon": "📦",
+      "enabled": true,
+      "renderer": "renderItemsTab",
+      "order": 1
+    },
+    {
+      "id": "gear",
+      "label": "Gear",
+      "icon": "⚔️",
+      "enabled": true,
+      "renderer": "renderGearTab",
+      "order": 2
+    },
+    {
+      "id": "team",
+      "label": "Team",
+      "icon": "👥",
+      "enabled": true,
+      "renderer": "renderTeamTab",
+      "order": 3
+    },
+    {
+      "id": "pets",
+      "label": "Pets",
+      "icon": "🐾",
+      "enabled": true,
+      "renderer": "renderPetsTab",
+      "order": 4
+    },
+    {
+      "id": "skins",
+      "label": "Player",
+      "icon": "👤",
+      "enabled": true,
+      "renderer": "renderSkinsTab",
+      "order": 5
+    },
+    {
+      "id": "talents",
+      "label": "Talents",
+      "icon": "⭐",
+      "enabled": true,
+      "renderer": "renderTalentsTab",
+      "order": 6
+    },
+    {
+      "id": "vehicles",
+      "label": "Vehicles",
+      "icon": "🚗",
+      "enabled": true,
+      "renderer": "renderVehiclesTab",
+      "order": 7
+    },
+    {
+      "id": "ai",
+      "label": "AI",
+      "icon": "🤖",
+      "enabled": true,
+      "renderer": "renderAITab",
+      "order": 8
+    },
+    {
+      "id": "alchemy",
+      "label": "Alchemy",
+      "icon": "⚗️",
+      "enabled": true,
+      "renderer": "renderAlchemyTab",
+      "order": 9
+    },
+    {
+      "id": "skills",
+      "label": "Skills",
+      "icon": "🔰",
+      "enabled": true,
+      "renderer": "renderSkillsTab",
+      "order": 10
+    },
+    {
+      "id": "spirit",
+      "label": "Spirit",
+      "icon": "✨",
+      "enabled": true,
+      "renderer": "renderSpiritTab",
+      "order": 11
+    },
+    {
+      "id": "supernatural",
+      "label": "Supernatural",
+      "icon": "🔮",
+      "enabled": true,
+      "renderer": "renderSupernaturalTab",
+      "order": 12
+    },
+    {
+      "id": "quests",
+      "label": "Quests",
+      "icon": "📜",
+      "enabled": true,
+      "renderer": "renderQuestsTab",
+      "order": 13
+    },
+    {
+      "id": "drops",
+      "label": "Drop Systems",
+      "icon": "🎁",
+      "enabled": true,
+      "renderer": "renderDropSystemsTab",
+      "order": 14
+    },
+    {
+      "id": "bestiary",
+      "label": "Bestiary",
+      "icon": "📖",
+      "enabled": true,
+      "renderer": "renderBestiaryTab",
+      "order": 15
+    },
+    {
+      "id": "missions",
+      "label": "Mission Board",
+      "icon": "🗺️",
+      "enabled": true,
+      "renderer": "renderMissionBoardTab",
+      "order": 16
+    },
+    {
+      "id": "map",
+      "label": "Map",
+      "icon": "🗺️",
+      "enabled": true,
+      "renderer": "renderMapTab",
+      "order": 17
+    },
+    {
+      "id": "shop",
+      "label": "Shop",
+      "icon": "🏪",
+      "enabled": true,
+      "renderer": "renderShopTab",
+      "order": 18
+    },
+    {
+      "id": "settings",
+      "label": "Settings",
+      "icon": "⚙️",
+      "enabled": true,
+      "renderer": "renderSettingsTab",
+      "order": 19
+    },
+    {
+      "id": "controls",
+      "label": "Controls",
+      "icon": "🕹️",
+      "enabled": true,
+      "renderer": "renderControlsTab",
+      "order": 20
+    }
+  ],
+  "tabsArray": [
+    "items",
+    "gear",
+    "team",
+    "pets",
+    "skins",
+    "talents",
+    "vehicles",
+    "ai",
+    "alchemy",
+    "skills",
+    "spirit",
+    "supernatural",
+    "quests",
+    "map",
+    "shop",
+    "settings"
+  ],
+  "manifestTabs": [
+    {
+      "id": "items",
+      "label": "Items",
+      "renderer": "renderItemsTab",
+      "order": 1
+    },
+    {
+      "id": "gear",
+      "label": "Gear",
+      "renderer": "renderGearTab",
+      "order": 2
+    },
+    {
+      "id": "team",
+      "label": "Team",
+      "renderer": "renderTeamTab",
+      "order": 3
+    },
+    {
+      "id": "pets",
+      "label": "Pets",
+      "renderer": "renderPetsTab",
+      "order": 4
+    },
+    {
+      "id": "skins",
+      "label": "Skins",
+      "renderer": "renderSkinsTab",
+      "order": 5
+    },
+    {
+      "id": "talents",
+      "label": "Talents",
+      "renderer": "renderTalentsTab",
+      "order": 6
+    },
+    {
+      "id": "vehicles",
+      "label": "Vehicles",
+      "renderer": "renderVehiclesTab",
+      "order": 7
+    },
+    {
+      "id": "ai",
+      "label": "AI",
+      "renderer": "renderAITab",
+      "order": 8
+    },
+    {
+      "id": "alchemy",
+      "label": "Alchemy",
+      "renderer": "renderAlchemyTab",
+      "order": 9
+    }
+  ],
+  "rendererFunctions": [
+    "renderControlsTab",
+    "renderItemsTab",
+    "renderGearTab",
+    "renderShopTab",
+    "renderTalentsTab",
+    "renderPetsTab",
+    "renderSkinsTab",
+    "renderVehiclesTab",
+    "renderAITab",
+    "renderTeamTab",
+    "renderSkillsTab",
+    "renderAlchemyTab",
+    "renderSpiritTab",
+    "renderSupernaturalTab",
+    "renderQuestsTab",
+    "renderDropSystemsTab",
+    "renderBestiaryTab",
+    "renderMissionBoardTab",
+    "renderMapTab",
+    "renderSettingsTab"
+  ],
+  "allTabIds": [
+    "ai",
+    "alchemy",
+    "bestiary",
+    "controls",
+    "drops",
+    "gear",
+    "items",
+    "map",
+    "missions",
+    "pets",
+    "quests",
+    "settings",
+    "shop",
+    "skills",
+    "skins",
+    "spirit",
+    "supernatural",
+    "talents",
+    "team",
+    "vehicles"
+  ],
+  "differences": {
+    "inDefinitionsNotInArray": [
+      "drops",
+      "bestiary",
+      "missions",
+      "controls"
+    ],
+    "inArrayNotInDefinitions": [],
+    "inManifestNotInDefinitions": []
+  },
+  "generatedAt": "2025-11-22T21:28:51.166Z"
+}
