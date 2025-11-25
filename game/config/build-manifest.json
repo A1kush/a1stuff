@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "generatedAt": "2025-11-25T08:45:00Z",
+  "stages": [
+    "boot",
+    "systems",
+    "ui",
+    "telemetry"
+  ],
+  "modules": [
+    {
+      "id": "state-bus",
+      "label": "Global Event Bus",
+      "type": "script",
+      "path": "./js/state-bus.js",
+      "stage": "boot",
+      "dependsOn": [],
+      "segments": [
+        "system.bus"
+      ]
+    },
+    {
+      "id": "config-bridge",
+      "label": "Runtime Config Bridge",
+      "type": "config",
+      "path": "./config/config.js",
+      "stage": "boot",
+      "dependsOn": [
+        "state-bus"
+      ],
+      "segments": [
+        "config.runtime"
+      ]
+    },
+    {
+      "id": "debug-profiler",
+      "label": "Debug Overlay & Profiler",
+      "type": "script",
+      "path": "./js/debug/profiler.js",
+      "stage": "telemetry",
+      "dependsOn": [
+        "state-bus"
+      ],
+      "segments": [
+        "debug.overlay",
+        "hud.core"
+      ]
+    }
+  ],
+  "legacySegments": [
+    {
+      "id": "core.engine",
+      "path": "inline://core.engine",
+      "note": "Large inline module – pending extraction."
+    },
+    {
+      "id": "combat.engine",
+      "path": "inline://combat.engine",
+      "note": "Rounded for loader scheduling once externalized."
+    },
+    {
+      "id": "inventory.bridge",
+      "path": "inline://inventory.bridge",
+      "note": "Bag bridge still inline."
+    }
+  ]
+}
